@@ -1,25 +1,22 @@
-import type { FabricKey } from "../data/fabrics";
 import type { Design, DesignRules } from "../lib/custom";
 import { useShop } from "../state/ShopContext";
 import { Dimension } from "./FloorPlanDrawing";
+import { findSwatch } from "../data/fabrics";
 
 // Space around the piece for the dimension lines, and the thickness of arms and back, in centimetres.
 const MARGIN = 62;
 const ARM = 20;
 const BACK = 22;
 const GAP = 4;
-// One neutral upholstery tone: the real colour is the code the visitor typed, shown in the photos.
+// A neutral upholstery tone until the visitor picks a fabric colour.
 const FABRIC_TONE = "#cdbfa8";
 
-// A light texture over the colour, so velvet, bouclé, linen and leather look different.
-function Texture({ fabric }: { fabric: FabricKey }) {
+// A soft light-and-shade over the fabric tone, so the cushions look upholstered.
+function Texture() {
   return (
     <defs>
-      <pattern id="weave-boucle" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r="1.6" /><circle cx="7" cy="6.5" r="1.4" /></pattern>
-      <pattern id="weave-linen" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 3H6M3 0V6" strokeWidth="0.7" /></pattern>
-      <linearGradient id="weave-velvet" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff" stopOpacity=".28" /><stop offset=".5" stopColor="#fff" stopOpacity="0" /><stop offset="1" stopColor="#000" stopOpacity=".16" /></linearGradient>
-      <linearGradient id="weave-leather" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#fff" stopOpacity=".34" /><stop offset=".35" stopColor="#fff" stopOpacity="0" /></linearGradient>
-      <style>{`.design-piece .weave { fill: url(#weave-${fabric}); }`}</style>
+      <linearGradient id="weave" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#fff" stopOpacity=".28" /><stop offset=".5" stopColor="#fff" stopOpacity="0" /><stop offset="1" stopColor="#000" stopOpacity=".16" /></linearGradient>
+      <style>{".design-piece .weave { fill: url(#weave); }"}</style>
     </defs>
   );
 }
@@ -60,8 +57,8 @@ export function DesignDrawing({ design, rules, outline = false, dimensions = tru
 
   return (
     <svg className={outline ? "design-drawing outline" : "design-drawing"} viewBox={`${-margin} ${-margin} ${width + margin * 2} ${height + margin * (dimensions ? 1.6 : 2)}`} role="img" aria-label={`${width} × ${depth} ${t.cm}`}>
-      {!outline && <Texture fabric={design.fabric} />}
-      <g className="design-piece" style={{ fill: outline ? "#fff" : FABRIC_TONE }}>
+      {!outline && <Texture />}
+      <g className="design-piece" style={{ fill: outline ? "#fff" : findSwatch(design.colorCode)?.swatch.color ?? FABRIC_TONE }}>
         <Block x={0} y={0} width={width} height={depth} radius={14} />
         {hasChaise && <Block x={chaiseX} y={0} width={chaiseWidth} height={chaiseLength} radius={14} />}
         {isBed ? (

@@ -28,5 +28,5 @@ Vite + React 19 + TypeScript, plain CSS, three.js. Hebrew (RTL) and English.
 
 ## Open items
 - Google reviews widget: needs the embed code or business link.
-- Fabric, size ranges, firmness and prices per product are placeholders; most product descriptions are missing.
+- Product descriptions and specs (he + en) are in `src/data/details.json`, read from betak.co.il; 2054 (Kiara table set) has none because its page is empty. The configurator's size ranges and the sample fabric list in `fabrics.ts` are still generic.
 - Domain move: betak.co.il is managed by 2all; DNS has to point here (keep the MX records for email).

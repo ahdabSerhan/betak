@@ -1,8 +1,8 @@
-// "Make it yours": the sizes, seat division and fabric a visitor may choose for an upholstered piece.
+// "Make it yours": the sizes, seat division and fabric colour code a visitor may choose for an upholstered piece.
 import type { Product, ProductType } from "../data/catalog";
-import { fabricOf, FABRICS, type FabricKey } from "../data/fabrics";
-import type { Lang } from "../i18n/text";
 import { footprint } from "./measure";
+import { swatchLabel } from "../data/fabrics";
+import type { Lang } from "../i18n/text";
 
 export type Side = "left" | "right";
 export type Firmness = "soft" | "medium" | "firm";
@@ -17,8 +17,7 @@ export interface Design {
   chaiseSide: Side;
   chaiseLength: number;
   chaiseDepth: number;
-  fabric: FabricKey;
-  // The fabric colour code the visitor read off the product photos; empty until they type one.
+  // The fabric colour code the visitor picked in the fabric step (e.g. "REEF-4601"); empty until they pick one.
   colorCode: string;
   firmness: Firmness;
 }
@@ -76,7 +75,6 @@ export function standardDesign(product: Product, rules: DesignRules): Design {
     chaiseSide: "right",
     chaiseLength: rules.chaise ? within(typical.depth, rules.chaise) : 0,
     chaiseDepth: rules.chaise ? nearest(100, rules.depths) : 0,
-    fabric: FABRICS[0].key,
     colorCode: "",
     firmness: "medium",
   };
@@ -94,33 +92,30 @@ export const SHOW_SEATS = false;
 // The colour code as the store should read it: trimmed, inner spaces removed, upper case ("" when not given).
 export const cleanColorCode = (design: Design) => design.colorCode.replace(/\s+/g, "").toUpperCase();
 
-// A short code the store can read the whole design from, e.g. "sh91030-280x100-3-R200x100-VEL(1203)-M".
+// A short code the store can read the whole design from, e.g. "sh91030-280x100-3-R200x100-F(1203)-M".
 export function designCode(product: Product, design: Design): string {
   const size = `${design.width}x${design.depth}`;
   // Chaise: side (R/L), then length x depth.
   const chaise = design.chaiseLength > 0 && `${design.chaiseSide[0].toUpperCase()}${design.chaiseLength}x${design.chaiseDepth}`;
-  // Fabric, then the colour code in brackets when there is one.
-  const fabric = design.fabric.slice(0, 3).toUpperCase();
+  // The fabric colour code, marked F, when the visitor picked one.
   const color = cleanColorCode(design);
-  return [product.sku ?? product.id, size, design.seats || null, chaise, color ? `${fabric}(${color})` : fabric, design.firmness[0].toUpperCase()].filter(Boolean).join("-");
+  return [product.sku ?? product.id, size, design.seats || null, chaise, color && `F(${color})`, design.firmness[0].toUpperCase()].filter(Boolean).join("-");
 }
 
 interface DesignWords {
   cm: string;
-  colorCode: string;
+  fabricLabel: string;
   firmness: Record<Firmness, string>;
   seatsCount: (seats: number) => string;
   chaiseOn: (side: Side, length: number, depth: number) => string;
 }
 
-// The fabric and its colour code as text, e.g. "Velvet · colour code 1203" (just "Velvet" without a code).
-export function fabricText(design: Design, words: Pick<DesignWords, "colorCode">, lang: Lang): string {
-  const code = cleanColorCode(design);
-  const name = fabricOf(design.fabric).name[lang];
-  return code ? `${name} · ${words.colorCode} ${code}` : name;
+// The chosen fabric as text, e.g. "Fabric: Flamingo 2409" (null when not chosen yet).
+export function fabricText(design: Design, words: Pick<DesignWords, "fabricLabel">, lang: Lang): string | null {
+  return design.colorCode ? `${words.fabricLabel}: ${swatchLabel(design.colorCode, lang)}` : null;
 }
 
-// One line for the cart and the WhatsApp order, e.g. "250 × 95 cm · 3 seats · Velvet · colour code 1203".
+// One line for the cart and the WhatsApp order, e.g. "250 × 95 cm · 3 seats · Fabric: REEF-4601".
 export function describeDesign(design: Design, rules: DesignRules, words: DesignWords, lang: Lang): string {
   return [
     `${design.width} × ${design.depth} ${words.cm}`,

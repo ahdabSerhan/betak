@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useShop } from "../state/ShopContext";
 
 interface DialogProps {
@@ -8,7 +9,8 @@ interface DialogProps {
   children: ReactNode;
 }
 
-// Centered modal; closes on Escape or a click on the backdrop.
+// Centered modal; closes on Escape or a click on the backdrop. It is drawn at the end of <body>,
+// so a parent's stacking (a sticky column, an animation) cannot put page bars on top of it.
 export function Dialog({ label, onClose, narrow, children }: DialogProps) {
   const { t } = useShop();
 
@@ -18,7 +20,7 @@ export function Dialog({ label, onClose, narrow, children }: DialogProps) {
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  return (
+  return createPortal(
     <>
       <div className="scrim" />
       <div className="modal" onClick={(event) => event.target === event.currentTarget && onClose()}>
@@ -27,6 +29,7 @@ export function Dialog({ label, onClose, narrow, children }: DialogProps) {
           {children}
         </div>
       </div>
-    </>
+    </>,
+    document.body,
   );
 }

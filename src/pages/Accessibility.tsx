@@ -1,10 +1,11 @@
 import { ACCESSIBILITY, type Statement } from "../data/accessibility";
 import { PRIVACY } from "../data/privacy";
+import { SHIPPING } from "../data/shipping";
 import { TERMS } from "../data/terms";
 import type { Lang } from "../i18n/text";
 import { useShop } from "../state/ShopContext";
 
-// A page of legal text: the accessibility statement, the terms of use or the privacy policy.
+// A page of policy text: the accessibility statement, terms of use, shipping policy or privacy policy.
 function StatementPage({ statements }: { statements: Record<Lang, Statement> }) {
   const { lang } = useShop();
   const statement = statements[lang];
@@ -26,4 +27,5 @@ function StatementPage({ statements }: { statements: Record<Lang, Statement> }) 
 
 export const Accessibility = () => <StatementPage statements={ACCESSIBILITY} />;
 export const Terms = () => <StatementPage statements={TERMS} />;
+export const Shipping = () => <StatementPage statements={SHIPPING} />;
 export const Privacy = () => <StatementPage statements={PRIVACY} />;

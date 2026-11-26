@@ -12,7 +12,7 @@ import { productFromRoute } from "./lib/routes";
 import { esentrixEnabled } from "./lib/esentrix";
 import { About } from "./pages/About";
 import { AdminOrders } from "./pages/AdminOrders";
-import { Accessibility, Privacy, Terms } from "./pages/Accessibility";
+import { Accessibility, Privacy, Shipping, Terms } from "./pages/Accessibility";
 import { CategoryPage } from "./pages/CategoryPage";
 import { Contact } from "./pages/Contact";
 import { Designer } from "./pages/Designer";
@@ -34,6 +34,7 @@ function Page({ route }: { route: string }) {
   if (route === "accessibility") return <Accessibility />;
   if (route === "terms") return <Terms />;
   if (route === "privacy") return <Privacy />;
+  if (route === "shipping") return <Shipping />;
   return <Home />;
 }
 
@@ -58,7 +59,7 @@ export function App() {
 
   useEffect(() => {
     // Pages without a product or category are named by their menu label.
-    const pageName: Record<string, string> = { designer: t.designer, saved: t.saved, about: t.about, contact: t.contact, accessibility: t.accessibility, terms: t.terms, privacy: t.privacy, admin: t.admin.title };
+    const pageName: Record<string, string> = { designer: t.designer, saved: t.saved, about: t.about, contact: t.contact, accessibility: t.accessibility, terms: t.terms, privacy: t.privacy, shipping: t.shipping, admin: t.admin.title };
     document.title = route === "home" ? t.homeTitle : titleOf(product ? nameOf(product) : category?.h1[lang] ?? pageName[route], t.brandTitle);
   }, [route, product, category, lang, nameOf, t]);
 

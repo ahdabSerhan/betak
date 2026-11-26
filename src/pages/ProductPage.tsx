@@ -6,7 +6,6 @@ import { ReviewBelt } from "../components/ReviewBelt";
 import { ReviewForm } from "../components/ReviewForm";
 import { CATEGORIES, isOnSale, PRODUCTS, productsIn, type Product } from "../data/catalog";
 import { detailsOf, POLICIES, reviewsOf, type Review } from "../data/details";
-import { fabricOf } from "../data/fabrics";
 import { modelOf } from "../data/models";
 import { GOOGLE_REVIEWS_URL } from "../data/reviewLinks";
 import { fabricText, rulesFor, standardDesign, type Design, type DesignRules } from "../lib/custom";
@@ -64,12 +63,11 @@ function Gallery({ photos: allPhotos, title, badge }: { photos: string[]; title:
 // The visitor's own version of the piece: a measured drawing in the chosen fabric.
 function DesignSheet({ design, rules, summary }: { design: Design; rules: DesignRules; summary: string }) {
   const { t, lang } = useShop();
-  const fabric = fabricOf(design.fabric);
   return (
     <div className="design-sheet">
       <DesignDrawing design={design} rules={rules} />
       <div className="design-fabric">
-        <div><b>{fabricText(design, t, lang)}</b><small className="muted">{fabric.feel[lang]}</small></div>
+        <b>{fabricText(design, t, lang) ?? `${t.fabricLabel}: ${t.colorCodeMissing}`}</b>
         <span className="muted">{summary}</span>
       </div>
     </div>
@@ -111,7 +109,7 @@ export function ProductPage({ product }: { product: Product }) {
   const design = rules && { ...standardDesign(product, rules), ...designs[product.id] };
   const summary = designNote(product);
   const category = CATEGORIES.find((item) => item.id === product.category)!;
-  const details = detailsOf(product);
+  const details = detailsOf(product, lang);
   const reviews = reviewsOf(product);
   const title = nameOf(product);
   const saved = isSaved(product.id);
@@ -122,8 +120,6 @@ export function ProductPage({ product }: { product: Product }) {
     setDesign(product.id, next);
     setView("design");
   };
-  // The store's descriptions are written in Hebrew, so they show on the Hebrew site.
-  const showDescription = lang === "he" && details.paragraphs.length > 0;
 
   const addAndShowCart = () => {
     addToCart(product.id, quantity);
@@ -193,16 +189,16 @@ export function ProductPage({ product }: { product: Product }) {
             {reviews.length > 0 && <a className="review-link" href="#reviews" onClick={(event) => { event.preventDefault(); document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth" }); }}>{t.reviewsCount(reviews.length)}</a>}
           </div>
 
-          {showDescription ? details.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>) : <p className="muted">{t.intro}</p>}
+          {details.paragraphs.length > 0 ? details.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>) : <p className="muted">{t.intro}</p>}
 
-          {lang === "he" && details.specs.length > 0 && (
+          {details.specs.length > 0 && (
             <ul className="specs" aria-label={t.sizesTitle}>
               {details.specs.map((spec) => <li key={spec}>{spec}</li>)}
             </ul>
           )}
 
           {rules && design && (
-            <Configurator design={design} rules={rules} onChange={changeDesign} onReset={() => { setDesign(product.id, null); setView("photos"); }} key={product.id} />
+            <Configurator product={product} design={design} rules={rules} onChange={changeDesign} onReset={() => { setDesign(product.id, null); setView("photos"); }} key={product.id} />
           )}
 
           {buyRow}

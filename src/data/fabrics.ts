@@ -1,20 +1,55 @@
-// Upholstery fabrics offered in the product configurator; the visitor types the colour code from the product photos.
-// SAMPLE LIST: replace with Betak's real fabric catalogue before launch.
+// The store's fabric catalogs, cut out of the fabric charts photographed on betak.co.il (scripts/fabric-swatches.py).
+import type { Product } from "./catalog";
+import raw from "./fabrics.json";
+import { asset } from "../lib/asset";
 import type { Lang } from "../i18n/text";
 
-export type FabricKey = "velvet" | "boucle" | "linen" | "leather";
-
-export interface Fabric {
-  key: FabricKey;
-  name: Record<Lang, string>;
-  feel: Record<Lang, string>;
+export interface Swatch {
+  // The code printed next to the colour on the chart, e.g. "REEF-4601" or "Flamingo 2409".
+  code: string;
+  file: string;
+  // The swatch's typical colour, used to tint the sofa preview.
+  color: string;
 }
 
-export const FABRICS: Fabric[] = [
-  { key: "velvet", name: { he: "קטיפה", en: "Velvet" }, feel: { he: "מגע רך ומבריק", en: "Soft, with a gentle sheen" } },
-  { key: "boucle", name: { he: "בוקלה", en: "Bouclé" }, feel: { he: "מרקם לולאות חמים", en: "Warm, looped texture" } },
-  { key: "linen", name: { he: "אריג", en: "Woven linen" }, feel: { he: "אריגה טבעית ונושמת", en: "Natural, breathable weave" } },
-  { key: "leather", name: { he: "דמוי עור", en: "Faux leather" }, feel: { he: "חלק וקל לניקוי", en: "Smooth and easy to clean" } },
-];
+export interface FabricCatalog {
+  id: string;
+  name: { he: string; en: string };
+  swatches: Swatch[];
+}
 
-export const fabricOf = (key: FabricKey) => FABRICS.find((fabric) => fabric.key === key) ?? FABRICS[0];
+export const FABRIC_CATALOGS: FabricCatalog[] = raw.catalogs;
+const BY_PRODUCT: Record<string, string[] | undefined> = raw.products;
+// Products with a sharp cut-out for the preview; true when it also has a mask of the props standing in it.
+const PREVIEWS: Record<string, boolean | undefined> = raw.previews;
+
+// The catalogs pictured in this product's gallery; all of them when its gallery shows none.
+export function catalogsFor(product: Product): FabricCatalog[] {
+  const ids = BY_PRODUCT[product.id];
+  return ids ? FABRIC_CATALOGS.filter((catalog) => ids.includes(catalog.id)) : FABRIC_CATALOGS;
+}
+
+export const swatchImage = (swatch: Swatch) => asset(`img/fabrics/${swatch.file}`);
+
+// The picture for the fabric preview, and a mask of its props (tables, vases, plants), which stay uncoloured.
+export function previewOf(product: Product): { photo: string; props: string | null } | null {
+  const hasProps = PREVIEWS[product.id];
+  if (hasProps === undefined) return null;
+  return { photo: asset(`img/fabric-preview/f${product.id}.webp`), props: hasProps ? asset(`img/fabric-preview/p${product.id}.png`) : null };
+}
+
+// The catalog and swatch for a colour code, or null for a code typed by hand that is not in any catalog.
+export function findSwatch(code: string): { catalog: FabricCatalog; swatch: Swatch } | null {
+  for (const catalog of FABRIC_CATALOGS) {
+    const swatch = catalog.swatches.find((item) => item.code === code);
+    if (swatch) return { catalog, swatch };
+  }
+  return null;
+}
+
+// The code as the visitor reads it: catalogs that print plain numbers get their name in front ("Dream" style codes already carry the name).
+export function swatchLabel(code: string, lang: Lang): string {
+  const found = findSwatch(code);
+  if (!found || /\D/.test(code)) return code;
+  return `${found.catalog.name[lang]} · #${code}`;
+}
