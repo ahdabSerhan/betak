@@ -85,6 +85,9 @@ export function withWidth(design: Design, rules: DesignRules, width: number): De
   return { ...design, width, seats: seats.length === 0 || seats.includes(design.seats) ? design.seats : nearest(design.seats, seats) };
 }
 
+// The seats step (חלוקת מושבים) is hidden for now; set to true to bring it back everywhere.
+export const SHOW_SEATS = false;
+
 // A short code the store can read the whole design from, e.g. "sh91030-280x100-3-VEL-cream-M".
 export function designCode(product: Product, design: Design): string {
   const size = `${design.width}x${design.depth}`;
@@ -103,7 +106,7 @@ export function describeDesign(design: Design, rules: DesignRules, words: Design
   const fabric = fabricOf(design.fabric);
   return [
     `${design.width} × ${design.depth} ${words.cm}`,
-    design.seats > 0 && words.seatsCount(design.seats),
+    SHOW_SEATS && design.seats > 0 && words.seatsCount(design.seats),
     rules.chaise && words.chaiseOn(design.chaiseSide, design.chaiseLength),
     `${fabric.name[lang]} / ${colorOf(fabric, design.color).name[lang]}`,
     words.firmness[design.firmness],
