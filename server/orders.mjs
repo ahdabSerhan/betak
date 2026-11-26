@@ -9,29 +9,45 @@ const COMMIT_ATTEMPTS = 4;
 
 const text = (value, max) => (typeof value === "string" ? value.trim().slice(0, max) : "");
 
+const ADDRESS_FIELDS = { city: 60, street: 80, house: 10, entrance: 10, floor: 10, apartment: 10, entryCode: 20, zip: 10 };
+
 // The order as the store keeps it, or an error message when something required is missing.
-export function cleanOrder(input) {
-  const name = text(input?.name, 80);
+// priceOf gives the catalog price of a product, so prices never come from the browser.
+export function cleanOrder(input, priceOf) {
+  const firstName = text(input?.firstName, 40);
+  const lastName = text(input?.lastName, 40);
   const phone = text(input?.phone, 30);
+  const phone2 = text(input?.phone2, 30);
   const email = text(input?.email, 120);
   const note = text(input?.note, 1000);
-  const lines = (Array.isArray(input?.lines) ? input.lines : []).slice(0, 50).map((line) => ({
-    productId: Number.isInteger(line?.productId) ? line.productId : 0,
-    name: text(line?.name, 200),
-    sku: text(line?.sku, 40),
-    design: text(line?.design, 500),
-    quantity: Math.min(99, Math.max(1, Math.trunc(Number(line?.quantity) || 1))),
-    price: Math.max(0, Number(line?.price) || 0),
-  })).filter((line) => line.name);
+  const address = Object.fromEntries(Object.entries(ADDRESS_FIELDS).map(([key, max]) => [key, text(input?.address?.[key], max)]));
+  const elevator = ["yes", "no"].includes(input?.elevator) ? input.elevator : "";
+  const payWith = input?.payWith === "card" ? "card" : "phone";
+  const lines = (Array.isArray(input?.lines) ? input.lines : []).slice(0, 50).map((line) => {
+    const productId = Number.isInteger(line?.productId) ? line.productId : 0;
+    return {
+      productId,
+      name: text(line?.name, 200),
+      sku: text(line?.sku, 40),
+      design: text(line?.design, 500),
+      quantity: Math.min(99, Math.max(1, Math.trunc(Number(line?.quantity) || 1))),
+      price: priceOf ? priceOf(productId) : Math.max(0, Number(line?.price) || 0),
+    };
+  });
 
-  if (name.length < 2) return { error: "name" };
+  if (firstName.length < 2 || lastName.length < 2) return { error: "name" };
   if (phone.replace(/\D/g, "").length < 9) return { error: "phone" };
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "email" };
-  if (lines.length === 0) return { error: "lines" };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "email" };
+  if (address.city.length < 2 || address.street.length < 2) return { error: "address" };
+  if (!elevator) return { error: "elevator" };
+  if (lines.length === 0 || lines.some((line) => !line.name || line.price === undefined)) return { error: "lines" };
 
-  // The total is worked out here, not taken from the browser.
+  // The total is worked out here from the catalog prices.
   const total = lines.reduce((sum, line) => sum + line.price * line.quantity, 0);
-  return { order: { name, phone, email, note, lines, total, lang: input?.lang === "en" ? "en" : "he", source: "site", read: false } };
+  const name = `${firstName} ${lastName}`;
+  return {
+    order: { name, firstName, lastName, phone, phone2, email, address, elevator, payWith, note, lines, total, lang: input?.lang === "en" ? "en" : "he", source: "site", read: false },
+  };
 }
 
 // --- Firestore values <-> plain values ----------------------------------------------------------
@@ -113,6 +129,16 @@ function firestoreStore({ getToken, getProject }) {
       return rows.filter((row) => row.document).map(({ document }) => ({ ...fromFields(document.fields), id: document.name.split("/").pop() }));
     },
 
+    async get(id) {
+      const document = await call(`/orders/${encodeURIComponent(id)}`);
+      return document && { ...fromFields(document.fields), id };
+    },
+
+    // Only the payment part changes, so the rest of the order is never overwritten.
+    async setPayment(id, payment) {
+      await call(`/orders/${encodeURIComponent(id)}?updateMask.fieldPaths=payment&currentDocument.exists=true`, { method: "PATCH", body: { fields: toFields({ payment }) } });
+    },
+
     async setRead(id, read) {
       await call(`/orders/${encodeURIComponent(id)}?updateMask.fieldPaths=read&currentDocument.exists=true`, { method: "PATCH", body: { fields: toFields({ read }) } });
     },
@@ -131,6 +157,13 @@ function memoryStore() {
     },
     async list() {
       return orders.slice(0, LIST_LIMIT);
+    },
+    async get(id) {
+      return orders.find((item) => item.id === id) ?? null;
+    },
+    async setPayment(id, payment) {
+      const order = orders.find((item) => item.id === id);
+      if (order) order.payment = payment;
     },
     async setRead(id, read) {
       const order = orders.find((item) => item.id === id);

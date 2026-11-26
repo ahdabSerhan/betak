@@ -24,6 +24,7 @@ interface Shop {
   cartLines: CartLine[];
   cartCount: number;
   cartTotal: number;
+  clearCart: () => void;
   addToCart: (productId: number, quantity?: number) => void;
   saved: number[];
   isSaved: (productId: number) => boolean;
@@ -82,6 +83,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     });
   }, [setCart]);
 
+  const clearCart = useCallback(() => setCart({}), [setCart]);
+
   const toggleSaved = useCallback((productId: number) => {
     setSaved((current) => (current.includes(productId) ? current.filter((id) => id !== productId) : [...current, productId]));
   }, [setSaved]);
@@ -100,6 +103,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       cartCount: cartLines.reduce((sum, line) => sum + line.quantity, 0),
       cartTotal: cartLines.reduce((sum, line) => sum + line.product.price * line.quantity, 0),
       addToCart,
+      clearCart,
       saved,
       isSaved: (productId) => saved.includes(productId),
       toggleSaved,
@@ -137,7 +141,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         navigate("designer");
       },
     };
-  }, [lang, cart, saved, cartOpen, agentOpen, agentPrompt, agentRoom, roomPhoto, designs, setDesigns, agentBrief, addToCart, toggleSaved, setLang]);
+  }, [lang, cart, saved, cartOpen, agentOpen, agentPrompt, agentRoom, roomPhoto, designs, setDesigns, agentBrief, addToCart, toggleSaved, setLang, clearCart]);
 
   return <ShopContext.Provider value={shop}>{children}</ShopContext.Provider>;
 }

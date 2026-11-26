@@ -142,8 +142,10 @@ const pages = [
 
 const indexed = pages.filter((page) => page.index);
 writeFileSync(join(DIST, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexed.map((page) => `  <url><loc>${page.url}</loc></url>`).join("\n")}\n</urlset>\n`);
-writeFileSync(join(DIST, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+writeFileSync(join(DIST, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\nDisallow: /paid\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 // The server uses this to send the old site's product addresses to the new ones.
+// Catalog prices for the server, which works out each order's total from them.
+writeFileSync(join(DIST, "prices.json"), JSON.stringify(Object.fromEntries(PRODUCTS.map((product) => [product.id, product.price]))));
 writeFileSync(join(DIST, "routes.json"), JSON.stringify(Object.fromEntries(PRODUCTS.map((product) => [product.id, pathOf(productRoute(product))]))));
 
 console.log(`Pre-built ${pages.length} pages (${indexed.length} in the sitemap) for ${SITE_URL}`);

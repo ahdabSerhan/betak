@@ -17,6 +17,7 @@ Vite + React 19 + TypeScript, plain CSS, three.js. Hebrew (RTL) and English.
 - `scripts/prerender.mjs` + `src/seo/entry.ts`: static pages with titles, meta, canonical and JSON-LD.
 - `server/server.mjs`: no-dependency Node server. `server/redirects.json` maps old betak.co.il addresses to new ones (301).
 - Orders: the cart form saves each order (`src/lib/orders.ts` → `POST /api/orders`, `server/orders.mjs`, Firestore) then opens WhatsApp. The private page `/admin/orders` (`src/pages/AdminOrders.tsx`) needs Google sign-in with an account in `ADMIN_EMAILS` (`server/admin-auth.mjs`). Setup in README.
+- Card payments: `server/upay.mjs` sends card orders to UPay's hosted payment page (`UPAY_EMAIL`, `UPAY_LIVE`); UPay reports back to `/api/upay/ipn`, the customer returns to `/paid`.
 - AI agent: `src/lib/agent.ts` calls `/api/designer`, which calls Gemini on Vertex AI (`GEMINI_MODEL`, default gemini-3.8-flash).
 - Room designer (`src/pages/Designer.tsx`, scene) and 3D showroom (`src/showroom`). AI-made 3D models in `public/models`.
 
@@ -29,4 +30,5 @@ Vite + React 19 + TypeScript, plain CSS, three.js. Hebrew (RTL) and English.
 ## Open items
 - Google reviews widget: needs the embed code or business link.
 - Product descriptions and specs (he + en) are in `src/data/details.json`, read from betak.co.il; 2054 (Kiara table set) has none because its page is empty. The configurator's size ranges and the sample fabric list in `fabrics.ts` are still generic.
+- UPay: their API isn't public; payment reports are not yet verified with UPay (needs their docs + API key).
 - Domain move: betak.co.il is managed by 2all; DNS has to point here (keep the MX records for email).
