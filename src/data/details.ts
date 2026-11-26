@@ -1,4 +1,4 @@
-// Descriptions and gallery photos collected from the product pages of betak.co.il (Hebrew).
+// Descriptions, specs and gallery photos collected from the product pages of betak.co.il.
 import type { Lang } from "../i18n/text";
 import type { Product } from "./catalog";
 import rawDetails from "./details.json";
@@ -7,14 +7,17 @@ import rawReviews from "./reviews.json";
 import rawPolicies from "./policies.json";
 import { asset } from "../lib/asset";
 
+// One product's text in both languages. `source` is the betak.co.il page it was read from.
 interface RawDetails {
-  description: string;
-  gallery: string[];
+  source?: string;
+  description: Record<Lang, string[]>;
+  specs: Record<Lang, string[]>;
+  gallery?: string[];
 }
 
 export interface ProductDetails {
   paragraphs: string[];
-  // Size lines such as "אורך: 200 ס"מ", shown as a spec list.
+  // Size, foam and fabric lines such as "Length: 200 cm", shown as a spec list.
   specs: string[];
   photos: string[];
 }
@@ -36,15 +39,10 @@ export const reviewsOf = (product: Product): Review[] => REVIEWS[product.id] ?? 
 
 // Every review with the id of the product it was written about, for the home page.
 export const ALL_REVIEWS = Object.entries(REVIEWS).flatMap(([productId, reviews]) => (reviews ?? []).map((review) => ({ ...review, productId: Number(productId) })));
-const SPECS_HEADING = /^מידות/;
-
-export function detailsOf(product: Product): ProductDetails {
+export function detailsOf(product: Product, lang: Lang = "he"): ProductDetails {
   const raw = DETAILS[product.id];
-  const lines = (raw?.description ?? "").split("\n").map((line) => line.trim()).filter(Boolean);
-  // Everything after the "מידות" (dimensions) heading is a spec line.
-  const heading = lines.findIndex((line) => SPECS_HEADING.test(line));
-  const paragraphs = heading === -1 ? lines : lines.slice(0, heading);
-  const specs = heading === -1 ? [] : lines.slice(heading + 1);
+  const paragraphs = raw?.description[lang] ?? [];
+  const specs = raw?.specs[lang] ?? [];
   const gallery = GALLERIES[product.id]?.map(storePhoto) ?? raw?.gallery ?? [];
   return { paragraphs, specs, photos: [product.image, ...gallery] };
 }
