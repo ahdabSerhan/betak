@@ -109,7 +109,7 @@ export function ProductPage({ product }: { product: Product }) {
   const design = rules && { ...standardDesign(product, rules), ...designs[product.id] };
   const summary = designNote(product);
   const category = CATEGORIES.find((item) => item.id === product.category)!;
-  const details = detailsOf(product);
+  const details = detailsOf(product, lang);
   const reviews = reviewsOf(product);
   const title = nameOf(product);
   const saved = isSaved(product.id);
@@ -120,8 +120,6 @@ export function ProductPage({ product }: { product: Product }) {
     setDesign(product.id, next);
     setView("design");
   };
-  // The store's descriptions are written in Hebrew, so they show on the Hebrew site.
-  const showDescription = lang === "he" && details.paragraphs.length > 0;
 
   const addAndShowCart = () => {
     addToCart(product.id, quantity);
@@ -191,9 +189,9 @@ export function ProductPage({ product }: { product: Product }) {
             {reviews.length > 0 && <a className="review-link" href="#reviews" onClick={(event) => { event.preventDefault(); document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth" }); }}>{t.reviewsCount(reviews.length)}</a>}
           </div>
 
-          {showDescription ? details.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>) : <p className="muted">{t.intro}</p>}
+          {details.paragraphs.length > 0 ? details.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>) : <p className="muted">{t.intro}</p>}
 
-          {lang === "he" && details.specs.length > 0 && (
+          {details.specs.length > 0 && (
             <ul className="specs" aria-label={t.sizesTitle}>
               {details.specs.map((spec) => <li key={spec}>{spec}</li>)}
             </ul>
