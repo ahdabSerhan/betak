@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import type { Product } from "../data/catalog";
 import { cutoutOf } from "../data/cutouts";
-import { catalogsFor, findSwatch, propsMaskOf, swatchImage, swatchLabel, type Swatch } from "../data/fabrics";
+import { catalogsFor, findSwatch, previewOf, swatchImage, swatchLabel, type Swatch } from "../data/fabrics";
 import { useShop } from "../state/ShopContext";
 import { Dialog } from "./Dialog";
 
 // The preview is drawn at most this wide, which is enough for the dialog and quick to recolour.
-const PREVIEW_WIDTH = 720;
+const PREVIEW_WIDTH = 1200;
 // How far (RGB distance) a pixel may be from the upholstery's own colour and still count as fabric.
 const FABRIC_NEAR = 70;
 const FABRIC_FAR = 150;
@@ -123,7 +123,9 @@ function FabricDialog({ product, code, onPick, onClose }: FabricPickerProps & { 
   const [catalogId, setCatalogId] = useState(start && catalogs.includes(start.catalog) ? start.catalog.id : catalogs[0].id);
   const [selected, setSelected] = useState<Swatch>(start?.swatch ?? catalogs[0].swatches[0]);
   const catalog = catalogs.find((item) => item.id === catalogId)!;
-  const cutout = cutoutOf(product);
+  // The sharp preview cut-out, or else the smaller one the room designer uses.
+  const preview = previewOf(product);
+  const cutout = preview?.photo ?? cutoutOf(product);
   const label = swatchLabel(selected.code, lang);
   const colors = catalogs.reduce((sum, item) => sum + item.swatches.length, 0);
 
@@ -136,7 +138,7 @@ function FabricDialog({ product, code, onPick, onClose }: FabricPickerProps & { 
         </div>
 
         <figure className="fabric-preview">
-          {cutout ? <TintedPhoto src={cutout} propsMask={propsMaskOf(product)} color={selected.color} alt={`${nameOf(product)} · ${label}`} /> : <img src={swatchImage(selected)} alt={label} />}
+          {cutout ? <TintedPhoto src={cutout} propsMask={preview?.props ?? null} color={selected.color} alt={`${nameOf(product)} · ${label}`} /> : <img src={swatchImage(selected)} alt={label} />}
           <figcaption>
             <b dir="auto">{label}</b>
             <span className="fabric-badge">{t.fabricSimulation}</span>
