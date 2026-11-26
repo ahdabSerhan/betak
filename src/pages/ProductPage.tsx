@@ -6,10 +6,10 @@ import { ReviewBelt } from "../components/ReviewBelt";
 import { ReviewForm } from "../components/ReviewForm";
 import { CATEGORIES, isOnSale, PRODUCTS, productsIn, type Product } from "../data/catalog";
 import { detailsOf, POLICIES, reviewsOf, type Review } from "../data/details";
-import { colorOf, fabricOf } from "../data/fabrics";
+import { fabricOf } from "../data/fabrics";
 import { modelOf } from "../data/models";
 import { GOOGLE_REVIEWS_URL } from "../data/reviewLinks";
-import { rulesFor, standardDesign, type Design, type DesignRules } from "../lib/custom";
+import { fabricText, rulesFor, standardDesign, type Design, type DesignRules } from "../lib/custom";
 import { money, whatsappLink } from "../lib/format";
 import { useShop } from "../state/ShopContext";
 import { href } from "../lib/routes";
@@ -63,15 +63,13 @@ function Gallery({ photos: allPhotos, title, badge }: { photos: string[]; title:
 
 // The visitor's own version of the piece: a measured drawing in the chosen fabric.
 function DesignSheet({ design, rules, summary }: { design: Design; rules: DesignRules; summary: string }) {
-  const { lang } = useShop();
+  const { t, lang } = useShop();
   const fabric = fabricOf(design.fabric);
-  const color = colorOf(fabric, design.color);
   return (
     <div className="design-sheet">
       <DesignDrawing design={design} rules={rules} />
       <div className="design-fabric">
-        <i style={{ background: color.hex }} />
-        <div><b>{fabric.name[lang]} / {color.name[lang]}</b><small className="muted">{fabric.feel[lang]}</small></div>
+        <div><b>{fabricText(design, t, lang)}</b><small className="muted">{fabric.feel[lang]}</small></div>
         <span className="muted">{summary}</span>
       </div>
     </div>

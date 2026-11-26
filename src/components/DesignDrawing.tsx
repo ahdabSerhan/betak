@@ -1,4 +1,4 @@
-import { colorOf, fabricOf, type FabricKey } from "../data/fabrics";
+import type { FabricKey } from "../data/fabrics";
 import type { Design, DesignRules } from "../lib/custom";
 import { useShop } from "../state/ShopContext";
 import { Dimension } from "./FloorPlanDrawing";
@@ -8,6 +8,8 @@ const MARGIN = 62;
 const ARM = 20;
 const BACK = 22;
 const GAP = 4;
+// One neutral upholstery tone: the real colour is the code the visitor typed, shown in the photos.
+const FABRIC_TONE = "#cdbfa8";
 
 // A light texture over the colour, so velvet, bouclé, linen and leather look different.
 function Texture({ fabric }: { fabric: FabricKey }) {
@@ -44,7 +46,6 @@ interface DesignDrawingProps {
 export function DesignDrawing({ design, rules, outline = false, dimensions = true }: DesignDrawingProps) {
   const { t } = useShop();
   const { width, depth, seats, chaiseLength } = design;
-  const fabric = fabricOf(design.fabric);
   const hasChaise = rules.chaise !== null;
   const height = hasChaise ? chaiseLength : depth;
   const onRight = design.chaiseSide === "right";
@@ -52,15 +53,15 @@ export function DesignDrawing({ design, rules, outline = false, dimensions = tru
   const inner = width - ARM * 2;
   const cushions = Math.max(seats, 1);
   const cushion = inner / cushions;
-  // The chaise takes the place of the end seat and reaches forward.
-  const chaiseWidth = cushion + ARM;
+  // The chaise takes the place of the end seat, reaches forward, and is as deep (wide) as the visitor chose.
+  const chaiseWidth = Math.min(design.chaiseDepth, width - ARM);
   const chaiseX = onRight ? width - chaiseWidth : 0;
   const margin = dimensions ? MARGIN : 6;
 
   return (
     <svg className={outline ? "design-drawing outline" : "design-drawing"} viewBox={`${-margin} ${-margin} ${width + margin * 2} ${height + margin * (dimensions ? 1.6 : 2)}`} role="img" aria-label={`${width} × ${depth} ${t.cm}`}>
       {!outline && <Texture fabric={design.fabric} />}
-      <g className="design-piece" style={{ fill: outline ? "#fff" : colorOf(fabric, design.color).hex }}>
+      <g className="design-piece" style={{ fill: outline ? "#fff" : FABRIC_TONE }}>
         <Block x={0} y={0} width={width} height={depth} radius={14} />
         {hasChaise && <Block x={chaiseX} y={0} width={chaiseWidth} height={chaiseLength} radius={14} />}
         {isBed ? (
@@ -90,6 +91,7 @@ export function DesignDrawing({ design, rules, outline = false, dimensions = tru
           <Dimension x1={0} y1={-30} x2={width} y2={-30} label={`${width} ${t.cm}`} />
           <Dimension x1={onRight ? -30 : width + 30} y1={0} x2={onRight ? -30 : width + 30} y2={depth} label={`${depth}`} />
           {hasChaise && <Dimension x1={onRight ? width + 30 : -30} y1={0} x2={onRight ? width + 30 : -30} y2={chaiseLength} label={`${chaiseLength}`} />}
+          {hasChaise && <Dimension x1={chaiseX} y1={chaiseLength + 30} x2={chaiseX + chaiseWidth} y2={chaiseLength + 30} label={`${chaiseWidth}`} />}
         </>
       )}
     </svg>

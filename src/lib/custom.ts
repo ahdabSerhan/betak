@@ -1,6 +1,6 @@
 // "Make it yours": the sizes, seat division and fabric a visitor may choose for an upholstered piece.
 import type { Product, ProductType } from "../data/catalog";
-import { colorOf, fabricOf, FABRICS, type FabricKey } from "../data/fabrics";
+import { fabricOf, FABRICS, type FabricKey } from "../data/fabrics";
 import type { Lang } from "../i18n/text";
 import { footprint } from "./measure";
 
@@ -13,11 +13,13 @@ export interface Design {
   width: number;
   depth: number;
   seats: number;
-  // Corner sofas only: which side the chaise is on, and how far it reaches.
+  // Corner sofas only: which side the chaise is on, how far it reaches, and how deep (wide) its seat is.
   chaiseSide: Side;
   chaiseLength: number;
+  chaiseDepth: number;
   fabric: FabricKey;
-  color: string;
+  // The fabric colour code the visitor read off the product photos; empty until they type one.
+  colorCode: string;
   firmness: Firmness;
 }
 
@@ -73,8 +75,9 @@ export function standardDesign(product: Product, rules: DesignRules): Design {
     seats: seats.length > 0 ? nearest(3, seats) : 0,
     chaiseSide: "right",
     chaiseLength: rules.chaise ? within(typical.depth, rules.chaise) : 0,
+    chaiseDepth: rules.chaise ? nearest(100, rules.depths) : 0,
     fabric: FABRICS[0].key,
-    color: FABRICS[0].colors[0].key,
+    colorCode: "",
     firmness: "medium",
   };
 }
@@ -88,27 +91,42 @@ export function withWidth(design: Design, rules: DesignRules, width: number): De
 // The seats step (חלוקת מושבים) is hidden for now; set to true to bring it back everywhere.
 export const SHOW_SEATS = false;
 
-// A short code the store can read the whole design from, e.g. "sh91030-280x100-3-VEL-cream-M".
+// The colour code as the store should read it: trimmed, inner spaces removed, upper case ("" when not given).
+export const cleanColorCode = (design: Design) => design.colorCode.replace(/\s+/g, "").toUpperCase();
+
+// A short code the store can read the whole design from, e.g. "sh91030-280x100-3-R200x100-VEL(1203)-M".
 export function designCode(product: Product, design: Design): string {
   const size = `${design.width}x${design.depth}`;
-  return [product.sku ?? product.id, size, design.seats || null, design.fabric.slice(0, 3).toUpperCase(), design.color, design.firmness[0].toUpperCase()].filter(Boolean).join("-");
+  // Chaise: side (R/L), then length x depth.
+  const chaise = design.chaiseLength > 0 && `${design.chaiseSide[0].toUpperCase()}${design.chaiseLength}x${design.chaiseDepth}`;
+  // Fabric, then the colour code in brackets when there is one.
+  const fabric = design.fabric.slice(0, 3).toUpperCase();
+  const color = cleanColorCode(design);
+  return [product.sku ?? product.id, size, design.seats || null, chaise, color ? `${fabric}(${color})` : fabric, design.firmness[0].toUpperCase()].filter(Boolean).join("-");
 }
 
 interface DesignWords {
   cm: string;
+  colorCode: string;
   firmness: Record<Firmness, string>;
   seatsCount: (seats: number) => string;
-  chaiseOn: (side: Side, length: number) => string;
+  chaiseOn: (side: Side, length: number, depth: number) => string;
 }
 
-// One line for the cart and the WhatsApp order, e.g. "250 × 95 cm · 3 seats · Velvet / Cream".
+// The fabric and its colour code as text, e.g. "Velvet · colour code 1203" (just "Velvet" without a code).
+export function fabricText(design: Design, words: Pick<DesignWords, "colorCode">, lang: Lang): string {
+  const code = cleanColorCode(design);
+  const name = fabricOf(design.fabric).name[lang];
+  return code ? `${name} · ${words.colorCode} ${code}` : name;
+}
+
+// One line for the cart and the WhatsApp order, e.g. "250 × 95 cm · 3 seats · Velvet · colour code 1203".
 export function describeDesign(design: Design, rules: DesignRules, words: DesignWords, lang: Lang): string {
-  const fabric = fabricOf(design.fabric);
   return [
     `${design.width} × ${design.depth} ${words.cm}`,
     SHOW_SEATS && design.seats > 0 && words.seatsCount(design.seats),
-    rules.chaise && words.chaiseOn(design.chaiseSide, design.chaiseLength),
-    `${fabric.name[lang]} / ${colorOf(fabric, design.color).name[lang]}`,
+    rules.chaise && words.chaiseOn(design.chaiseSide, design.chaiseLength, design.chaiseDepth),
+    fabricText(design, words, lang),
     words.firmness[design.firmness],
   ].filter(Boolean).join(" · ");
 }
