@@ -668,7 +668,6 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 .design-drawing .plan-dimension text { fill: #1f1f1f; font-family: var(--body); font-size: 15px; font-weight: 500; paint-order: stroke; stroke: var(--pale); stroke-width: 10px; }
 .design-drawing.outline .plan-dimension text { stroke: #fff; }
 .design-fabric { display: flex; align-items: center; gap: 14px; padding: 12px 14px; background: #fff; border: 1px solid var(--rule); }
-.design-fabric div { display: grid; }
 .design-fabric span { margin-inline-start: auto; font-size: 14px; }
 
 .config { border: 1px solid var(--rule); background: #fff; font-family: var(--body); color: #1f1f1f; }
@@ -689,14 +688,13 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 .config-slider input { width: 100%; accent-color: #1f1f1f; }
 .config .chip { border-radius: 4px; border-color: var(--rule); }
 .config .chip[aria-pressed="true"] { background: #1f1f1f; border-color: #1f1f1f; }
-.config-cards, .config-fabrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
-.config-cards button, .config-fabrics button { display: grid; gap: 8px; justify-items: center; padding: 16px 10px; border: 1px solid var(--rule); border-radius: 4px; background: #fff; font: inherit; color: inherit; cursor: pointer; transition: border-color .2s, background .2s; }
-.config-cards button:hover, .config-fabrics button:hover { border-color: #8d8a84; }
-.config-cards button[aria-pressed="true"], .config-fabrics button[aria-pressed="true"] { border-color: #1f1f1f; box-shadow: inset 0 0 0 1px #1f1f1f; }
+.config-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.config-cards button { display: grid; gap: 8px; justify-items: center; padding: 16px 10px; border: 1px solid var(--rule); border-radius: 4px; background: #fff; font: inherit; color: inherit; cursor: pointer; transition: border-color .2s, background .2s; }
+.config-cards button:hover { border-color: #8d8a84; }
+.config-cards button[aria-pressed="true"] { border-color: #1f1f1f; box-shadow: inset 0 0 0 1px #1f1f1f; }
 .config-cards svg { width: 100%; height: 58px; }
-.config-cards small, .config-fabrics small { color: var(--muted); }
-.config-fabrics button { justify-items: start; text-align: start; gap: 2px; padding: 12px 14px; }
-.config-code { display: grid; gap: 6px; margin-block-start: 16px; }
+.config-cards small { color: var(--muted); }
+.config-code { display: grid; gap: 6px; }
 .config-code input { padding: 10px 12px; border: 1px solid #8d8a84; border-radius: 4px; font: inherit; font-size: 17px; letter-spacing: .04em; color: inherit; background: #fff; }
 /* Codes read left to right, but sit on the reading side of a Hebrew page. */
 html[dir="rtl"] .config-code input { text-align: right; }

@@ -1,7 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { Product } from "../data/catalog";
-import { FABRICS, fabricOf } from "../data/fabrics";
-import { cleanColorCode, designCode, fabricText, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
+import { cleanColorCode, designCode, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
 import { useShop } from "../state/ShopContext";
 import { DesignDrawing } from "./DesignDrawing";
 import { Fold } from "./Fold";
@@ -35,18 +34,18 @@ function Slider({ label, value, range, unit, onChange }: SliderProps) {
 
 // What the visitor chose in each step, as short text.
 function useChosen(design: Design): Record<Step, string> {
-  const { t, lang } = useShop();
+  const { t } = useShop();
   return {
     size: `${design.width} × ${design.depth} ${t.cm}`,
     seats: t.seatsCount(design.seats),
-    fabric: fabricText(design, t, lang),
+    fabric: cleanColorCode(design) || t.colorCodeMissing,
     firmness: t.firmness[design.firmness],
   };
 }
 
 // "Your design": the finished choice as a small drawing and a table, with a code the store can read it from.
 export function DesignSummary({ product, design, rules }: { product: Product; design: Design; rules: DesignRules }) {
-  const { t, lang } = useShop();
+  const { t } = useShop();
   const [copied, setCopied] = useState(false);
   const chosen = useChosen(design);
   const code = designCode(product, design);
@@ -56,7 +55,6 @@ export function DesignSummary({ product, design, rules }: { product: Product; de
     [t.specSize, chosen.size],
     ...(SHOW_SEATS && rules.seats.length > 0 ? [[t.specSeats, chosen.seats] as [string, string]] : []),
     ...(rules.chaise ? [[t.configChaise, `${t.sides[design.chaiseSide]} · ${design.chaiseLength} ${t.cm}`] as [string, string], [t.configChaiseDepth, `${design.chaiseDepth} ${t.cm}`] as [string, string]] : []),
-    [t.specFabric, fabricOf(design.fabric).name[lang]],
     [t.specColorCode, cleanColorCode(design) || t.colorCodeMissing],
     [t.configSteps.firmness, chosen.firmness],
     [t.specCode, code],
@@ -82,7 +80,7 @@ export function DesignSummary({ product, design, rules }: { product: Product; de
 
 // "Make it yours": numbered sections that expand in place; each closed row shows the current choice.
 export function Configurator({ design, rules, onChange, onReset }: ConfiguratorProps) {
-  const { t, lang } = useShop();
+  const { t } = useShop();
   const steps: Step[] = SHOW_SEATS && rules.seats.length > 0 ? ["size", "seats", "fabric", "firmness"] : ["size", "fabric", "firmness"];
   const [open, setOpen] = useState<Step | null>("size");
   const change = (part: Partial<Design>) => onChange({ ...design, ...part });
@@ -143,14 +141,6 @@ export function Configurator({ design, rules, onChange, onReset }: ConfiguratorP
     ),
     fabric: (
       <>
-        <div className="config-fabrics">
-          {FABRICS.map((item) => (
-            <button aria-pressed={item.key === design.fabric} onClick={() => change({ fabric: item.key })} key={item.key}>
-              <b>{item.name[lang]}</b>
-              <small>{item.feel[lang]}</small>
-            </button>
-          ))}
-        </div>
         {/* The colours are shown in the product photos, so the visitor types the code printed there. */}
         <label className="config-code">
           <span>{t.colorCodeLabel}</span>
