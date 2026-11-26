@@ -7,7 +7,7 @@ Vite + React 19 + TypeScript, plain CSS, three.js. Hebrew (RTL) and English.
 - `npm install` then `npm run dev`: local development (the AI agent falls back to simple rules, there is no server).
 - `npm run build`: builds the app, pre-builds one HTML page per route (SEO), sitemap.xml, robots.txt and routes.json into `dist/`.
 - `PORT=8080 node server/server.mjs`: serves `dist/` like production, including 301 redirects and `/api/designer`.
-- Deploy (owner only): `gcloud builds submit --project cs-poc-powbbzquo5jfciibv06ma0z --config cloudbuild.yaml`.
+- Deploy: every push to `main` deploys automatically (Cloud Build trigger). Never push to `main` directly: work on a branch and open a pull request for Ahdab to review.
   Live: https://betak-website-230492521256.me-west1.run.app (noindex until the betak.co.il domain points here).
 
 ## Layout
