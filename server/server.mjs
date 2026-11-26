@@ -5,6 +5,8 @@ import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { adminConfig, checkAdmin } from "./admin-auth.mjs";
+import { cleanOrder, createOrderStore } from "./orders.mjs";
 
 const PORT = Number(process.env.PORT ?? 8080);
 const MODEL = process.env.GEMINI_MODEL ?? "gemini-3.8-flash";
@@ -33,7 +35,8 @@ const CONTENT_TYPES = {
 let cachedToken = { value: "", expiresAt: 0 };
 
 function sendJson(response, status, payload) {
-  response.writeHead(status, { "content-type": "application/json" });
+  // Orders hold personal details, so no API answer is ever cached.
+  response.writeHead(status, { "content-type": "application/json", "cache-control": "no-store" });
   response.end(JSON.stringify(payload));
 }
 
@@ -61,8 +64,59 @@ async function accessToken() {
   return cachedToken.value;
 }
 
+let cachedProject = process.env.GOOGLE_CLOUD_PROJECT ?? "";
+const projectId = async () => (cachedProject ||= await metadata("project/project-id"));
+const orders = createOrderStore({ getToken: accessToken, getProject: projectId });
+
+// A few orders per visitor per hour is plenty; more is a script filling the form.
+const ORDERS_PER_HOUR = 10;
+const recentOrders = new Map();
+
+function tooManyOrders(request) {
+  const visitor = String(request.headers["x-forwarded-for"] ?? request.socket.remoteAddress).split(",")[0].trim();
+  const hourAgo = Date.now() - 3_600_000;
+  const times = (recentOrders.get(visitor) ?? []).filter((time) => time > hourAgo);
+  if (recentOrders.size > 5000) recentOrders.clear();
+  recentOrders.set(visitor, [...times, Date.now()]);
+  return times.length >= ORDERS_PER_HOUR;
+}
+
+// A visitor sends an order from the cart; the answer carries its order number.
+async function handleNewOrder(request, response) {
+  try {
+    if (tooManyOrders(request)) return sendJson(response, 429, { error: "Too many orders" });
+    const { order, error } = cleanOrder(await readJson(request));
+    if (error) return sendJson(response, 400, { error });
+    const saved = await orders.add(order);
+    sendJson(response, 201, { number: saved.number });
+  } catch (error) {
+    // The cart still sends the order on WhatsApp when this fails.
+    console.error(error);
+    sendJson(response, 502, { error: "Orders are unavailable right now." });
+  }
+}
+
+// The store's own orders page: list the orders, mark one read or unread.
+async function handleAdmin(request, response, pathname) {
+  if (pathname === "/api/admin/config") return sendJson(response, 200, adminConfig());
+  const access = await checkAdmin(request);
+  if (access !== "ok") return sendJson(response, access === "signed-out" ? 401 : 403, { error: access });
+  try {
+    if (pathname === "/api/admin/orders" && request.method === "GET") return sendJson(response, 200, { orders: await orders.list() });
+    const match = pathname.match(/^\/api\/admin\/orders\/(\d+)$/);
+    if (match && request.method === "PATCH") {
+      await orders.setRead(match[1], Boolean((await readJson(request)).read));
+      return sendJson(response, 200, { ok: true });
+    }
+    sendJson(response, 404, { error: "Not found" });
+  } catch (error) {
+    console.error(error);
+    sendJson(response, 502, { error: "Orders are unavailable right now." });
+  }
+}
+
 async function askGemini({ system, messages }) {
-  const project = process.env.GOOGLE_CLOUD_PROJECT ?? (await metadata("project/project-id"));
+  const project = await projectId();
   const host = LOCATION === "global" ? "aiplatform.googleapis.com" : `${LOCATION}-aiplatform.googleapis.com`;
   const url = `https://${host}/v1/projects/${project}/locations/${LOCATION}/publishers/google/models/${MODEL}:generateContent`;
 
@@ -148,6 +202,8 @@ createServer((request, response) => {
   const url = new URL(request.url, "http://localhost");
   const { pathname } = url;
   if (pathname === "/api/designer") return request.method === "POST" ? handleDesigner(request, response) : sendJson(response, 405, { error: "Use POST" });
+  if (pathname === "/api/orders") return request.method === "POST" ? handleNewOrder(request, response) : sendJson(response, 405, { error: "Use POST" });
+  if (pathname.startsWith("/api/admin/")) return handleAdmin(request, response, pathname);
   if (request.method !== "GET" && request.method !== "HEAD") return sendJson(response, 405, { error: "Method not allowed" });
   const host = request.headers.host ?? "";
   // One domain: www.betak.co.il sends visitors to betak.co.il.
@@ -158,5 +214,10 @@ createServer((request, response) => {
   if (moved) return redirect(response, moved);
   // One address per page: /sofas/ and /sofas are the same page, so the slash is dropped.
   if (pathname.length > 1 && pathname.endsWith("/")) return redirect(response, pathname.slice(0, -1) + url.search);
+  // The orders page is the site's own app, never indexed and never cached.
+  if (pathname === "/admin/orders") {
+    response.writeHead(200, { "content-type": CONTENT_TYPES[".html"], "cache-control": "no-store", "x-robots-tag": "noindex, nofollow" });
+    return createReadStream(join(SITE_ROOT, "index.html")).pipe(response);
+  }
   serveFile(pathname, response);
 }).listen(PORT, () => console.log(`Betak site listening on port ${PORT}; AI designer uses ${MODEL} on Vertex AI (${LOCATION})`));

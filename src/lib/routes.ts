@@ -15,6 +15,7 @@ export const productFromRoute = (route: string) => (route.startsWith(PRODUCT_PRE
 // The address of a page, e.g. "product-1686" → "/product/1686-camila-3-seater-sofa".
 export function pathOf(route: string): string {
   if (route === "home") return "/";
+  if (route === "admin") return "/admin/orders";
   const product = productFromRoute(route);
   if (product) return `/product/${product.id}-${slugify(product.name.en)}`;
   return `/${route}`;

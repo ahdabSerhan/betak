@@ -63,6 +63,13 @@ export const TEXT = {
     slots: { sofa: "ספה", tables: "מזנון ושולחן", armchair: "כורסא", rug: "שטיח", bed: "מיטה", mattress: "מזרן", ottoman: "הדום", table: "שולחן", chairs: "כיסאות", sideboard: "מזנון" },
     disclaimer: "הגוונים והמידות עשויים להיות שונים מעט במציאות. בדקו מידות לפני הזמנה.",
     waOrder: "שלום, אני רוצה להזמין מאתר ביתאק:", waAsk: "שלום, יש לי שאלה על", waPhoto: "שלום, אשמח להמלצה לחדר שלי. מצרף/ת תמונה.", waRoom: "שלום, עיצבתי חדר באתר ביתאק ואשמח לייעוץ:",
+    orderDetails: "פרטים להזמנה", orderName: "שם מלא", orderPhone: "טלפון", orderEmail: "מייל (לא חובה)", orderNoteField: "הערה להזמנה (לא חובה)", orderSending: "שולחים...", orderNumber: "מספר הזמנה",
+    orderSaved: (number: number) => `ההזמנה נרשמה, מספר ${number}. ממשיכים איתכם בוואטסאפ.`, orderPrivacy: "הפרטים נשמרים אצלנו רק לטיפול בהזמנה. פרטים נוספים ב",
+    admin: {
+      title: "ניהול הזמנות", signIn: "התחברו עם חשבון Google של העסק כדי לראות את ההזמנות.", signOut: "יציאה", notAllowed: "החשבון הזה לא מורשה לראות הזמנות.", notReady: "דף ההזמנות עדיין לא הוגדר בשרת.",
+      loading: "טוען הזמנות...", error: "לא הצלחנו לטעון את ההזמנות. נסו שוב.", empty: "אין הזמנות להצגה.", unreadOnly: "רק הזמנות שלא נקראו", search: "חיפוש לפי שם, טלפון או מספר הזמנה", export: "ייצוא לאקסל", refresh: "רענון",
+      count: (shown: number, unread: number) => `${shown} הזמנות, ${unread} לא נקראו`, number: "מספר הזמנה", date: "תאריך", customer: "לקוח", contact: "יצירת קשר", items: "פריטים", total: "סך הכול", read: "נקרא", whatsapp: "וואטסאפ", phone: "טלפון", email: "מייל", note: "הערה", markRead: (number: number) => `סימון הזמנה ${number} כנקראה`,
+    },
   },
   en: {
     strip: "Fast delivery across Israel · Furniture for home and business at fair prices",
@@ -127,6 +134,13 @@ export const TEXT = {
     slots: { sofa: "Sofa", tables: "Sideboard & table", armchair: "Armchair", rug: "Rug", bed: "Bed", mattress: "Mattress", ottoman: "Ottoman", table: "Table", chairs: "Chairs", sideboard: "Sideboard" },
     disclaimer: "Colours and dimensions may differ slightly in real life. Check sizes before ordering.",
     waOrder: "Hello, I would like to order from the Betak site:", waAsk: "Hello, I have a question about", waPhoto: "Hello, I would like a suggestion for my room. Photo attached.", waRoom: "Hello, I designed a room on the Betak site and would like advice:",
+    orderDetails: "Your details", orderName: "Full name", orderPhone: "Phone", orderEmail: "Email (optional)", orderNoteField: "Order note (optional)", orderSending: "Sending...", orderNumber: "Order number",
+    orderSaved: (number: number) => `Your order is in, number ${number}. We continue on WhatsApp.`, orderPrivacy: "We keep these details only to handle your order. More in our ",
+    admin: {
+      title: "Orders", signIn: "Sign in with the store's Google account to see the orders.", signOut: "Sign out", notAllowed: "This account may not see orders.", notReady: "The orders page is not set up on the server yet.",
+      loading: "Loading orders...", error: "The orders could not be loaded. Try again.", empty: "No orders to show.", unreadOnly: "Unread orders only", search: "Search by name, phone or order number", export: "Export to Excel", refresh: "Refresh",
+      count: (shown: number, unread: number) => `${shown} orders, ${unread} unread`, number: "Order", date: "Date", customer: "Customer", contact: "Contact", items: "Items", total: "Total", read: "Read", whatsapp: "WhatsApp", phone: "Phone", email: "Email", note: "Note", markRead: (number: number) => `Mark order ${number} as read`,
+    },
   },
 };
 

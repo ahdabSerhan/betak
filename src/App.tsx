@@ -11,6 +11,7 @@ import { useRoute } from "./hooks/useRoute";
 import { productFromRoute } from "./lib/routes";
 import { esentrixEnabled } from "./lib/esentrix";
 import { About } from "./pages/About";
+import { AdminOrders } from "./pages/AdminOrders";
 import { Accessibility, Privacy, Terms } from "./pages/Accessibility";
 import { CategoryPage } from "./pages/CategoryPage";
 import { Contact } from "./pages/Contact";
@@ -47,11 +48,28 @@ export function App() {
   const product = productFromRoute(route);
   const category = CATEGORIES.find((item) => item.id === route);
 
+  // The store's orders page stands alone: no shop menu, chat or cart, and never indexed.
+  useEffect(() => {
+    if (route !== "admin") return;
+    const robots = Object.assign(document.createElement("meta"), { name: "robots", content: "noindex, nofollow" });
+    document.head.append(robots);
+    return () => robots.remove();
+  }, [route]);
+
   useEffect(() => {
     // Pages without a product or category are named by their menu label.
-    const pageName: Record<string, string> = { designer: t.designer, saved: t.saved, about: t.about, contact: t.contact, accessibility: t.accessibility, terms: t.terms, privacy: t.privacy };
+    const pageName: Record<string, string> = { designer: t.designer, saved: t.saved, about: t.about, contact: t.contact, accessibility: t.accessibility, terms: t.terms, privacy: t.privacy, admin: t.admin.title };
     document.title = route === "home" ? t.homeTitle : titleOf(product ? nameOf(product) : category?.h1[lang] ?? pageName[route], t.brandTitle);
   }, [route, product, category, lang, nameOf, t]);
+
+  if (route === "admin") {
+    return (
+      <>
+        <main id="main" tabIndex={-1}><AdminOrders /></main>
+        <AccessibilityMenu />
+      </>
+    );
+  }
 
   return (
     <>

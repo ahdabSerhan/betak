@@ -141,7 +141,7 @@ const pages = [
 
 const indexed = pages.filter((page) => page.index);
 writeFileSync(join(DIST, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexed.map((page) => `  <url><loc>${page.url}</loc></url>`).join("\n")}\n</urlset>\n`);
-writeFileSync(join(DIST, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+writeFileSync(join(DIST, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 // The server uses this to send the old site's product addresses to the new ones.
 writeFileSync(join(DIST, "routes.json"), JSON.stringify(Object.fromEntries(PRODUCTS.map((product) => [product.id, pathOf(productRoute(product))]))));
 
