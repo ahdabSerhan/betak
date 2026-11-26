@@ -1,0 +1,35 @@
+# Runs on every pull request and every push to main: the site must build and pass axe (WCAG 2.1 AA).
+# Pushes to main also deploy through Cloud Build, so open a pull request first to see these checks before going live.
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-a11y:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Chromium for the accessibility check
+        run: npx playwright install --with-deps chromium
+
+      - name: Accessibility check (axe, every page in Hebrew and English)
+        run: npm run check:a11y
