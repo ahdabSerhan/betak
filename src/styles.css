@@ -840,3 +840,10 @@ html.a11y-grayscale { filter: grayscale(1); }
 .a11y-links a:not(.btn) { outline: 1px dashed currentColor; outline-offset: 2px; }
 .a11y-still *, .a11y-still *::before, .a11y-still *::after { animation: none !important; transition: none !important; }
 .a11y-still .review-belt.glides { overflow-x: auto; mask-image: none; }
+
+/* Cookie notice: a bar at the bottom until the visitor agrees. */
+.cookie-notice { position: fixed; inset-inline: 16px; inset-block-end: 16px; z-index: 28; max-width: 760px; margin-inline: auto; display: flex; align-items: center; gap: 16px; padding: 14px 18px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 20px 40px -16px rgba(29, 22, 18, .45); font-size: 15px; }
+.cookie-notice p { margin: 0; flex: 1; }
+.cookie-notice a { color: var(--accent-ink); text-decoration: underline; }
+.cookie-notice .btn { flex-shrink: 0; }
+@media (max-width: 600px) { .cookie-notice { flex-direction: column; align-items: stretch; } }

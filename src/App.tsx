@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { AccessibilityMenu } from "./components/AccessibilityMenu";
 import { AgentWidget } from "./components/AgentWidget";
 import { CartDrawer } from "./components/CartDrawer";
+import { CookieNotice } from "./components/CookieNotice";
 import { FloatingContact } from "./components/FloatingContact";
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
@@ -10,7 +11,7 @@ import { useRoute } from "./hooks/useRoute";
 import { productFromRoute } from "./lib/routes";
 import { esentrixEnabled } from "./lib/esentrix";
 import { About } from "./pages/About";
-import { Accessibility } from "./pages/Accessibility";
+import { Accessibility, Privacy, Terms } from "./pages/Accessibility";
 import { CategoryPage } from "./pages/CategoryPage";
 import { Contact } from "./pages/Contact";
 import { Designer } from "./pages/Designer";
@@ -30,6 +31,8 @@ function Page({ route }: { route: string }) {
   if (route === "about") return <About />;
   if (route === "contact") return <Contact />;
   if (route === "accessibility") return <Accessibility />;
+  if (route === "terms") return <Terms />;
+  if (route === "privacy") return <Privacy />;
   return <Home />;
 }
 
@@ -46,7 +49,7 @@ export function App() {
 
   useEffect(() => {
     // Pages without a product or category are named by their menu label.
-    const pageName: Record<string, string> = { designer: t.designer, saved: t.saved, about: t.about, contact: t.contact, accessibility: t.accessibility };
+    const pageName: Record<string, string> = { designer: t.designer, saved: t.saved, about: t.about, contact: t.contact, accessibility: t.accessibility, terms: t.terms, privacy: t.privacy };
     document.title = route === "home" ? t.homeTitle : titleOf(product ? nameOf(product) : category?.h1[lang] ?? pageName[route], t.brandTitle);
   }, [route, product, category, lang, nameOf, t]);
 
@@ -62,6 +65,7 @@ export function App() {
       {!esentrixEnabled && <AgentWidget viewing={product} />}
       <FloatingContact />
       <AccessibilityMenu />
+      <CookieNotice />
       {cartOpen && <CartDrawer />}
     </>
   );
