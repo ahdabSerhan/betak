@@ -696,7 +696,9 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 .config-cards svg { width: 100%; height: 58px; }
 .config-cards small, .config-fabrics small { color: var(--muted); }
 .config-fabrics button { justify-items: start; text-align: start; gap: 2px; padding: 12px 14px; }
-.config-code { display: grid; gap: 6px; margin-block-start: 16px; }
+/* The fabric step: a large line sending the visitor to the product photos, then the code field. */
+.config-photo-hint { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.4; }
+.config-code { display: grid; gap: 6px; margin-block-start: 12px; }
 .config-code input { padding: 10px 12px; border: 1px solid #8d8a84; border-radius: 4px; font: inherit; font-size: 17px; letter-spacing: .04em; color: inherit; background: #fff; }
 /* Codes read left to right, but sit on the reading side of a Hebrew page. */
 html[dir="rtl"] .config-code input { text-align: right; }

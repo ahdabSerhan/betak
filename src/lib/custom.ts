@@ -1,7 +1,6 @@
 // "Make it yours": the sizes, seat division and fabric a visitor may choose for an upholstered piece.
 import type { Product, ProductType } from "../data/catalog";
-import { fabricOf, FABRICS, type FabricKey } from "../data/fabrics";
-import type { Lang } from "../i18n/text";
+import { FABRICS, type FabricKey } from "../data/fabrics";
 import { footprint } from "./measure";
 
 export type Side = "left" | "right";
@@ -113,20 +112,19 @@ interface DesignWords {
   chaiseOn: (side: Side, length: number, depth: number) => string;
 }
 
-// The fabric and its colour code as text, e.g. "Velvet · colour code 1203" (just "Velvet" without a code).
-export function fabricText(design: Design, words: Pick<DesignWords, "colorCode">, lang: Lang): string {
+// The colour code picked from the product photos as text, e.g. "colour code 1203" (empty until one is typed).
+export function fabricText(design: Design, words: Pick<DesignWords, "colorCode">): string {
   const code = cleanColorCode(design);
-  const name = fabricOf(design.fabric).name[lang];
-  return code ? `${name} · ${words.colorCode} ${code}` : name;
+  return code ? `${words.colorCode} ${code}` : "";
 }
 
-// One line for the cart and the WhatsApp order, e.g. "250 × 95 cm · 3 seats · Velvet · colour code 1203".
-export function describeDesign(design: Design, rules: DesignRules, words: DesignWords, lang: Lang): string {
+// One line for the cart and the WhatsApp order, e.g. "250 × 95 cm · 3 seats · colour code 1203".
+export function describeDesign(design: Design, rules: DesignRules, words: DesignWords): string {
   return [
     `${design.width} × ${design.depth} ${words.cm}`,
     SHOW_SEATS && design.seats > 0 && words.seatsCount(design.seats),
     rules.chaise && words.chaiseOn(design.chaiseSide, design.chaiseLength, design.chaiseDepth),
-    fabricText(design, words, lang),
+    fabricText(design, words),
     words.firmness[design.firmness],
   ].filter(Boolean).join(" · ");
 }
