@@ -100,8 +100,11 @@ def main():
         if found:
             products[product] = [c["id"] for c in catalogs if c["id"] in found]
 
-    with open(os.path.join(ROOT, "src/data/fabrics.json"), "w") as out:
-        json.dump({"catalogs": catalogs, "products": products}, out, ensure_ascii=False, indent=1)
+    path = os.path.join(ROOT, "src/data/fabrics.json")
+    # Keep the list of prop masks written by scripts/fabric-props.py.
+    props = json.load(open(path)).get("props", []) if os.path.exists(path) else []
+    with open(path, "w") as out:
+        json.dump({"catalogs": catalogs, "products": products, "props": props}, out, ensure_ascii=False, indent=1)
     print(len(catalogs), "catalogs,", sum(len(c["swatches"]) for c in catalogs), "swatches,", len(products), "products")
 
 

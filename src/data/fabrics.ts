@@ -20,6 +20,7 @@ export interface FabricCatalog {
 
 export const FABRIC_CATALOGS: FabricCatalog[] = raw.catalogs;
 const BY_PRODUCT: Record<string, string[] | undefined> = raw.products;
+const WITH_PROPS = new Set(raw.props);
 
 // The catalogs pictured in this product's gallery; all of them when its gallery shows none.
 export function catalogsFor(product: Product): FabricCatalog[] {
@@ -28,6 +29,9 @@ export function catalogsFor(product: Product): FabricCatalog[] {
 }
 
 export const swatchImage = (swatch: Swatch) => asset(`img/fabrics/${swatch.file}`);
+
+// A mask of the props in the product's cut-out photo (tables, vases, plants), which the preview leaves uncoloured.
+export const propsMaskOf = (product: Product) => (WITH_PROPS.has(String(product.id)) ? asset(`img/fabric-props/p${product.id}.png`) : null);
 
 // The catalog and swatch for a colour code, or null for a code typed by hand that is not in any catalog.
 export function findSwatch(code: string): { catalog: FabricCatalog; swatch: Swatch } | null {

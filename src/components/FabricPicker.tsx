@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Product } from "../data/catalog";
 import { cutoutOf } from "../data/cutouts";
-import { catalogsFor, findSwatch, swatchImage, swatchLabel, type Swatch } from "../data/fabrics";
+import { catalogsFor, findSwatch, propsMaskOf, swatchImage, swatchLabel, type Swatch } from "../data/fabrics";
 import { useShop } from "../state/ShopContext";
 import { Dialog } from "./Dialog";
 
@@ -14,51 +14,73 @@ const FABRIC_FAR = 150;
 const toRgb = (hex: string) => [1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16));
 const luminance = (r: number, g: number, b: number) => 0.299 * r + 0.587 * g + 0.114 * b;
 
-// The piece's cut-out photo repainted in the swatch colour: each pixel keeps its light and shade,
-// and pixels far from the upholstery colour (wooden legs, props) are left mostly as they are.
-function TintedPhoto({ src, color, alt }: { src: string; color: string; alt: string }) {
-  const canvas = useRef<HTMLCanvasElement>(null);
-  const [photo, setPhoto] = useState<ImageData | null>(null);
-
-  useEffect(() => {
+// Draws an image at the preview size and returns its pixels.
+function loadPixels(src: string, width?: number, height?: number): Promise<ImageData> {
+  return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => {
       const scale = Math.min(1, PREVIEW_WIDTH / image.naturalWidth);
       const board = document.createElement("canvas");
-      board.width = Math.round(image.naturalWidth * scale);
-      board.height = Math.round(image.naturalHeight * scale);
+      board.width = width ?? Math.round(image.naturalWidth * scale);
+      board.height = height ?? Math.round(image.naturalHeight * scale);
       const context = board.getContext("2d", { willReadFrequently: true })!;
       context.drawImage(image, 0, 0, board.width, board.height);
-      setPhoto(context.getImageData(0, 0, board.width, board.height));
+      resolve(context.getImageData(0, 0, board.width, board.height));
     };
+    image.onerror = reject;
     image.src = src;
-  }, [src]);
+  });
+}
+
+interface Photo {
+  pixels: ImageData;
+  // Per pixel, 255 where a prop (table, vase, plant) stands, 0 on the piece itself.
+  props: Uint8ClampedArray | null;
+}
+
+// The piece's cut-out photo repainted in the swatch colour: each pixel keeps its light and shade.
+// Props marked in the photo stay as they are, and so do pixels far from the upholstery colour (wooden legs).
+function TintedPhoto({ src, propsMask, color, alt }: { src: string; propsMask: string | null; color: string; alt: string }) {
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const [photo, setPhoto] = useState<Photo | null>(null);
+
+  useEffect(() => {
+    let current = true;
+    loadPixels(src).then(async (pixels) => {
+      // Without its mask the preview still works; the props are then tinted too.
+      const mask = propsMask ? await loadPixels(propsMask, pixels.width, pixels.height).catch(() => null) : null;
+      if (current) setPhoto({ pixels, props: mask && mask.data });
+    }).catch(() => undefined);
+    return () => { current = false; };
+  }, [src, propsMask]);
 
   useEffect(() => {
     if (!photo || !canvas.current) return;
-    const source = photo.data;
-    // The upholstery colour: the median of the visible pixels, since the fabric covers most of the piece.
+    const { pixels, props } = photo;
+    const source = pixels.data;
+    // The upholstery colour: the median of the piece's visible pixels, since the fabric covers most of it.
     const visible: number[][] = [];
-    for (let i = 0; i < source.length; i += 16) if (source[i + 3] > 200) visible.push([source[i], source[i + 1], source[i + 2]]);
+    for (let i = 0; i < source.length; i += 16) if (source[i + 3] > 200 && !(props && props[i] > 127)) visible.push([source[i], source[i + 1], source[i + 2]]);
     const median = [0, 1, 2].map((c) => visible.map((p) => p[c]).sort((a, b) => a - b)[visible.length >> 1] ?? 128);
     const baseLight = luminance(median[0], median[1], median[2]);
     const [r, g, b] = toRgb(color);
 
-    const out = new ImageData(photo.width, photo.height);
+    const out = new ImageData(pixels.width, pixels.height);
     const target = out.data;
     for (let i = 0; i < source.length; i += 4) {
       const [sr, sg, sb] = [source[i], source[i + 1], source[i + 2]];
       // Light and shade relative to the fabric's average, laid over the new colour.
       const shade = luminance(sr, sg, sb) - baseLight;
       const distance = Math.hypot(sr - median[0], sg - median[1], sb - median[2]);
-      const weight = Math.min(1, Math.max(0, (FABRIC_FAR - distance) / (FABRIC_FAR - FABRIC_NEAR)));
+      const fabric = props ? 1 - props[i] / 255 : 1;
+      const weight = fabric * Math.min(1, Math.max(0, (FABRIC_FAR - distance) / (FABRIC_FAR - FABRIC_NEAR)));
       target[i] = sr + (r + shade - sr) * weight;
       target[i + 1] = sg + (g + shade - sg) * weight;
       target[i + 2] = sb + (b + shade - sb) * weight;
       target[i + 3] = source[i + 3];
     }
-    canvas.current.width = photo.width;
-    canvas.current.height = photo.height;
+    canvas.current.width = pixels.width;
+    canvas.current.height = pixels.height;
     canvas.current.getContext("2d")!.putImageData(out, 0, 0);
   }, [photo, color]);
 
@@ -114,7 +136,7 @@ function FabricDialog({ product, code, onPick, onClose }: FabricPickerProps & { 
         </div>
 
         <figure className="fabric-preview">
-          {cutout ? <TintedPhoto src={cutout} color={selected.color} alt={`${nameOf(product)} · ${label}`} /> : <img src={swatchImage(selected)} alt={label} />}
+          {cutout ? <TintedPhoto src={cutout} propsMask={propsMaskOf(product)} color={selected.color} alt={`${nameOf(product)} · ${label}`} /> : <img src={swatchImage(selected)} alt={label} />}
           <figcaption>
             <b dir="auto">{label}</b>
             <span className="fabric-badge">{t.fabricSimulation}</span>
