@@ -10,7 +10,7 @@ export interface StatementSection {
 
 export interface Statement {
   title: string;
-  updated: string;
+  updated?: string;
   sections: StatementSection[];
 }
 

@@ -4,7 +4,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ACCESSIBILITY, CATEGORIES, PRODUCTS, detailsOf, pathOf, productRoute, productsIn, reviewsOf } from "../seo-build/entry.js";
+import { ACCESSIBILITY, TERMS, CATEGORIES, PRODUCTS, detailsOf, pathOf, productRoute, productsIn, reviewsOf } from "../seo-build/entry.js";
 
 const SITE_URL = (process.env.SITE_URL ?? "https://betak.co.il").replace(/\/$/, "");
 const DIST = join(dirname(fileURLToPath(import.meta.url)), "../dist");
@@ -109,6 +109,13 @@ function categoryPage(category) {
   });
 }
 
+// The HTML of a text page such as the accessibility statement or the terms.
+function statementBody(statement) {
+  const updated = statement.updated ? `<p>${escape(statement.updated)}</p>` : "";
+  const sections = statement.sections.map((section) => `<h2>${escape(section.title)}</h2>${(section.paragraphs ?? []).map((text) => `<p>${escape(text)}</p>`).join("")}${section.items ? `<ul>${section.items.map((item) => `<li>${escape(item)}</li>`).join("")}</ul>` : ""}`).join("");
+  return `<h1>${escape(statement.title)}</h1>${updated}${sections}`;
+}
+
 const pages = [
   writePage({
     route: "home",
@@ -127,7 +134,13 @@ const pages = [
     route: "accessibility",
     title: `${ACCESSIBILITY.he.title} | ${BRAND}`,
     description: clip(`${ACCESSIBILITY.he.title} של אתר ${BRAND}: רמת הנגישות, ההתאמות שבוצעו ופרטי רכז/ת הנגישות.`),
-    body: `<h1>${ACCESSIBILITY.he.title}</h1><p>${ACCESSIBILITY.he.updated}</p>${ACCESSIBILITY.he.sections.map((section) => `<h2>${escape(section.title)}</h2>${(section.paragraphs ?? []).map((text) => `<p>${escape(text)}</p>`).join("")}${section.items ? `<ul>${section.items.map((item) => `<li>${escape(item)}</li>`).join("")}</ul>` : ""}`).join("")}`,
+    body: statementBody(ACCESSIBILITY.he),
+  }),
+  writePage({
+    route: "terms",
+    title: `${TERMS.he.title} | ${BRAND}`,
+    description: clip(`${TERMS.he.title} אתר ${BRAND}: הזמנה ותשלום, ביטול עסקאות, אחריות ושירות.`),
+    body: statementBody(TERMS.he),
   }),
   writePage({ route: "saved", title: `הרשימה שלי | ${BRAND}`, description: `הרהיטים ששמרתם ב${BRAND}.`, body: "<h1>הרשימה שלי</h1>", index: false }),
 ];

@@ -108,6 +108,8 @@ function redirectFor(url) {
     const current = productPaths[Number.parseInt(segments[1], 10)];
     return current && current !== url.pathname ? current : null;
   }
+  // Old info pages such as /תקנון.
+  if (segments.length === 1 && OLD_ADDRESSES.pages[segments[0]]) return `/${OLD_ADDRESSES.pages[segments[0]]}`;
   if (!OLD_STORE_SECTIONS.has(segments[0])) return null;
   // /חנות/ספות/ספה-פינתית-דגם-קאמילה: the last part names the product, the middle part the section.
   const product = OLD_ADDRESSES.slugs[segments.at(-1)];

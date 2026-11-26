@@ -1,0 +1,138 @@
+// The store's terms and conditions (תקנון), copied from the previous site (betak.co.il/תקנון).
+import type { Lang } from "../i18n/text";
+import type { Statement } from "./accessibility";
+
+export const TERMS: Record<Lang, Statement> = {
+  he: {
+    title: "תקנון",
+    sections: [
+      {
+        title: "כללי",
+        items: [
+          "ביתאק היא חנות אינטרנטית (להלן: \"החנות ו/או האתר\") תוכלו לרכוש מגוון רהיטים בדרך נוחה, קלה ומהירה ובמחירים נוחים לכל כיס.",
+          "מחירי המוצרים בחנות כוללים מע\"מ.",
+          "גיל המינימום לביצוע הזמנה דרך האתר הוא 18 שנים.",
+          "הוראות תקנון זה יחולו על כל שימוש ורכישה שיעשו על ידך בחנות זאת, התקנון מהווה חוזה התקשרות מחייב בינך לבין החנות, לכל דבר ועניין.",
+          "הנך מתבקש לקרוא תקנון זה במלואו ובעיון, כתנאי מוקדם להתקשרות בין הצדדים גלישה בחנות ו/או רכישת המוצר ו/או שירות המוצעים למכירה בו, מהווה את הסכמתך לנהוג על פי הוראות התקנון וכל שימוש בשירותי החנות כפוף להוראות התקנון.",
+          "החברה רשאית לשנות את תנאי תקנון מעת לעת ולפי שיקול החברה הבלעדיים.",
+          "תמונות המוצרים בחנות תואמות למוצר המקורי ואולם בחלק מן המקרים התמונות הינן להמחשה בלבד.",
+          "במוצרים מעץ, בבדים ובעורות ישנם הבדלים של גוון וטקסטורה. כמו כן, עלולה להיות סטייה קלה מהמידות הנקובות במפרט הטכני של המוצע וכד'. הלקוח מסכים לקבלת מוצרים בהם חלו סטיות קלות.",
+          "האתר מקיים בקרה שוטפת על מלאי המוצרים המוצעים למכירה. כאשר המלאי עומד בפני סיום יידע מפעיל האתר את הצרכנים על כך, או יעדכן את מספר המוצרים שנותרו במלאי במקום בולט באתר. אם לאחר ביצוע ההזמנה יתברר כי המוצר אזל, החנות תודיע על כך ללקוח תוך שני ימי עסקים ותאפשר לו לבחור בין קבלת מוצר חלופי ושווה ערך לבין השבת מלוא הסכום ששולם על ידו.",
+          "השימוש באתר מותר לצרכים אישיים ובלתי מסחריים ובאופן ובהיקף המותר על פי כללי השימוש ההוגן והוראות כל דין.",
+          "האתר משתמש כאתר מכירות לצורך רכישת מוצרי ריהוט בהזמנה אישית ומיוחדת.",
+          "לבית משפט השלום נוף הגליל תהיה הסמכות הייחודית והבלעדית לדון בכל תובענה הקשורה בהזמנת מוצרים מאיתנו ו/או בקשר עם שימוש באתר.",
+          "ניתן לבצע בירורים ולקבל כל מידע נוסף בטלפון או בווטסאפ מס 054-6938334 בין השעות 9:00 - 19:00 או בדוא\"ל support@betak.co.il",
+        ],
+      },
+      {
+        title: "אופן הזמנת המוצרים בחנות",
+        items: [
+          "מילוי כל הפרטים מהווה תנאי מוקדם לביצוע ההזמנה. לשם הבטחת ביצוע ההזמנה ביעילות וללא תקלות יש להקפיד על מסירת כל הפרטים במדויק.",
+          "לרשות לקוחות החנות מספר אפשרויות לתשלום: באמצעות כרטיס אשראי - התשלום בכרטיס אשראי בכפוף לתנאי חברת האשראי.",
+          "ניתן למסור את פרטי כרטיס האשראי בטופס הזמנה מאובטח באתר או בטלפון לנציג שירות.",
+          "לידיעתכם, פרטי כרטיס האשראי אינם נשמרים.",
+          "ניתן לשלם בכרטיס האשראי בתשלום אחד או עד 12 תשלומים, בתשלומים שווים ללא ריבית והצמדה או בקרדיט.",
+          "מיד לאחר ביצוע ההזמנה, תיערך בדיקה של פרטי כרטיס האשראי ועם אישור ההזמנה ע\"י חברת האשראי.",
+          "חיוב המזמין בגין עלות המוצר ו/או השירות שהוזמן על ידו, יתבצע באמצעות כרטיס האשראי, לאחר אישור העסקה ע\"י חברת האשראי.",
+          "הפרטים כפי שהוזנו בהליך ההרשמה וכן רישום העסקה במחשבי החנות יהוו ראיה חלוטה לנכונות הפעולות.",
+          "הגשת פרטים כוזבים הינה עבירה פלילית והעושה כן, צפוי להליכים משפטיים פליליים ואזרחיים.",
+          "באחריות הלקוח לבדוק שהמידות שהוזמנו מתאימות לביתו כולל כניסה ומעבר ולוודא שהסחורה תיכנס לביתו, אי כניסה של הסחורה יחוייב הלקוח בתשלום הובלה נוסף, בנוסף יחוייב הלקוח על ייצור פריט ו/או חלק נוסף שיותאמו לבית הלקוח.",
+          "לפרטים נוספים ובירורים, ניתן לפנות ישירות אלינו בטלפון ו/או באמצעות דואר אלקטרוני כפי שאלה מופיעים בקישור \"יצירת קשר\" בחנות.",
+        ],
+      },
+      {
+        title: "ביטול עסקאות",
+        items: [
+          "זכות ביטול בהתאם לחוק הגנת הצרכן, התשמ\"א-1981, רשאי הצרכן לבטל עסקה בתוך 14 ימים ממועד קבלת המוצר, בתנאי שהמוצר חדש, לא נעשה בו שימוש, לא הורכב והוא באריזתו המקורית.",
+          "לשים לב שהמוצר שיוצר בייצור אישי עבורך אינו ניתן לביטול (רשום מתחת לכל מוצר בהחרגות והערות אם המוצר מיוצר במיוחד עבורך/מוצר שמחזיקים במלאי). אם הנך אזרח ותיק, עולה חדש או אדם עם מוגבלות כהגדרתם בחוק הגנת הצרכן וההתקשרות בעסקה כללה שיחה בינך ובין החברה (לרבות שיחה באמצעות תקשורת אלקטרונית) הנך רשאי לבטל את העסקה בתוך ארבעה חודשים ממועד קבלת המוצר או מיום קבלת מסמך גילוי (לפי המאוחר מביניהם) אך יהיה עליך להציג תעודה המעידה על השתייכותך לאחת מאוכלוסיות אלה, על פי הקבוע בחוק הגנת הצרכן.",
+          "זכות הביטול לא תחול כאשר המוצר מיוצר במיוחד עבורך, החל ממועד תחילת ייצורו. בהתאם להוראות חוק הגנת הצרכן והתקנות אשר הותקנו בעקבותיו, זכות הביטול לא תחול לגבי מוצר שיוצר במיוחד בעבור הצרכן לפי מידות/צבעים/סוגי בדים ו/או דרישות מיוחדות של המזמין ו/או מוצר אשר אינו מוחזק במלאי באופן שוטף.",
+          "מוצר שהורכב בבית הלקוח, בין אם על ידו או על ידי מרכיב מוסמך, לא יהיה ניתן לביטול עסקה.",
+          "החזרת המוצר היא באחריותך ועל חשבונך ועליך לוודא כי לא ייגרם לו נזק במהלך ההובלה. אם יתברר כי במוצר שהוחזר נגרם פגם או נזק, נהיה רשאים לתבוע ממך פיצוי בגין כך. אם תבקש כי החזרת המוצר תיעשה על ידינו הדבר כרוך בתשלום דמי הובלה בסך 350 ₪ בצירוף תוספת עבור הובלה מאזורים מרוחקים, לפי הפירוט הקבוע בסע’ 28 שלעיל.",
+          "כספך יוחזר לך בתוך 14 ימים מיום קבלת ההודעה על הביטול, למעט דמי ביטול בשיעור של 5% ממחיר המוצר ועד 100 ₪.",
+          "במקרה של פגם במוצר רשאית החברה לתקן את הפגם או לספק מוצר חדש זהה וכל זאת בהתאם לשיקול החברה.",
+          "סעיף יסוד - ביתאק תהיה רשאית לבטל כל עסקה במידה והדגם השתנה, נגמר מהמלאי/ לא ניתן להשיג אותו עוד. במידה ואירוע מסוג זה מתרחש מבצע ההזמנה מצהיר כי הוא מודע לכך כי יהיה איחור בזמן האספקה או ביטול העסקה ללא פיצוי ותמורה כלשהי.",
+          "התמונות של המוצרים המוצעים באתר הם להמחשה בלבד.",
+          "שים לב: בחלק מן המוצרים עשוי להיות שוני בין המוצר המוצג לבין המוצר שיתקבל כתוצאה מתכונות המוצר.",
+          "שים לב: בחלק מן המוצרים צפויים להיווצר שינויים מסויימים כתוצאה מן השימוש, כגון שינויים בתפרים, שקיעה או התרוככות במידה סבירה של רכיבים רכים כגון כריות וחומרי ריפוד, קימוט של הבד ושינוי גוון בבדי מיקרופייבר קטיפתיים. שינויים אלה נובעים מתכונותיו הטבעיות של החומר, אינם מהווים אי התאמה, פגם או תקלה ולא תינתן אחריות בגינם. מובהר, כי הריהיטים מיוצרים באופן אשר לוקח בחשבון את השפעת השימוש על הרהיט, במידה מסויימת של התרוככות או כיו\"ב.",
+          "כל פנייה לבקשה לביטול עסקה /תלונה על המוצר ייעשה בכתב בלבד, באמצעות הדואר האלקטרוני ל רהיטי ביתאק כאשר על מבצע הפעולה מוטלת האחריות לוודא את קבלת ההודעה.",
+        ],
+      },
+      {
+        title: "אחריות ושירות",
+        items: [
+          "אנו עושים כמיטב יכולתנו לשרת אתכם נאמנה. בכל שאלה בנוגע למוצר עצמו, מפרט טכני.",
+          "אנו נעשה את המיטב לתת מענה לכל שאלה או בעיה.",
+          "האחריות למערכת הישיבה, סלונים ומיטות לשנה אחת.",
+          "האחריות לא תחול במקרה של נזק פיזי, פגיעת ברק, השחתות שונות, שריפה, רטיבות או שימוש בלתי סביר במוצר.",
+          "במקרה של פגם קל במוצר הניתן לתיקון מיידי נשמרת לחנות הזכות לתקן את המוצר לשביעות רצונו המלאה של המזמין תוך 14 ימי עסקים. אם לא ניתן לתקנו יוחלף המוצר במוצר חדש או שכספו של המזמין יושב לו.",
+        ],
+      },
+    ],
+  },
+  en: {
+    title: "Terms and conditions",
+    sections: [
+      {
+        title: "General",
+        items: [
+          "Betak is an online store (the \"store\" or the \"site\") where you can buy a wide range of furniture easily and quickly, at prices that suit every budget.",
+          "Product prices in the store include VAT.",
+          "You must be at least 18 years old to order through the site.",
+          "These terms apply to every use of and purchase from this store, and form a binding contract between you and the store in every respect.",
+          "Please read these terms fully and carefully before doing business with us. Browsing the store or buying a product or service offered on it means you agree to these terms, and every use of the store's services is subject to them.",
+          "The company may change these terms from time to time at its sole discretion.",
+          "Product photos match the original product, but in some cases they are for illustration only.",
+          "Wood, fabric and leather products vary in shade and texture, and there may be a slight deviation from the dimensions in the product's technical specification. The customer agrees to receive products with slight deviations.",
+          "The site monitors the stock of the products it offers. When stock is running out, the site operator will let customers know or show the number of items left in a prominent place on the site. If a product turns out to be sold out after an order is placed, the store will inform the customer within two business days and let them choose between an equivalent replacement and a full refund of the amount paid.",
+          "The site may be used for personal, non-commercial purposes, in the manner and scope allowed by fair use and by law.",
+          "The site is a sales site for buying furniture made to personal, special order.",
+          "The Nof HaGalil Magistrates' Court has sole and exclusive jurisdiction over any claim concerning orders from us or the use of the site.",
+          "For questions and any further information, call or WhatsApp 054-6938334 between 9:00 and 19:00, or email support@betak.co.il.",
+        ],
+      },
+      {
+        title: "How to order",
+        items: [
+          "Filling in all the details is a precondition for placing an order. To make sure your order goes through smoothly, please give all details accurately.",
+          "Payment options: by credit card, subject to the credit card company's terms.",
+          "Card details can be given in the secure order form on the site or by phone to a customer service representative.",
+          "Please note that credit card details are not stored.",
+          "You can pay by credit card in one payment or up to 12 equal payments without interest or linkage, or by credit.",
+          "Right after the order is placed, the card details are checked and the order is approved by the credit card company.",
+          "The customer is charged for the product or service ordered by credit card after the credit card company approves the transaction.",
+          "The details entered when ordering and the record of the transaction in the store's computers are conclusive evidence that the actions were correct.",
+          "Giving false details is a criminal offence and may lead to criminal and civil proceedings.",
+          "The customer is responsible for checking that the dimensions ordered fit their home, including the entrance and the way in, and that the goods will get inside. If the goods cannot get in, the customer will pay for another delivery and for making an item or part adapted to their home.",
+          "For more details and questions, contact us directly by phone or email, as listed on the store's Contact page.",
+        ],
+      },
+      {
+        title: "Cancelling an order",
+        items: [
+          "Under the Consumer Protection Law, 5741-1981, a consumer may cancel a transaction within 14 days of receiving the product, provided the product is new, unused, unassembled and in its original packaging.",
+          "Please note that a product made to order for you cannot be cancelled (each product's exclusions and notes say whether it is made especially for you or kept in stock). If you are a senior citizen, a new immigrant or a person with a disability as defined in the Consumer Protection Law, and the transaction included a conversation between you and the company (including by electronic means), you may cancel within four months of receiving the product or the disclosure document (whichever is later), but you must show a certificate proving that you belong to one of these groups, as the Consumer Protection Law sets out.",
+          "The right to cancel does not apply once production of a product made especially for you has started. Under the Consumer Protection Law and its regulations, the right to cancel does not apply to a product made especially for the consumer to their dimensions, colours, fabrics or other special requirements, or to a product that is not regularly kept in stock.",
+          "A product that has been assembled in the customer's home, whether by the customer or by a qualified assembler, cannot be cancelled.",
+          "Returning the product is your responsibility and at your expense, and you must make sure it is not damaged in transit. If the returned product turns out to be damaged or defective, we may claim compensation from you. If you ask us to collect the product, a delivery fee of ₪350 applies, plus a surcharge for remote areas, as set out in section 28 above.",
+          "Your money will be refunded within 14 days of receiving the cancellation notice, minus a cancellation fee of 5% of the product's price, up to ₪100.",
+          "If a product is defective, the company may repair the defect or supply an identical new product, at its discretion.",
+          "Fundamental clause: Betak may cancel any transaction if the model has changed, is out of stock or can no longer be obtained. If this happens, the customer declares that they are aware that delivery may be delayed or the transaction cancelled without any compensation.",
+          "Photos of the products on the site are for illustration only.",
+          "Please note: some products may differ from the product shown because of the product's properties.",
+          "Please note: some products are expected to change somewhat with use, such as changes in the stitching, reasonable sinking or softening of soft parts such as cushions and padding, creasing of the fabric and a change of shade in velvety microfibre fabrics. These changes come from the natural properties of the material, are not a mismatch, defect or fault, and are not covered by the warranty. The furniture is made with the effect of use, such as some softening, in mind.",
+          "Every request to cancel a transaction or complaint about a product must be made in writing only, by email to Betak Furniture, and the sender is responsible for making sure the message was received.",
+        ],
+      },
+      {
+        title: "Warranty and service",
+        items: [
+          "We do our best to serve you faithfully with any question about the product itself or its technical specification.",
+          "We will do our best to answer every question or problem.",
+          "Seating systems, living room sets and beds carry a one-year warranty.",
+          "The warranty does not cover physical damage, lightning, vandalism, fire, moisture or unreasonable use of the product.",
+          "If a product has a minor defect that can be repaired right away, the store may repair it to the customer's full satisfaction within 14 business days. If it cannot be repaired, the product will be replaced with a new one or the customer's money refunded.",
+        ],
+      },
+    ],
+  },
+};
