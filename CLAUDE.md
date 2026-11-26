@@ -16,6 +16,7 @@ Vite + React 19 + TypeScript, plain CSS, three.js. Hebrew (RTL) and English.
 - `src/data`: catalog, `galleries.json` (photos per product, files in `public/img/g`), `reviews.json`, `accessibility.ts` (accessibility statement), `store.ts` (phone, email).
 - `scripts/prerender.mjs` + `src/seo/entry.ts`: static pages with titles, meta, canonical and JSON-LD.
 - `server/server.mjs`: no-dependency Node server. `server/redirects.json` maps old betak.co.il addresses to new ones (301).
+- Orders: the cart form saves each order (`src/lib/orders.ts` → `POST /api/orders`, `server/orders.mjs`, Firestore) then opens WhatsApp. The private page `/admin/orders` (`src/pages/AdminOrders.tsx`) needs Google sign-in with an account in `ADMIN_EMAILS` (`server/admin-auth.mjs`). Setup in README.
 - AI agent: `src/lib/agent.ts` calls `/api/designer`, which calls Gemini on Vertex AI (`GEMINI_MODEL`, default gemini-3.8-flash).
 - Room designer (`src/pages/Designer.tsx`, scene) and 3D showroom (`src/showroom`). AI-made 3D models in `public/models`.
 

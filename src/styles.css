@@ -857,3 +857,34 @@ html.a11y-grayscale { filter: grayscale(1); }
 .cookie-notice a { color: var(--accent-ink); text-decoration: underline; }
 .cookie-notice .btn { flex-shrink: 0; }
 @media (max-width: 600px) { .cookie-notice { flex-direction: column; align-items: stretch; } }
+
+/* Order details in the cart */
+.order-form { display: grid; gap: 10px; padding-block: 16px; border-top: 1px solid var(--line); margin-top: 8px; }
+.order-form h3 { margin: 0; font-size: 16px; }
+.order-form label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
+.order-form input, .order-form textarea { font: inherit; font-weight: 400; padding: 9px 12px; border: 1px solid var(--muted); border-radius: 4px; background: var(--surface); }
+.order-form input[dir="ltr"] { text-align: end; }
+.order-saved { margin: 0; font-weight: 600; }
+.order-saved:empty { display: none; }
+.drawer button.btn:disabled { opacity: .7; cursor: wait; }
+
+/* The store's orders page */
+.admin-orders { padding-block: 32px 64px; }
+.admin-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.admin-signin { display: grid; gap: 16px; justify-items: start; padding: 24px; background: var(--surface); border: 1px solid var(--line); max-width: 480px; }
+.admin-tools { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-block: 16px 4px; }
+.admin-search { flex: 1 1 260px; }
+.admin-search input { width: 100%; font: inherit; padding: 9px 12px; border: 1px solid var(--muted); border-radius: 4px; background: var(--surface); }
+.admin-check { display: inline-flex; gap: 8px; align-items: center; }
+.table-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); }
+.orders-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.orders-table th, .orders-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: start; vertical-align: top; }
+.orders-table thead th { background: var(--paper); white-space: nowrap; }
+.orders-table tbody tr.unread { background: #fff8ea; }
+.orders-table tbody tr.unread th, .orders-table tbody tr.unread td:nth-child(4) { font-weight: 700; }
+.orders-table input[type="checkbox"] { inline-size: 20px; block-size: 20px; }
+.contact-links { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+.contact-links a { white-space: nowrap; }
+.order-note { margin: 6px 0 0; max-width: 32ch; }
+.order-lines { margin: 0; padding-inline-start: 18px; min-width: 220px; }
+.order-lines small { display: block; }

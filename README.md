@@ -79,4 +79,32 @@ gcloud artifacts repositories create betak --repository-format docker --location
 
 ## Ordering
 
-The cart sends the order to the store's WhatsApp number. There is no online payment yet.
+The cart asks for the customer's name, phone, email (optional) and a note, saves the order on the server
+(`POST /api/orders`, kept in Firestore with its own order number from 5001) and then opens WhatsApp with the
+order and its number. If saving fails, WhatsApp still opens. There is no online payment yet.
+
+### The store's orders page
+
+`/admin/orders` lists the orders (newest first, up to 300) with WhatsApp, phone and email links, a "read"
+checkbox, search, an unread filter and export to Excel. It is linked from nowhere, never indexed, and the
+server hands orders only to a Google account listed in `ADMIN_EMAILS` (`server/admin-auth.mjs`).
+
+One-time setup in the project:
+
+```bash
+PROJECT=cs-poc-powbbzquo5jfciibv06ma0z
+gcloud services enable firestore.googleapis.com --project $PROJECT
+gcloud firestore databases create --location me-west1 --project $PROJECT
+# The Cloud Run service account reads and writes orders:
+gcloud projects add-iam-policy-binding $PROJECT --member serviceAccount:<run service account> --role roles/datastore.user
+```
+
+- Google sign-in: in the Cloud console, Google Auth Platform → Clients → Create client → Web application.
+  Authorized JavaScript origins: the Cloud Run address and `https://betak.co.il`. Copy the client id.
+- Tell the service who may sign in (kept on the service, not in the code):
+  `gcloud run services update betak-website --region me-west1 --project $PROJECT --update-env-vars GOOGLE_CLIENT_ID=<client id>,ADMIN_EMAILS=<gmail>`
+  (several emails: separate with `\,` or use `--env-vars-file`).
+
+Local run without Google Cloud: `ORDERS_STORE=memory npm start` keeps orders in memory. To open the orders
+page locally, also set `ADMIN_TEST_TOKEN` and put the same value in the tab's `sessionStorage`
+(`betak.admin.token`); the production image ignores it.
