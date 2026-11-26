@@ -79,9 +79,38 @@ gcloud artifacts repositories create betak --repository-format docker --location
 
 ## Ordering
 
-The cart asks for the customer's name, phone, email (optional) and a note, saves the order on the server
-(`POST /api/orders`, kept in Firestore with its own order number from 5001) and then opens WhatsApp with the
-order and its number. If saving fails, WhatsApp still opens. There is no online payment yet.
+The cart asks for the same details as the old site: first and last name, email, main and other phone, the
+full address (city, street, house, entrance, floor, apartment, door code, postcode), notes, whether there is
+a lift, and how to pay. The order is saved on the server (`POST /api/orders`, kept in Firestore with its own
+order number from 5001). Prices and the total come from the catalog (`dist/prices.json`, written by the build),
+never from the browser.
+
+- **Order by phone:** WhatsApp opens with the order and its number, as before. If saving fails, WhatsApp still opens.
+- **Pay by credit card (UPay):** the customer moves to UPay's secure payment page (`server/upay.mjs`); card
+  details never reach this site. UPay sends the customer back to `/paid?order=<number>` and reports the payment
+  to `/api/upay/ipn`, which marks the order on the orders page. Shown only when `UPAY_EMAIL` is set.
+
+### Card payments (UPay)
+
+Settings on the Cloud Run service (none of them is a secret):
+
+| Variable | Meaning |
+| --- | --- |
+| `UPAY_EMAIL` | The UPay account's email. Turns card payment on. |
+| `UPAY_LIVE` | `1` takes real money. Anything else uses UPay's test mode. |
+| `UPAY_MAX_PAYMENTS` | Most installments offered (default 10). |
+| `UPAY_INVOICE` | `1` asks UPay to issue the invoice and receipt. |
+| `PUBLIC_SITE_URL` | Optional, e.g. `https://betak.co.il`, for UPay's return and report addresses. |
+
+```bash
+gcloud run services update betak-website --region me-west1 --project $PROJECT --update-env-vars UPAY_EMAIL=<upay email>,UPAY_LIVE=0
+```
+
+UPay does not publish its API, so the report from UPay is stored as it arrives and read defensively. Every
+order's report address carries a random token, but the customer can see that address, so a report is not proof
+of payment: the orders page says "UPay reported paid" and asks to confirm in UPay before shipping. Once UPay
+send their API documentation and an API key, the server can check each payment with UPay directly; the key
+then goes in Secret Manager (`--update-secrets UPAY_KEY=upay-key:latest`), never in the code or the chat.
 
 ### The store's orders page
 

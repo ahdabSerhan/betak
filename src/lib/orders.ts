@@ -9,33 +9,93 @@ export interface OrderLine {
   price: number;
 }
 
+export interface Address {
+  city: string;
+  street: string;
+  house: string;
+  entrance: string;
+  floor: string;
+  apartment: string;
+  entryCode: string;
+  zip: string;
+}
+
+export type PayWith = "card" | "phone";
+
 export interface NewOrder {
-  name: string;
+  firstName: string;
+  lastName: string;
   phone: string;
+  phone2: string;
   email: string;
+  address: Address;
+  elevator: "" | "yes" | "no";
+  payWith: PayWith;
   note: string;
   lang: string;
   lines: OrderLine[];
 }
 
-export interface Order extends NewOrder {
+// What UPay reported about a card payment; orders from before card payments have none.
+export interface Payment {
+  method: "upay";
+  status: "pending" | "reported" | "failed" | "amount-mismatch";
+  live: boolean;
+  amount?: number | null;
+  reference?: string;
+  payments?: string;
+  reportedAt?: string;
+}
+
+// Older orders have only a name, phone, email and note, so the newer fields are optional.
+export interface Order extends Omit<NewOrder, "firstName" | "lastName" | "phone2" | "address" | "elevator" | "payWith"> {
   id: string;
   number: number;
+  name: string;
+  phone2?: string;
+  address?: Address;
+  elevator?: string;
+  payWith?: PayWith;
+  payment?: Payment;
   total: number;
   source: string;
   read: boolean;
   createdAt: string;
 }
 
-// Saves the order and returns its number, or null when the server could not save it.
-export async function saveOrder(order: NewOrder): Promise<number | null> {
+// Saves the order. A card order also gets the address of UPay's payment page.
+export async function saveOrder(order: NewOrder): Promise<{ number: number; payUrl?: string } | null> {
   try {
     const response = await fetch("/api/orders", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(order) });
     if (!response.ok) return null;
-    return (await response.json()).number ?? null;
+    const answer = await response.json();
+    return answer.number ? answer : null;
   } catch {
     return null;
   }
+}
+
+// Whether card payment is set up on the server, and the most installments offered.
+export async function paymentConfig(): Promise<{ card: boolean; maxPayments: number }> {
+  try {
+    const response = await fetch("/api/payments/config");
+    return response.ok ? await response.json() : { card: false, maxPayments: 1 };
+  } catch {
+    return { card: false, maxPayments: 1 };
+  }
+}
+
+// One line for an address, e.g. "הרצל 12, כניסה ב, קומה 3, דירה 7, תל אביב".
+export function addressLine(address: Address | undefined, t: { entrance: string; floor: string; apartment: string; entryCode: string }) {
+  if (!address) return "";
+  return [
+    [address.street, address.house].filter(Boolean).join(" "),
+    address.entrance && `${t.entrance} ${address.entrance}`,
+    address.floor && `${t.floor} ${address.floor}`,
+    address.apartment && `${t.apartment} ${address.apartment}`,
+    address.entryCode && `${t.entryCode} ${address.entryCode}`,
+    [address.city, address.zip].filter(Boolean).join(" "),
+  ].filter(Boolean).join(", ");
 }
 
 export type AdminStatus = "ok" | "signed-out" | "not-allowed" | "error";

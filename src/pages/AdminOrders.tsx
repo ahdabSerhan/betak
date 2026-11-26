@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { STORE } from "../data/store";
 import { money } from "../lib/format";
-import { adminConfig, listOrders, markRead, type AdminStatus, type Order } from "../lib/orders";
+import { addressLine, adminConfig, listOrders, markRead, type AdminStatus, type Order } from "../lib/orders";
+import type { Text } from "../i18n/text";
 import { useShop } from "../state/ShopContext";
 
 // Google's sign-in script, loaded only on this page.
@@ -62,11 +63,16 @@ function loadGoogle(): Promise<void> {
 const digits = (phone: string) => phone.replace(/\D/g, "");
 const whatsappNumber = (phone: string) => (digits(phone).startsWith("0") ? `972${digits(phone).slice(1)}` : digits(phone));
 
-function exportCsv(orders: Order[], headings: string[]) {
+// How an order is paid, in the store's words: a phone order, or the state of its card payment.
+const paymentLabel = (order: Order, statuses: Record<string, string>) => statuses[order.payment?.status ?? "phone"] ?? statuses.phone;
+
+function exportCsv(orders: Order[], headings: string[], a: Text["admin"], c: Text["checkout"]) {
   const cell = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`;
   const rows = orders.map((order) => [
-    order.number, new Date(order.createdAt).toLocaleString("he-IL"), order.name, order.phone, order.email, order.note,
-    order.lines.map((line) => `${line.name} ×${line.quantity}${line.design ? ` (${line.design})` : ""}`).join("; "), order.total, order.read ? "✓" : "",
+    order.number, new Date(order.createdAt).toLocaleString("he-IL"), order.name, order.phone, order.phone2 ?? "", order.email,
+    addressLine(order.address, c), order.elevator ? (order.elevator === "yes" ? a.yes : a.no) : "", order.note,
+    order.lines.map((line) => `${line.name} ×${line.quantity}${line.design ? ` (${line.design})` : ""}`).join("; "), order.total,
+    paymentLabel(order, a.payStatus), order.payment?.reference ?? "", order.read ? "✓" : "",
   ]);
   // The byte order mark tells Excel the file is UTF-8, so Hebrew shows correctly.
   const csv = "﻿" + [headings, ...rows].map((row) => row.map(cell).join(",")).join("\r\n");
@@ -75,6 +81,21 @@ function exportCsv(orders: Order[], headings: string[]) {
   link.download = `betak-orders-${new Date().toISOString().slice(0, 10)}.csv`;
   link.click();
   URL.revokeObjectURL(link.href);
+}
+
+// The payment state of an order; a card payment UPay reported still has to be confirmed in UPay before shipping.
+function PaymentCell({ order }: { order: Order }) {
+  const a = useShop().t.admin;
+  const payment = order.payment;
+  return (
+    <div className={`pay-state ${payment?.status ?? "phone"}`}>
+      <b>{paymentLabel(order, a.payStatus)}</b>
+      {payment && !payment.live && <small> ({a.test})</small>}
+      {payment?.payments && Number(payment.payments) > 1 && <small>{a.installments(payment.payments)}</small>}
+      {payment?.reference && <small>{a.reference}: <span dir="ltr">{payment.reference}</span></small>}
+      {payment && payment.status !== "pending" && <small className="muted">{a.payCheck}</small>}
+    </div>
+  );
 }
 
 function OrderRow({ order, onRead }: { order: Order; onRead: (order: Order, read: boolean) => void }) {
@@ -90,8 +111,11 @@ function OrderRow({ order, onRead }: { order: Order; onRead: (order: Order, read
         <div className="contact-links">
           <a href={`https://wa.me/${whatsappNumber(order.phone)}`} target="_blank" rel="noopener">{a.whatsapp}</a>
           <a href={`tel:${digits(order.phone)}`} dir="ltr">{order.phone}</a>
+          {order.phone2 && <a href={`tel:${digits(order.phone2)}`} dir="ltr">{order.phone2}</a>}
           {order.email && <a href={`mailto:${order.email}`}>{a.email}</a>}
         </div>
+        {order.address && <p className="order-note"><b>{a.address}:</b> {addressLine(order.address, t.checkout)}</p>}
+        {order.elevator && <p className="order-note"><b>{a.elevator}:</b> {order.elevator === "yes" ? a.yes : a.no}</p>}
         {order.note && <p className="order-note"><b>{a.note}:</b> {order.note}</p>}
       </td>
       <td>
@@ -101,7 +125,10 @@ function OrderRow({ order, onRead }: { order: Order; onRead: (order: Order, read
           ))}
         </ul>
       </td>
-      <td className="price">{money(order.total)}</td>
+      <td>
+        <span className="price">{money(order.total)}</span>
+        <PaymentCell order={order} />
+      </td>
     </tr>
   );
 }
@@ -171,7 +198,7 @@ export function AdminOrders() {
     return orders.filter((order) => (!unreadOnly || !order.read) && matches(order));
   }, [orders, unreadOnly, search]);
 
-  const headings = [a.number, a.date, a.customer, a.phone, a.email, a.note, a.items, a.total, a.read];
+  const headings = [a.number, a.date, a.customer, a.phone, a.phone2, a.email, a.address, a.elevator, a.note, a.items, a.total, a.payment, a.reference, a.read];
 
   return (
     <section className="wrap admin-orders">
@@ -197,7 +224,7 @@ export function AdminOrders() {
             </label>
             <label className="admin-check"><input type="checkbox" checked={unreadOnly} onChange={(event) => setUnreadOnly(event.target.checked)} /> {a.unreadOnly}</label>
             <button className="btn ghost small" onClick={load}>{a.refresh}</button>
-            <button className="btn small" onClick={() => exportCsv(shown, headings)} disabled={shown.length === 0}>{a.export}</button>
+            <button className="btn small" onClick={() => exportCsv(shown, headings, a, t.checkout)} disabled={shown.length === 0}>{a.export}</button>
           </div>
           <p role="status" className="muted">
             {status === "loading" ? a.loading : status === "not-allowed" ? a.notAllowed : status === "error" ? a.error : a.count(shown.length, orders.filter((order) => !order.read).length)}
@@ -207,7 +234,7 @@ export function AdminOrders() {
             <div className="table-scroll" tabIndex={0} role="region" aria-label={a.title}>
               <table className="orders-table">
                 <thead>
-                  <tr><th scope="col">{a.read}</th><th scope="col">{a.number}</th><th scope="col">{a.date}</th><th scope="col">{a.customer}</th><th scope="col">{a.contact}</th><th scope="col">{a.items}</th><th scope="col">{a.total}</th></tr>
+                  <tr><th scope="col">{a.read}</th><th scope="col">{a.number}</th><th scope="col">{a.date}</th><th scope="col">{a.customer}</th><th scope="col">{a.contact}</th><th scope="col">{a.items}</th><th scope="col">{a.total} / {a.payment}</th></tr>
                 </thead>
                 <tbody>
                   {shown.map((order) => <OrderRow order={order} onRead={onRead} key={order.id} />)}

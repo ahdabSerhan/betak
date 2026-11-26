@@ -1,12 +1,14 @@
 // Production server: serves the built site and the AI designer endpoint (Gemini on Vertex AI).
 // On Cloud Run it signs in as the service account, so there is no API key to manage.
 // Local run: npm run build && GOOGLE_CLOUD_PROJECT=<project> GOOGLE_ACCESS_TOKEN=$(gcloud auth print-access-token) npm start
+import { timingSafeEqual } from "node:crypto";
 import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { adminConfig, checkAdmin } from "./admin-auth.mjs";
 import { cleanOrder, createOrderStore } from "./orders.mjs";
+import { newPayment, paymentConfig, paymentsEnabled, paymentUrl, readReport } from "./upay.mjs";
 
 const PORT = Number(process.env.PORT ?? 8080);
 const MODEL = process.env.GEMINI_MODEL ?? "gemini-3.8-flash";
@@ -40,14 +42,16 @@ function sendJson(response, status, payload) {
   response.end(JSON.stringify(payload));
 }
 
-async function readJson(request) {
+async function readBody(request) {
   let body = "";
   for await (const chunk of request) {
     body += chunk;
     if (body.length > MAX_BODY_BYTES) throw new Error("Request too large");
   }
-  return JSON.parse(body);
+  return body;
 }
+
+const readJson = async (request) => JSON.parse(await readBody(request));
 
 // Google Cloud's metadata server knows the project and hands out access tokens.
 async function metadata(path) {
@@ -81,13 +85,28 @@ function tooManyOrders(request) {
   return times.length >= ORDERS_PER_HOUR;
 }
 
-// A visitor sends an order from the cart; the answer carries its order number.
+// Catalog prices by product id, written by the build, so an order's total never trusts the browser.
+const PRICES = existsSync(join(SITE_ROOT, "prices.json")) ? JSON.parse(readFileSync(join(SITE_ROOT, "prices.json"), "utf8")) : {};
+const priceOf = (productId) => PRICES[productId];
+
+// This site's own address, for the links UPay sends the customer and its report back to.
+function siteUrl(request) {
+  if (process.env.PUBLIC_SITE_URL) return process.env.PUBLIC_SITE_URL.replace(/\/$/, "");
+  const protocol = String(request.headers["x-forwarded-proto"] ?? "http").split(",")[0];
+  return `${protocol}://${request.headers.host}`;
+}
+
+// A visitor sends an order from the cart; the answer carries its order number,
+// and for a card payment the address of UPay's payment page.
 async function handleNewOrder(request, response) {
   try {
     if (tooManyOrders(request)) return sendJson(response, 429, { error: "Too many orders" });
-    const { order, error } = cleanOrder(await readJson(request));
+    const { order, error } = cleanOrder(await readJson(request), priceOf);
     if (error) return sendJson(response, 400, { error });
+    if (order.payWith === "card" && !paymentsEnabled()) return sendJson(response, 409, { error: "payments-off" });
+    if (order.payWith === "card") order.payment = newPayment();
     const saved = await orders.add(order);
+    if (saved.payment) return sendJson(response, 201, { number: saved.number, payUrl: paymentUrl(saved, siteUrl(request)) });
     sendJson(response, 201, { number: saved.number });
   } catch (error) {
     // The cart still sends the order on WhatsApp when this fails.
@@ -96,13 +115,40 @@ async function handleNewOrder(request, response) {
   }
 }
 
+// UPay reports a payment to the address the order gave it; the token in that address must match the order's.
+async function handlePaymentReport(request, response, url) {
+  try {
+    const body = request.method === "POST" ? await readBody(request) : "";
+    const fields = Object.fromEntries(url.searchParams);
+    // UPay's format is not published, so both a form and JSON body are read.
+    const bodyFields = body.trim().startsWith("{") ? JSON.parse(body) : Object.fromEntries(new URLSearchParams(body));
+    Object.assign(fields, typeof bodyFields === "object" && bodyFields ? bodyFields : {});
+    const token = String(fields.token ?? "");
+    delete fields.token;
+    const order = /^\d+$/.test(String(fields.order)) ? await orders.get(String(fields.order)) : null;
+    const expected = Buffer.from(order?.payment?.token ?? "");
+    if (!order || expected.length === 0 || expected.length !== token.length || !timingSafeEqual(expected, Buffer.from(token))) {
+      return sendJson(response, 404, { error: "Unknown order" });
+    }
+    await orders.setPayment(order.id, { ...order.payment, ...readReport(fields, order) });
+    response.writeHead(200, { "content-type": "text/plain", "cache-control": "no-store" });
+    response.end("OK");
+  } catch (error) {
+    console.error(error);
+    sendJson(response, 500, { error: "Could not record the payment." });
+  }
+}
+
+// The payment token is only for UPay's report, so the orders page never sees it.
+const withoutToken = (order) => (order.payment ? { ...order, payment: { ...order.payment, token: undefined } } : order);
+
 // The store's own orders page: list the orders, mark one read or unread.
 async function handleAdmin(request, response, pathname) {
   if (pathname === "/api/admin/config") return sendJson(response, 200, adminConfig());
   const access = await checkAdmin(request);
   if (access !== "ok") return sendJson(response, access === "signed-out" ? 401 : 403, { error: access });
   try {
-    if (pathname === "/api/admin/orders" && request.method === "GET") return sendJson(response, 200, { orders: await orders.list() });
+    if (pathname === "/api/admin/orders" && request.method === "GET") return sendJson(response, 200, { orders: (await orders.list()).map(withoutToken) });
     const match = pathname.match(/^\/api\/admin\/orders\/(\d+)$/);
     if (match && request.method === "PATCH") {
       await orders.setRead(match[1], Boolean((await readJson(request)).read));
@@ -204,6 +250,8 @@ createServer((request, response) => {
   if (pathname === "/api/designer") return request.method === "POST" ? handleDesigner(request, response) : sendJson(response, 405, { error: "Use POST" });
   if (pathname === "/api/orders") return request.method === "POST" ? handleNewOrder(request, response) : sendJson(response, 405, { error: "Use POST" });
   if (pathname.startsWith("/api/admin/")) return handleAdmin(request, response, pathname);
+  if (pathname === "/api/payments/config") return sendJson(response, 200, paymentConfig());
+  if (pathname === "/api/upay/ipn") return handlePaymentReport(request, response, url);
   if (request.method !== "GET" && request.method !== "HEAD") return sendJson(response, 405, { error: "Method not allowed" });
   const host = request.headers.host ?? "";
   // One domain: www.betak.co.il sends visitors to betak.co.il.
@@ -214,8 +262,8 @@ createServer((request, response) => {
   if (moved) return redirect(response, moved);
   // One address per page: /sofas/ and /sofas are the same page, so the slash is dropped.
   if (pathname.length > 1 && pathname.endsWith("/")) return redirect(response, pathname.slice(0, -1) + url.search);
-  // The orders page is the site's own app, never indexed and never cached.
-  if (pathname === "/admin/orders") {
+  // The orders page and the after-payment page are the site's own app, never indexed and never cached.
+  if (pathname === "/admin/orders" || pathname === "/paid") {
     response.writeHead(200, { "content-type": CONTENT_TYPES[".html"], "cache-control": "no-store", "x-robots-tag": "noindex, nofollow" });
     return createReadStream(join(SITE_ROOT, "index.html")).pipe(response);
   }

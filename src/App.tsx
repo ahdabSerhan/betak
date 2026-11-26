@@ -17,6 +17,7 @@ import { CategoryPage } from "./pages/CategoryPage";
 import { Contact } from "./pages/Contact";
 import { Designer } from "./pages/Designer";
 import { Home } from "./pages/Home";
+import { Paid } from "./pages/Paid";
 import { ProductPage } from "./pages/ProductPage";
 import { Saved } from "./pages/Saved";
 import { useShop } from "./state/ShopContext";
@@ -35,6 +36,7 @@ function Page({ route }: { route: string }) {
   if (route === "terms") return <Terms />;
   if (route === "privacy") return <Privacy />;
   if (route === "shipping") return <Shipping />;
+  if (route === "paid") return <Paid />;
   return <Home />;
 }
 
@@ -49,9 +51,9 @@ export function App() {
   const product = productFromRoute(route);
   const category = CATEGORIES.find((item) => item.id === route);
 
-  // The store's orders page stands alone: no shop menu, chat or cart, and never indexed.
+  // The store's orders page and the after-payment page are never indexed.
   useEffect(() => {
-    if (route !== "admin") return;
+    if (route !== "admin" && route !== "paid") return;
     const robots = Object.assign(document.createElement("meta"), { name: "robots", content: "noindex, nofollow" });
     document.head.append(robots);
     return () => robots.remove();
@@ -59,7 +61,7 @@ export function App() {
 
   useEffect(() => {
     // Pages without a product or category are named by their menu label.
-    const pageName: Record<string, string> = { designer: t.designer, saved: t.saved, about: t.about, contact: t.contact, accessibility: t.accessibility, terms: t.terms, privacy: t.privacy, shipping: t.shipping, admin: t.admin.title };
+    const pageName: Record<string, string> = { designer: t.designer, saved: t.saved, about: t.about, contact: t.contact, accessibility: t.accessibility, terms: t.terms, privacy: t.privacy, shipping: t.shipping, admin: t.admin.title, paid: t.paid.title };
     document.title = route === "home" ? t.homeTitle : titleOf(product ? nameOf(product) : category?.h1[lang] ?? pageName[route], t.brandTitle);
   }, [route, product, category, lang, nameOf, t]);
 

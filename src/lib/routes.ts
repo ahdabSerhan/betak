@@ -4,7 +4,7 @@ import { CATEGORIES, productById, type Product } from "../data/catalog";
 
 export const USES_PATHS = import.meta.env.BASE_URL === "/";
 
-const PAGES = ["designer", "saved", "about", "contact", "accessibility", "terms", "privacy", "shipping"];
+const PAGES = ["designer", "saved", "about", "contact", "accessibility", "terms", "privacy", "shipping", "paid"];
 const PRODUCT_PREFIX = "product-";
 
 const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
