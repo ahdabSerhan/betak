@@ -441,361 +441,361 @@
    ]
   },
   {
-   "id": "colors70",
+   "id": "dream",
    "name": {
-    "he": "70 גוונים",
-    "en": "70 colours"
+    "he": "דרים",
+    "en": "Dream"
    },
    "photo": 1002,
    "swatches": [
     {
-     "code": "1",
-     "file": "colors70-1.webp",
+     "code": "Dream 1",
+     "file": "dream-dream-1.webp",
      "color": "#d1c8bb"
     },
     {
-     "code": "2",
-     "file": "colors70-2.webp",
+     "code": "Dream 2",
+     "file": "dream-dream-2.webp",
      "color": "#d2c2b1"
     },
     {
-     "code": "3",
-     "file": "colors70-3.webp",
+     "code": "Dream 3",
+     "file": "dream-dream-3.webp",
      "color": "#c8b9a4"
     },
     {
-     "code": "4",
-     "file": "colors70-4.webp",
+     "code": "Dream 4",
+     "file": "dream-dream-4.webp",
      "color": "#b19e88"
     },
     {
-     "code": "5",
-     "file": "colors70-5.webp",
+     "code": "Dream 5",
+     "file": "dream-dream-5.webp",
      "color": "#d4c4a9"
     },
     {
-     "code": "6",
-     "file": "colors70-6.webp",
+     "code": "Dream 6",
+     "file": "dream-dream-6.webp",
      "color": "#c3aa7b"
     },
     {
-     "code": "7",
-     "file": "colors70-7.webp",
+     "code": "Dream 7",
+     "file": "dream-dream-7.webp",
      "color": "#c2a36c"
     },
     {
-     "code": "8",
-     "file": "colors70-8.webp",
+     "code": "Dream 8",
+     "file": "dream-dream-8.webp",
      "color": "#8a6539"
     },
     {
-     "code": "9",
-     "file": "colors70-9.webp",
+     "code": "Dream 9",
+     "file": "dream-dream-9.webp",
      "color": "#503820"
     },
     {
-     "code": "10",
-     "file": "colors70-10.webp",
+     "code": "Dream 10",
+     "file": "dream-dream-10.webp",
      "color": "#413025"
     },
     {
-     "code": "11",
-     "file": "colors70-11.webp",
+     "code": "Dream 11",
+     "file": "dream-dream-11.webp",
      "color": "#37291e"
     },
     {
-     "code": "12",
-     "file": "colors70-12.webp",
+     "code": "Dream 12",
+     "file": "dream-dream-12.webp",
      "color": "#312927"
     },
     {
-     "code": "13",
-     "file": "colors70-13.webp",
+     "code": "Dream 13",
+     "file": "dream-dream-13.webp",
      "color": "#2c211b"
     },
     {
-     "code": "14",
-     "file": "colors70-14.webp",
+     "code": "Dream 14",
+     "file": "dream-dream-14.webp",
      "color": "#211a1a"
     },
     {
-     "code": "15",
-     "file": "colors70-15.webp",
+     "code": "Dream 15",
+     "file": "dream-dream-15.webp",
      "color": "#978065"
     },
     {
-     "code": "16",
-     "file": "colors70-16.webp",
+     "code": "Dream 16",
+     "file": "dream-dream-16.webp",
      "color": "#90826b"
     },
     {
-     "code": "17",
-     "file": "colors70-17.webp",
+     "code": "Dream 17",
+     "file": "dream-dream-17.webp",
      "color": "#8e7e70"
     },
     {
-     "code": "18",
-     "file": "colors70-18.webp",
+     "code": "Dream 18",
+     "file": "dream-dream-18.webp",
      "color": "#5a544d"
     },
     {
-     "code": "19",
-     "file": "colors70-19.webp",
+     "code": "Dream 19",
+     "file": "dream-dream-19.webp",
      "color": "#34302b"
     },
     {
-     "code": "20",
-     "file": "colors70-20.webp",
+     "code": "Dream 20",
+     "file": "dream-dream-20.webp",
      "color": "#78772f"
     },
     {
-     "code": "21",
-     "file": "colors70-21.webp",
+     "code": "Dream 21",
+     "file": "dream-dream-21.webp",
      "color": "#758a4b"
     },
     {
-     "code": "22",
-     "file": "colors70-22.webp",
+     "code": "Dream 22",
+     "file": "dream-dream-22.webp",
      "color": "#807734"
     },
     {
-     "code": "23",
-     "file": "colors70-23.webp",
+     "code": "Dream 23",
+     "file": "dream-dream-23.webp",
      "color": "#605f37"
     },
     {
-     "code": "24",
-     "file": "colors70-24.webp",
+     "code": "Dream 24",
+     "file": "dream-dream-24.webp",
      "color": "#686742"
     },
     {
-     "code": "25",
-     "file": "colors70-25.webp",
+     "code": "Dream 25",
+     "file": "dream-dream-25.webp",
      "color": "#182e28"
     },
     {
-     "code": "26",
-     "file": "colors70-26.webp",
+     "code": "Dream 26",
+     "file": "dream-dream-26.webp",
      "color": "#1f2923"
     },
     {
-     "code": "27",
-     "file": "colors70-27.webp",
+     "code": "Dream 27",
+     "file": "dream-dream-27.webp",
      "color": "#cba736"
     },
     {
-     "code": "28",
-     "file": "colors70-28.webp",
+     "code": "Dream 28",
+     "file": "dream-dream-28.webp",
      "color": "#816d27"
     },
     {
-     "code": "29",
-     "file": "colors70-29.webp",
+     "code": "Dream 29",
+     "file": "dream-dream-29.webp",
      "color": "#d4a33a"
     },
     {
-     "code": "30",
-     "file": "colors70-30.webp",
+     "code": "Dream 30",
+     "file": "dream-dream-30.webp",
      "color": "#b17f3e"
     },
     {
-     "code": "31",
-     "file": "colors70-31.webp",
+     "code": "Dream 31",
+     "file": "dream-dream-31.webp",
      "color": "#c9b8ae"
     },
     {
-     "code": "32",
-     "file": "colors70-32.webp",
+     "code": "Dream 32",
+     "file": "dream-dream-32.webp",
      "color": "#927d76"
     },
     {
-     "code": "33",
-     "file": "colors70-33.webp",
+     "code": "Dream 33",
+     "file": "dream-dream-33.webp",
      "color": "#926963"
     },
     {
-     "code": "34",
-     "file": "colors70-34.webp",
+     "code": "Dream 34",
+     "file": "dream-dream-34.webp",
      "color": "#8e502b"
     },
     {
-     "code": "35",
-     "file": "colors70-35.webp",
+     "code": "Dream 35",
+     "file": "dream-dream-35.webp",
      "color": "#614036"
     },
     {
-     "code": "36",
-     "file": "colors70-36.webp",
+     "code": "Dream 36",
+     "file": "dream-dream-36.webp",
      "color": "#a98f93"
     },
     {
-     "code": "37",
-     "file": "colors70-37.webp",
+     "code": "Dream 37",
+     "file": "dream-dream-37.webp",
      "color": "#796079"
     },
     {
-     "code": "38",
-     "file": "colors70-38.webp",
+     "code": "Dream 38",
+     "file": "dream-dream-38.webp",
      "color": "#523b68"
     },
     {
-     "code": "39",
-     "file": "colors70-39.webp",
+     "code": "Dream 39",
+     "file": "dream-dream-39.webp",
      "color": "#391832"
     },
     {
-     "code": "40",
-     "file": "colors70-40.webp",
+     "code": "Dream 40",
+     "file": "dream-dream-40.webp",
      "color": "#5c1d52"
     },
     {
-     "code": "41",
-     "file": "colors70-41.webp",
+     "code": "Dream 41",
+     "file": "dream-dream-41.webp",
      "color": "#9b366d"
     },
     {
-     "code": "42",
-     "file": "colors70-42.webp",
+     "code": "Dream 42",
+     "file": "dream-dream-42.webp",
      "color": "#6a1b36"
     },
     {
-     "code": "43",
-     "file": "colors70-43.webp",
+     "code": "Dream 43",
+     "file": "dream-dream-43.webp",
      "color": "#9a264f"
     },
     {
-     "code": "44",
-     "file": "colors70-44.webp",
+     "code": "Dream 44",
+     "file": "dream-dream-44.webp",
      "color": "#981e32"
     },
     {
-     "code": "45",
-     "file": "colors70-45.webp",
+     "code": "Dream 45",
+     "file": "dream-dream-45.webp",
      "color": "#3e0915"
     },
     {
-     "code": "46",
-     "file": "colors70-46.webp",
+     "code": "Dream 46",
+     "file": "dream-dream-46.webp",
      "color": "#430d1d"
     },
     {
-     "code": "47",
-     "file": "colors70-47.webp",
+     "code": "Dream 47",
+     "file": "dream-dream-47.webp",
      "color": "#380d15"
     },
     {
-     "code": "48",
-     "file": "colors70-48.webp",
+     "code": "Dream 48",
+     "file": "dream-dream-48.webp",
      "color": "#978985"
     },
     {
-     "code": "49",
-     "file": "colors70-49.webp",
+     "code": "Dream 49",
+     "file": "dream-dream-49.webp",
      "color": "#918477"
     },
     {
-     "code": "50",
-     "file": "colors70-50.webp",
+     "code": "Dream 50",
+     "file": "dream-dream-50.webp",
      "color": "#6c6865"
     },
     {
-     "code": "51",
-     "file": "colors70-51.webp",
+     "code": "Dream 51",
+     "file": "dream-dream-51.webp",
      "color": "#89867e"
     },
     {
-     "code": "52",
-     "file": "colors70-52.webp",
+     "code": "Dream 52",
+     "file": "dream-dream-52.webp",
      "color": "#73716d"
     },
     {
-     "code": "53",
-     "file": "colors70-53.webp",
+     "code": "Dream 53",
+     "file": "dream-dream-53.webp",
      "color": "#535154"
     },
     {
-     "code": "54",
-     "file": "colors70-54.webp",
+     "code": "Dream 54",
+     "file": "dream-dream-54.webp",
      "color": "#88a3a3"
     },
     {
-     "code": "55",
-     "file": "colors70-55.webp",
+     "code": "Dream 55",
+     "file": "dream-dream-55.webp",
      "color": "#c0c2bf"
     },
     {
-     "code": "56",
-     "file": "colors70-56.webp",
+     "code": "Dream 56",
+     "file": "dream-dream-56.webp",
      "color": "#989a97"
     },
     {
-     "code": "57",
-     "file": "colors70-57.webp",
+     "code": "Dream 57",
+     "file": "dream-dream-57.webp",
      "color": "#75818b"
     },
     {
-     "code": "58",
-     "file": "colors70-58.webp",
+     "code": "Dream 58",
+     "file": "dream-dream-58.webp",
      "color": "#65787a"
     },
     {
-     "code": "59",
-     "file": "colors70-59.webp",
+     "code": "Dream 59",
+     "file": "dream-dream-59.webp",
      "color": "#808c85"
     },
     {
-     "code": "60",
-     "file": "colors70-60.webp",
+     "code": "Dream 60",
+     "file": "dream-dream-60.webp",
      "color": "#1b3644"
     },
     {
-     "code": "61",
-     "file": "colors70-61.webp",
+     "code": "Dream 61",
+     "file": "dream-dream-61.webp",
      "color": "#2a3e4e"
     },
     {
-     "code": "62",
-     "file": "colors70-62.webp",
+     "code": "Dream 62",
+     "file": "dream-dream-62.webp",
      "color": "#53717d"
     },
     {
-     "code": "63",
-     "file": "colors70-63.webp",
+     "code": "Dream 63",
+     "file": "dream-dream-63.webp",
      "color": "#567282"
     },
     {
-     "code": "64",
-     "file": "colors70-64.webp",
+     "code": "Dream 64",
+     "file": "dream-dream-64.webp",
      "color": "#242f57"
     },
     {
-     "code": "65",
-     "file": "colors70-65.webp",
+     "code": "Dream 65",
+     "file": "dream-dream-65.webp",
      "color": "#18253a"
     },
     {
-     "code": "66",
-     "file": "colors70-66.webp",
+     "code": "Dream 66",
+     "file": "dream-dream-66.webp",
      "color": "#111d36"
     },
     {
-     "code": "67",
-     "file": "colors70-67.webp",
+     "code": "Dream 67",
+     "file": "dream-dream-67.webp",
      "color": "#111319"
     },
     {
-     "code": "68",
-     "file": "colors70-68.webp",
+     "code": "Dream 68",
+     "file": "dream-dream-68.webp",
      "color": "#b99793"
     },
     {
-     "code": "69",
-     "file": "colors70-69.webp",
+     "code": "Dream 69",
+     "file": "dream-dream-69.webp",
      "color": "#b19b94"
     },
     {
-     "code": "70",
-     "file": "colors70-70.webp",
+     "code": "Dream 70",
+     "file": "dream-dream-70.webp",
      "color": "#1e2645"
     }
    ]
@@ -807,335 +807,335 @@
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1897": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1686": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1861": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1856": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1702": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1838": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1837": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1916": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1926": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1873": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1865": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1881": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "2065": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1887": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1789": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1900": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1907": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1908": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1920": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1923": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1932": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1935": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1938": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1829": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1941": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1824": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1951": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "2020": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "2002": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1997": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1955": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1953": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1850": [
    "rado",
    "reef",
    "flamingo",
-   "colors70"
+   "dream"
   ],
   "1847": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1715": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1991": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1994": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "2004": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "2007": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "2067": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1986": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1672": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1859": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1876": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1870": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1884": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1890": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1674": [
    "rado",
@@ -1146,76 +1146,76 @@
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1895": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1903": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1943": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1948": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1821": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1929": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1965": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1961": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1841": [
    "rado",
    "reef",
    "flamingo",
    "dallas",
-   "colors70"
+   "dream"
   ],
   "1852": [
    "rado",
    "reef",
    "flamingo",
-   "colors70"
+   "dream"
   ]
  }
 }

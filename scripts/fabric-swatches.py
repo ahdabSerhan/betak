@@ -43,10 +43,10 @@ CHARTS = [
     {"id": "reef", "name": {"he": "ריף", "en": "Reef"}, "photo": 1004, "columns": [((60, 740), (820, 1100), 0, [f"REEF-{n}" for n in range(4601, 4620)])]},
     {"id": "flamingo", "name": {"he": "פלמינגו", "en": "Flamingo"}, "photo": 1003, "columns": [((60, 620), (690, 1120), 0, [f"Flamingo {n}" for n in range(2401, 2421)])]},
     {"id": "dallas", "name": {"he": "דאלאס", "en": "Dallas"}, "photo": 1001, "columns": [((60, 720), (870, 1190), 0, [f"Dallas-{n}" for n in range(601, 617)])]},
-    {"id": "colors70", "name": {"he": "70 גוונים", "en": "70 colours"}, "photo": 1002, "columns": [
-        ((210, 560), (20, 140), 7, [str(n) for n in range(1, 36)]),
-        ((650, 1000), (1040, 1150), 0, [str(n) for n in range(36, 71)]),
-    ], "fix": {"29": 1400, "30": 1443, "31": 1488, "32": 1530, "33": 1570, "34": 1610, "35": 1638, "45": 505, "48": 654, "69": 1585, "70": 1622}},
+    {"id": "dream", "name": {"he": "דרים", "en": "Dream"}, "photo": 1002, "columns": [
+        ((210, 560), (20, 140), 7, [f"Dream {n}" for n in range(1, 36)]),
+        ((650, 1000), (1040, 1150), 0, [f"Dream {n}" for n in range(36, 71)]),
+    ], "fix": {"Dream 29": 1400, "Dream 30": 1443, "Dream 31": 1488, "Dream 32": 1530, "Dream 33": 1570, "Dream 34": 1610, "Dream 35": 1638, "Dream 45": 505, "Dream 48": 654, "Dream 69": 1585, "Dream 70": 1622}},
 ]
 
 

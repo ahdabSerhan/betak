@@ -38,7 +38,7 @@ export function findSwatch(code: string): { catalog: FabricCatalog; swatch: Swat
   return null;
 }
 
-// The code as the visitor reads it: catalogs that print plain numbers get their name in front ("70 colours · #12").
+// The code as the visitor reads it: catalogs that print plain numbers get their name in front ("Dream" style codes already carry the name).
 export function swatchLabel(code: string, lang: Lang): string {
   const found = findSwatch(code);
   if (!found || /\D/.test(code)) return code;
