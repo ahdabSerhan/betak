@@ -83,7 +83,9 @@ export function DesignSummary({ product, design, rules }: { product: Product; de
 // "Make it yours": numbered sections that expand in place; each closed row shows the current choice.
 export function Configurator({ design, rules, onChange, onReset }: ConfiguratorProps) {
   const { t, lang } = useShop();
-  const steps: Step[] = rules.seats.length > 0 ? ["size", "seats", "fabric", "firmness"] : ["size", "fabric", "firmness"];
+  // The "seats" step (חלוקת מושבים) is hidden for now; restore the line below to bring it back.
+  // const steps: Step[] = rules.seats.length > 0 ? ["size", "seats", "fabric", "firmness"] : ["size", "fabric", "firmness"];
+  const steps: Step[] = ["size", "fabric", "firmness"];
   const [open, setOpen] = useState<Step | null>("size");
   const fabric = fabricOf(design.fabric);
   const change = (part: Partial<Design>) => onChange({ ...design, ...part });
