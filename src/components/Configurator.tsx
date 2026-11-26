@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Product } from "../data/catalog";
-import { colorOf, FABRICS, fabricOf } from "../data/fabrics";
-import { designCode, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
+import { FABRICS, fabricOf } from "../data/fabrics";
+import { cleanColorCode, designCode, fabricText, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
 import { useShop } from "../state/ShopContext";
 import { DesignDrawing } from "./DesignDrawing";
 import { Fold } from "./Fold";
@@ -36,18 +36,17 @@ function Slider({ label, value, range, unit, onChange }: SliderProps) {
 // What the visitor chose in each step, as short text.
 function useChosen(design: Design): Record<Step, string> {
   const { t, lang } = useShop();
-  const fabric = fabricOf(design.fabric);
   return {
     size: `${design.width} × ${design.depth} ${t.cm}`,
     seats: t.seatsCount(design.seats),
-    fabric: `${fabric.name[lang]} / ${colorOf(fabric, design.color).name[lang]}`,
+    fabric: fabricText(design, t, lang),
     firmness: t.firmness[design.firmness],
   };
 }
 
 // "Your design": the finished choice as a small drawing and a table, with a code the store can read it from.
 export function DesignSummary({ product, design, rules }: { product: Product; design: Design; rules: DesignRules }) {
-  const { t } = useShop();
+  const { t, lang } = useShop();
   const [copied, setCopied] = useState(false);
   const chosen = useChosen(design);
   const code = designCode(product, design);
@@ -56,8 +55,9 @@ export function DesignSummary({ product, design, rules }: { product: Product; de
     [t.specShape, t.shapes[rules.shape]],
     [t.specSize, chosen.size],
     ...(SHOW_SEATS && rules.seats.length > 0 ? [[t.specSeats, chosen.seats] as [string, string]] : []),
-    ...(rules.chaise ? [[t.configChaise, `${t.sides[design.chaiseSide]} · ${design.chaiseLength} ${t.cm}`] as [string, string]] : []),
-    [t.specFabric, chosen.fabric],
+    ...(rules.chaise ? [[t.configChaise, `${t.sides[design.chaiseSide]} · ${design.chaiseLength} ${t.cm}`] as [string, string], [t.configChaiseDepth, `${design.chaiseDepth} ${t.cm}`] as [string, string]] : []),
+    [t.specFabric, fabricOf(design.fabric).name[lang]],
+    [t.specColorCode, cleanColorCode(design) || t.colorCodeMissing],
     [t.configSteps.firmness, chosen.firmness],
     [t.specCode, code],
   ];
@@ -85,7 +85,6 @@ export function Configurator({ design, rules, onChange, onReset }: ConfiguratorP
   const { t, lang } = useShop();
   const steps: Step[] = SHOW_SEATS && rules.seats.length > 0 ? ["size", "seats", "fabric", "firmness"] : ["size", "fabric", "firmness"];
   const [open, setOpen] = useState<Step | null>("size");
-  const fabric = fabricOf(design.fabric);
   const change = (part: Partial<Design>) => onChange({ ...design, ...part });
 
   const chosen = useChosen(design);
@@ -96,7 +95,7 @@ export function Configurator({ design, rules, onChange, onReset }: ConfiguratorP
         <Slider label={rules.shape === "bed" ? t.configMattress : t.configWidth} value={design.width} range={rules.width} unit={t.cm} onChange={(width) => onChange(withWidth(design, rules, width))} />
         {rules.depths.length > 0 && (
           <div className="config-row">
-            <span>{rules.shape === "bed" ? t.configLength : t.configDepth}</span>
+            <span>{rules.shape === "bed" ? t.configLength : rules.chaise ? t.configSofaDepth : t.configDepth}</span>
             <div className="chips">
               {rules.depths.map((depth) => <button className="chip" aria-pressed={design.depth === depth} onClick={() => change({ depth })} key={depth}>{depth} {t.cm}</button>)}
             </div>
@@ -105,6 +104,13 @@ export function Configurator({ design, rules, onChange, onReset }: ConfiguratorP
         {rules.chaise && (
           <>
             <Slider label={t.configChaise} value={design.chaiseLength} range={rules.chaise} unit={t.cm} onChange={(chaiseLength) => change({ chaiseLength })} />
+            {/* The chaise seat has its own depth, chosen from the same depths as the sofa. */}
+            <div className="config-row">
+              <span>{t.configChaiseDepth}</span>
+              <div className="chips">
+                {rules.depths.map((chaiseDepth) => <button className="chip" aria-pressed={design.chaiseDepth === chaiseDepth} onClick={() => change({ chaiseDepth })} key={chaiseDepth}>{chaiseDepth} {t.cm}</button>)}
+              </div>
+            </div>
             <div className="config-row">
               <span>{t.configSide}</span>
               <div className="chips">
@@ -139,20 +145,18 @@ export function Configurator({ design, rules, onChange, onReset }: ConfiguratorP
       <>
         <div className="config-fabrics">
           {FABRICS.map((item) => (
-            <button aria-pressed={item.key === design.fabric} onClick={() => change({ fabric: item.key, color: item.colors[0].key })} key={item.key}>
+            <button aria-pressed={item.key === design.fabric} onClick={() => change({ fabric: item.key })} key={item.key}>
               <b>{item.name[lang]}</b>
               <small>{item.feel[lang]}</small>
             </button>
           ))}
         </div>
-        <div className="config-swatches">
-          {fabric.colors.map((color) => (
-            <button aria-pressed={color.key === design.color} onClick={() => change({ color: color.key })} key={color.key}>
-              <i style={{ background: color.hex }} />
-              {color.name[lang]}
-            </button>
-          ))}
-        </div>
+        {/* The colours are shown in the product photos, so the visitor types the code printed there. */}
+        <label className="config-code">
+          <span>{t.colorCodeLabel}</span>
+          <input type="text" dir="ltr" value={design.colorCode} maxLength={20} autoComplete="off" spellCheck={false} placeholder={t.colorCodePlaceholder} aria-describedby="color-code-hint" onChange={(event) => change({ colorCode: event.target.value })} />
+          <small className="muted" id="color-code-hint">{t.colorCodeHint}</small>
+        </label>
       </>
     ),
   };

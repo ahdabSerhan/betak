@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { productById, type Product } from "../data/catalog";
 import { navigate } from "../hooks/useRoute";
 import { usePersistentState } from "../hooks/usePersistentState";
-import { describeDesign, rulesFor, type Design } from "../lib/custom";
+import { describeDesign, rulesFor, standardDesign, type Design } from "../lib/custom";
 import type { Piece } from "../lib/designer";
 import type { RoomDimensions } from "../lib/measure";
 import { askEsentrix, esentrixEnabled, loadEsentrixWidget } from "../lib/esentrix";
@@ -122,7 +122,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       designNote: (product) => {
         const rules = rulesFor(product);
         const design = designs[product.id];
-        return rules && design ? describeDesign(design, rules, TEXT[lang], lang) : null;
+        // Fill in choices added after the design was saved (e.g. the chaise depth).
+        return rules && design ? describeDesign({ ...standardDesign(product, rules), ...design }, rules, TEXT[lang], lang) : null;
       },
       roomPhoto,
       setRoomPhoto,
