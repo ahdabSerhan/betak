@@ -1,0 +1,8 @@
+node_modules
+dist
+seo-build
+dist-preview
+_originals
+models-work
+.DS_Store
+.env*

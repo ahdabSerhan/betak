@@ -1,0 +1,44 @@
+{
+  "he": {
+    "delivery": [
+      "הובלה והרכבה בתוספת 450 ₪ התשלום למוביל ביום האספקה.",
+      "זמן אספקה: מ-8 עד 21 ימי עסקים.",
+      "מחיר הובלה של שולחנות סלון 170 ש\"ח.",
+      "כל מוצר נוסף בתוספת 200 ₪ (כורסא או הדום בלי תוספת כסף)",
+      "הובלה לאזורים שמעבר לקו הירוק תוספת 150 ש\"ח וכמו כן מצריכה אישור מהחברה",
+      "הובלות לאזור מצפה רמון, אילת תהיה תוספת 400 ₪ למשלוח וייתכן עיכוב של 10 ימי עסקים נוספים",
+      "קומה 3 ומעלה בבניין ללא מעלית או שהמוצר אינו נכנס במעלית: תוספת לעלות הובלה רגילה: 50 ₪ לכל קומה לתשלום מול המוביל",
+      "בכל מקרה של צורך בשירותי מנוף חיצוניים או בפירוק והרכבה, החיוב יחול על הלקוח",
+      "הלקוח אחראי לוודא שהמידות מתאימות לביתו, כולל כניסה ומעבר. אי כניסה תחייב בתשלום הובלה נוסף ובייצור פריט / חלק מותאם.",
+      "פריט זה נעשה בייצור אישי במיוחד עבורכם, בגודל שבחרתם, עם הבד והסגנון שיהיו ייחודיים רק לכם.",
+      "ביתאק לא תהיה אחראית לאיחור ו/או עיכוב באספקה או לאי אספקה שנגרם כתוצאה מהלקוח עצמו ו/או מכוח עליון או אירועים שאינם בשליטתה."
+    ],
+    "questions": [
+      [
+        "אפשר לבצע שינויים במידות של הספה שבחרתי?",
+        "כן, כמובן. אתם מוזמנים לשוחח עם הנציגים שלנו על כל שינוי שאתם מעוניינים לבצע."
+      ]
+    ]
+  },
+  "en": {
+    "delivery": [
+      "Delivery and assembly cost an extra ₪450, paid to the carrier on the delivery day.",
+      "Delivery time: 8 to 21 business days.",
+      "Delivery of coffee tables costs ₪170.",
+      "Each additional product adds ₪200 (an armchair or ottoman adds nothing).",
+      "Delivery beyond the Green Line adds ₪150 and needs the company's approval.",
+      "Delivery to Mitzpe Ramon and Eilat adds ₪400 and may take 10 more business days.",
+      "Floor 3 and above without an elevator, or when the product does not fit in the elevator: ₪50 per floor on top of regular delivery, paid to the carrier.",
+      "If an external crane or disassembly and assembly are needed, the customer pays for them.",
+      "The customer is responsible for checking that the dimensions fit the home, including the entrance and the way in. If the item cannot enter, another delivery and a custom-made item or part are charged.",
+      "This item is made to order for you, in the size you chose, with a fabric and style that are yours alone.",
+      "Betak is not responsible for late or missed delivery caused by the customer, by force majeure or by events outside its control."
+    ],
+    "questions": [
+      [
+        "Can I change the dimensions of the sofa I chose?",
+        "Yes, of course. You are welcome to talk to our representatives about any change you would like."
+      ]
+    ]
+  }
+}

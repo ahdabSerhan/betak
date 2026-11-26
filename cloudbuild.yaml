@@ -1,0 +1,38 @@
+# Cloud Build: build the image, push it to Artifact Registry, deploy it to Cloud Run.
+# One-time setup is in README.md (create the "betak" repository, grant the build account its roles).
+# Run from the project folder:
+#   gcloud builds submit --project cs-poc-powbbzquo5jfciibv06ma0z --config cloudbuild.yaml
+
+substitutions:
+  _REGION: me-west1
+  _REPOSITORY: betak
+  _SERVICE: betak-website
+
+steps:
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args: [build, -t, "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:$BUILD_ID", .]
+
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    args: [push, "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:$BUILD_ID"]
+
+  - id: deploy
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:$BUILD_ID
+      - --region=${_REGION}
+      - --port=8080
+      - --memory=256Mi
+      - --max-instances=3
+      - --allow-unauthenticated
+
+images:
+  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:$BUILD_ID"
+
+options:
+  logging: CLOUD_LOGGING_ONLY

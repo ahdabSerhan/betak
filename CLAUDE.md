@@ -1,0 +1,31 @@
+# Betak website
+
+New site for Betak Furniture (רהיטי ביתאק), replacing the old betak.co.il on the 2all builder.
+Vite + React 19 + TypeScript, plain CSS, three.js. Hebrew (RTL) and English.
+
+## Commands
+- `npm install` then `npm run dev`: local development (the AI agent falls back to simple rules, there is no server).
+- `npm run build`: builds the app, pre-builds one HTML page per route (SEO), sitemap.xml, robots.txt and routes.json into `dist/`.
+- `PORT=8080 node server/server.mjs`: serves `dist/` like production, including 301 redirects and `/api/designer`.
+- Deploy (owner only): `gcloud builds submit --project cs-poc-powbbzquo5jfciibv06ma0z --config cloudbuild.yaml`.
+  Live: https://betak-website-230492521256.me-west1.run.app (noindex until the betak.co.il domain points here).
+
+## Layout
+- `src/pages`, `src/components`: UI. `src/i18n/text.ts`: every visible string, in `he` and `en`.
+- `src/lib/routes.ts`, `src/hooks/useRoute.ts`: real paths (`/sofas`, `/product/1686-camila-...`) with pushState.
+- `src/data`: catalog, `galleries.json` (photos per product, files in `public/img/g`), `reviews.json`, `accessibility.ts` (accessibility statement), `store.ts` (phone, email).
+- `scripts/prerender.mjs` + `src/seo/entry.ts`: static pages with titles, meta, canonical and JSON-LD.
+- `server/server.mjs`: no-dependency Node server. `server/redirects.json` maps old betak.co.il addresses to new ones (301).
+- AI agent: `src/lib/agent.ts` calls `/api/designer`, which calls Gemini on Vertex AI (`GEMINI_MODEL`, default gemini-3.8-flash).
+- Room designer (`src/pages/Designer.tsx`, scene) and 3D showroom (`src/showroom`). AI-made 3D models in `public/models`.
+
+## Rules
+- Never invent products, photos or reviews: everything comes from the original betak.co.il.
+- Every change works in Hebrew (RTL) and English; use logical CSS (`inset-inline-start`, not `left`).
+- Accessibility: IS 5568 / WCAG AA. Keep axe-core at zero violations. Accessibility menu options are classes on `<html>` (`a11y-*`).
+- Code style: simple and readable, like a senior Google engineer would write it; one-line comments on new code.
+
+## Open items
+- Google reviews widget: needs the embed code or business link.
+- Fabric, size ranges, firmness and prices per product are placeholders; most product descriptions are missing.
+- Domain move: betak.co.il is managed by 2all; DNS has to point here (keep the MX records for email).
