@@ -94,6 +94,8 @@ async function handleDesigner(request, response) {
 // The old betak.co.il addresses and where each now lives, so links and search rankings carry over (301).
 const OLD_ADDRESSES = JSON.parse(readFileSync(new URL("./redirects.json", import.meta.url), "utf8"));
 const OLD_STORE_SECTIONS = new Set(["חנות", "קטגוריות-מומלצות"]);
+// Old single pages: /תקנון is now /terms.
+const OLD_PAGES = { "תקנון": "/terms" };
 const productPaths = existsSync(join(SITE_ROOT, "routes.json")) ? JSON.parse(readFileSync(join(SITE_ROOT, "routes.json"), "utf8")) : {};
 
 // The new address for an old one, or null when the address is not an old one.
@@ -108,6 +110,7 @@ function redirectFor(url) {
     const current = productPaths[Number.parseInt(segments[1], 10)];
     return current && current !== url.pathname ? current : null;
   }
+  if (segments.length === 1 && OLD_PAGES[segments[0]]) return OLD_PAGES[segments[0]];
   if (!OLD_STORE_SECTIONS.has(segments[0])) return null;
   // /חנות/ספות/ספה-פינתית-דגם-קאמילה: the last part names the product, the middle part the section.
   const product = OLD_ADDRESSES.slugs[segments.at(-1)];

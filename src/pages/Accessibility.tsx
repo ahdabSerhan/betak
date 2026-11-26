@@ -1,10 +1,13 @@
-import { ACCESSIBILITY } from "../data/accessibility";
+import { ACCESSIBILITY, type Statement } from "../data/accessibility";
+import { PRIVACY } from "../data/privacy";
+import { TERMS } from "../data/terms";
+import type { Lang } from "../i18n/text";
 import { useShop } from "../state/ShopContext";
 
-// The accessibility statement (הצהרת נגישות).
-export function Accessibility() {
+// A page of legal text: the accessibility statement, the terms of use or the privacy policy.
+function StatementPage({ statements }: { statements: Record<Lang, Statement> }) {
   const { lang } = useShop();
-  const statement = ACCESSIBILITY[lang];
+  const statement = statements[lang];
 
   return (
     <article className="wrap page stack statement">
@@ -20,3 +23,7 @@ export function Accessibility() {
     </article>
   );
 }
+
+export const Accessibility = () => <StatementPage statements={ACCESSIBILITY} />;
+export const Terms = () => <StatementPage statements={TERMS} />;
+export const Privacy = () => <StatementPage statements={PRIVACY} />;

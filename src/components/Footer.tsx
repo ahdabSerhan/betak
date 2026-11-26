@@ -29,6 +29,9 @@ export function Footer() {
               <li><a href={href("about")}>{t.about}</a></li>
               <li><a href={href("contact")}>{t.contact}</a></li>
               <li><a href={href("designer")}>{t.designer}</a></li>
+              <li><a href={href("terms")}>{t.terms}</a></li>
+              <li><a href={href("privacy")}>{t.privacy}</a></li>
+              <li><a href={href("accessibility")}>{t.accessibility}</a></li>
             </ul>
           </div>
           <div>
