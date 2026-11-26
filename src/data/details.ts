@@ -36,17 +36,29 @@ export const reviewsOf = (product: Product): Review[] => REVIEWS[product.id] ?? 
 
 // Every review with the id of the product it was written about, for the home page.
 export const ALL_REVIEWS = Object.entries(REVIEWS).flatMap(([productId, reviews]) => (reviews ?? []).map((review) => ({ ...review, productId: Number(productId) })));
-const SPECS_HEADING = /^מידות/;
+// The dimensions heading, e.g. "מידות:", "📏 מידות:" or "מידת המזנון :".
+const SPECS_HEADING = /^[^\p{L}]*מידו?ת/u;
+// A dimension line has a number in it, e.g. "אורך: 220 ס"מ"; a second heading ("מידות השולחן:") stays with them.
+const isSpec = (line: string) => /\d/.test(line) || SPECS_HEADING.test(line);
 
 export function detailsOf(product: Product): ProductDetails {
   const raw = DETAILS[product.id];
   const lines = (raw?.description ?? "").split("\n").map((line) => line.trim()).filter(Boolean);
-  // Everything after the "מידות" (dimensions) heading is a spec line.
+  // The "מידות" (dimensions) heading, if the description has one.
   const heading = lines.findIndex((line) => SPECS_HEADING.test(line));
-  const paragraphs = heading === -1 ? lines : lines.slice(0, heading);
-  const specs = heading === -1 ? [] : lines.slice(heading + 1);
+  if (heading === -1) return { paragraphs: lines, specs: [], photos: photosOf(product, raw) };
+  // The dimension lines right after the heading are specs; any text after them stays in the description.
+  const rest = lines.slice(heading + 1);
+  const end = rest.findIndex((line) => !isSpec(line));
+  const specs = (end === -1 ? rest : rest.slice(0, end)).map((line) => line.replace(/^[•*\s]+/, ""));
+  const paragraphs = [...lines.slice(0, heading), ...(end === -1 ? [] : rest.slice(end))];
+  return { paragraphs, specs, photos: photosOf(product, raw) };
+}
+
+// The main photo followed by the product's extra photos.
+function photosOf(product: Product, raw: RawDetails | undefined): string[] {
   const gallery = GALLERIES[product.id]?.map(storePhoto) ?? raw?.gallery ?? [];
-  return { paragraphs, specs, photos: [product.image, ...gallery] };
+  return [product.image, ...gallery];
 }
 
 export interface Policies {
