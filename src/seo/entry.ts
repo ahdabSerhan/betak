@@ -4,4 +4,5 @@ export { detailsOf, reviewsOf } from "../data/details";
 export { pathOf, productRoute } from "../lib/routes";
 export { ACCESSIBILITY } from "../data/accessibility";
 export { PRIVACY } from "../data/privacy";
+export { SHIPPING } from "../data/shipping";
 export { TERMS } from "../data/terms";

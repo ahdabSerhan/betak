@@ -4,7 +4,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ACCESSIBILITY, CATEGORIES, PRIVACY, TERMS, PRODUCTS, detailsOf, pathOf, productRoute, productsIn, reviewsOf } from "../seo-build/entry.js";
+import { ACCESSIBILITY, CATEGORIES, PRIVACY, SHIPPING, TERMS, PRODUCTS, detailsOf, pathOf, productRoute, productsIn, reviewsOf } from "../seo-build/entry.js";
 
 const SITE_URL = (process.env.SITE_URL ?? "https://betak.co.il").replace(/\/$/, "");
 const DIST = join(dirname(fileURLToPath(import.meta.url)), "../dist");
@@ -135,6 +135,7 @@ const pages = [
   writePage({ route: "contact", title: `צור קשר | ${BRAND}`, description: clip(`צרו קשר עם ${BRAND}: טלפון 054-6938334, וואטסאפ ומייל support@betak.co.il.`), body: "<h1>צור קשר</h1>" }),
   statementPage("accessibility", `${ACCESSIBILITY.he.title} של אתר ${BRAND}: רמת הנגישות, ההתאמות שבוצעו ופרטי רכז/ת הנגישות.`, ACCESSIBILITY.he),
   statementPage("terms", `${TERMS.he.title} ${BRAND}: הזמנות, תשלום, ביטול עסקאות, אחריות ושירות.`, TERMS.he),
+  statementPage("shipping", `${SHIPPING.he.title} של ${BRAND}: עלויות הובלה, תוספות לקומות, לאזורים מרוחקים ולמוצרים נוספים.`, SHIPPING.he),
   statementPage("privacy", `${PRIVACY.he.title} של ${BRAND}: איזה מידע נאסף, עוגיות (Cookies), שיתוף מידע וזכויות המשתמש.`, PRIVACY.he),
   writePage({ route: "saved", title: `הרשימה שלי | ${BRAND}`, description: `הרהיטים ששמרתם ב${BRAND}.`, body: "<h1>הרשימה שלי</h1>", index: false }),
 ];
