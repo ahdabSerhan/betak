@@ -838,3 +838,9 @@ html.a11y-grayscale { filter: grayscale(1); }
 .a11y-links a:not(.btn) { outline: 1px dashed currentColor; outline-offset: 2px; }
 .a11y-still *, .a11y-still *::before, .a11y-still *::after { animation: none !important; transition: none !important; }
 .a11y-still .review-belt.glides { overflow-x: auto; mask-image: none; }
+
+/* The cookie notice: a card at the bottom of the screen until the visitor accepts it. */
+.cookie-notice { position: fixed; inset-block-end: 16px; inset-inline: 16px; z-index: 28; max-width: 560px; margin-inline: auto; display: grid; gap: 14px; justify-items: center; padding: 20px 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 20px 40px -16px rgba(29, 22, 18, .45); }
+.cookie-notice p { margin: 0; font-size: 15px; line-height: 1.6; }
+.cookie-notice a { color: var(--accent-ink); text-decoration: underline; }
+.cookie-notice .btn { min-width: 140px; }

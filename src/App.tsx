@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { AccessibilityMenu } from "./components/AccessibilityMenu";
+import { CookieNotice } from "./components/CookieNotice";
 import { AgentWidget } from "./components/AgentWidget";
 import { CartDrawer } from "./components/CartDrawer";
 import { FloatingContact } from "./components/FloatingContact";
@@ -62,6 +63,7 @@ export function App() {
       {!esentrixEnabled && <AgentWidget viewing={product} />}
       <FloatingContact />
       <AccessibilityMenu />
+      <CookieNotice />
       {cartOpen && <CartDrawer />}
     </>
   );
