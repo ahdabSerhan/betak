@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Product } from "../data/catalog";
 import { colorOf, FABRICS, fabricOf } from "../data/fabrics";
-import { designCode, FIRMNESS, seatChoices, withWidth, type Design, type DesignRules } from "../lib/custom";
+import { designCode, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
 import { useShop } from "../state/ShopContext";
 import { DesignDrawing } from "./DesignDrawing";
 import { Fold } from "./Fold";
@@ -55,7 +55,7 @@ export function DesignSummary({ product, design, rules }: { product: Product; de
   const spec: [label: string, value: string][] = [
     [t.specShape, t.shapes[rules.shape]],
     [t.specSize, chosen.size],
-    ...(rules.seats.length > 0 ? [[t.specSeats, chosen.seats] as [string, string]] : []),
+    ...(SHOW_SEATS && rules.seats.length > 0 ? [[t.specSeats, chosen.seats] as [string, string]] : []),
     ...(rules.chaise ? [[t.configChaise, `${t.sides[design.chaiseSide]} · ${design.chaiseLength} ${t.cm}`] as [string, string]] : []),
     [t.specFabric, chosen.fabric],
     [t.configSteps.firmness, chosen.firmness],
@@ -83,9 +83,7 @@ export function DesignSummary({ product, design, rules }: { product: Product; de
 // "Make it yours": numbered sections that expand in place; each closed row shows the current choice.
 export function Configurator({ design, rules, onChange, onReset }: ConfiguratorProps) {
   const { t, lang } = useShop();
-  // The "seats" step (חלוקת מושבים) is hidden for now; restore the line below to bring it back.
-  // const steps: Step[] = rules.seats.length > 0 ? ["size", "seats", "fabric", "firmness"] : ["size", "fabric", "firmness"];
-  const steps: Step[] = ["size", "fabric", "firmness"];
+  const steps: Step[] = SHOW_SEATS && rules.seats.length > 0 ? ["size", "seats", "fabric", "firmness"] : ["size", "fabric", "firmness"];
   const [open, setOpen] = useState<Step | null>("size");
   const fabric = fabricOf(design.fabric);
   const change = (part: Partial<Design>) => onChange({ ...design, ...part });
