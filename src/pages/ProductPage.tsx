@@ -62,12 +62,12 @@ function Gallery({ photos: allPhotos, title, badge }: { photos: string[]; title:
 
 // The visitor's own version of the piece: a measured drawing in the chosen fabric.
 function DesignSheet({ design, rules, summary }: { design: Design; rules: DesignRules; summary: string }) {
-  const { t } = useShop();
+  const { t, lang } = useShop();
   return (
     <div className="design-sheet">
       <DesignDrawing design={design} rules={rules} />
       <div className="design-fabric">
-        <b>{fabricText(design, t) ?? `${t.colorCodeLabel}: ${t.colorCodeMissing}`}</b>
+        <b>{fabricText(design, t, lang) ?? `${t.fabricLabel}: ${t.colorCodeMissing}`}</b>
         <span className="muted">{summary}</span>
       </div>
     </div>
@@ -198,7 +198,7 @@ export function ProductPage({ product }: { product: Product }) {
           )}
 
           {rules && design && (
-            <Configurator design={design} rules={rules} onChange={changeDesign} onReset={() => { setDesign(product.id, null); setView("photos"); }} key={product.id} />
+            <Configurator product={product} design={design} rules={rules} onChange={changeDesign} onReset={() => { setDesign(product.id, null); setView("photos"); }} key={product.id} />
           )}
 
           {buyRow}

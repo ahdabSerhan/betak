@@ -123,7 +123,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         const rules = rulesFor(product);
         const design = designs[product.id];
         // Fill in choices added after the design was saved (e.g. the chaise depth).
-        return rules && design ? describeDesign({ ...standardDesign(product, rules), ...design }, rules, TEXT[lang]) : null;
+        return rules && design ? describeDesign({ ...standardDesign(product, rules), ...design }, rules, TEXT[lang], lang) : null;
       },
       roomPhoto,
       setRoomPhoto,

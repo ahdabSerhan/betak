@@ -1,0 +1,1221 @@
+{
+ "catalogs": [
+  {
+   "id": "rado",
+   "name": {
+    "he": "רדו",
+    "en": "Rado"
+   },
+   "photo": 1000,
+   "swatches": [
+    {
+     "code": "RADO-1",
+     "file": "rado-rado-1.webp",
+     "color": "#cdc1ac"
+    },
+    {
+     "code": "RADO-2",
+     "file": "rado-rado-2.webp",
+     "color": "#c5b6a2"
+    },
+    {
+     "code": "RADO-3",
+     "file": "rado-rado-3.webp",
+     "color": "#9e8d7a"
+    },
+    {
+     "code": "RADO-4",
+     "file": "rado-rado-4.webp",
+     "color": "#83776b"
+    },
+    {
+     "code": "RADO-5",
+     "file": "rado-rado-5.webp",
+     "color": "#564e45"
+    },
+    {
+     "code": "RADO-6",
+     "file": "rado-rado-6.webp",
+     "color": "#4f443c"
+    },
+    {
+     "code": "RADO-7",
+     "file": "rado-rado-7.webp",
+     "color": "#313f33"
+    },
+    {
+     "code": "RADO-8",
+     "file": "rado-rado-8.webp",
+     "color": "#424c46"
+    },
+    {
+     "code": "RADO-9",
+     "file": "rado-rado-9.webp",
+     "color": "#656c65"
+    },
+    {
+     "code": "RADO-10",
+     "file": "rado-rado-10.webp",
+     "color": "#3c434e"
+    },
+    {
+     "code": "RADO-11",
+     "file": "rado-rado-11.webp",
+     "color": "#2b3d4a"
+    },
+    {
+     "code": "RADO-12",
+     "file": "rado-rado-12.webp",
+     "color": "#757880"
+    },
+    {
+     "code": "RADO-13",
+     "file": "rado-rado-13.webp",
+     "color": "#151725"
+    },
+    {
+     "code": "RADO-14",
+     "file": "rado-rado-14.webp",
+     "color": "#aa7c1f"
+    },
+    {
+     "code": "RADO-15",
+     "file": "rado-rado-15.webp",
+     "color": "#7b3e26"
+    },
+    {
+     "code": "RADO-16",
+     "file": "rado-rado-16.webp",
+     "color": "#5a1b1a"
+    },
+    {
+     "code": "RADO-17",
+     "file": "rado-rado-17.webp",
+     "color": "#dbc9bb"
+    },
+    {
+     "code": "RADO-18",
+     "file": "rado-rado-18.webp",
+     "color": "#ba9e95"
+    },
+    {
+     "code": "RADO-19",
+     "file": "rado-rado-19.webp",
+     "color": "#82544a"
+    },
+    {
+     "code": "RADO-20",
+     "file": "rado-rado-20.webp",
+     "color": "#653c35"
+    },
+    {
+     "code": "RADO-21",
+     "file": "rado-rado-21.webp",
+     "color": "#7b7267"
+    },
+    {
+     "code": "RADO-22",
+     "file": "rado-rado-22.webp",
+     "color": "#6a6662"
+    },
+    {
+     "code": "RADO-23",
+     "file": "rado-rado-23.webp",
+     "color": "#44403d"
+    },
+    {
+     "code": "RADO-24",
+     "file": "rado-rado-24.webp",
+     "color": "#323132"
+    },
+    {
+     "code": "RADO-25",
+     "file": "rado-rado-25.webp",
+     "color": "#070709"
+    }
+   ]
+  },
+  {
+   "id": "reef",
+   "name": {
+    "he": "ריף",
+    "en": "Reef"
+   },
+   "photo": 1004,
+   "swatches": [
+    {
+     "code": "REEF-4601",
+     "file": "reef-reef-4601.webp",
+     "color": "#c0b0a1"
+    },
+    {
+     "code": "REEF-4602",
+     "file": "reef-reef-4602.webp",
+     "color": "#9c8a79"
+    },
+    {
+     "code": "REEF-4603",
+     "file": "reef-reef-4603.webp",
+     "color": "#98846b"
+    },
+    {
+     "code": "REEF-4604",
+     "file": "reef-reef-4604.webp",
+     "color": "#948474"
+    },
+    {
+     "code": "REEF-4605",
+     "file": "reef-reef-4605.webp",
+     "color": "#998370"
+    },
+    {
+     "code": "REEF-4606",
+     "file": "reef-reef-4606.webp",
+     "color": "#483e35"
+    },
+    {
+     "code": "REEF-4607",
+     "file": "reef-reef-4607.webp",
+     "color": "#ab8124"
+    },
+    {
+     "code": "REEF-4608",
+     "file": "reef-reef-4608.webp",
+     "color": "#65341e"
+    },
+    {
+     "code": "REEF-4609",
+     "file": "reef-reef-4609.webp",
+     "color": "#805e5a"
+    },
+    {
+     "code": "REEF-4610",
+     "file": "reef-reef-4610.webp",
+     "color": "#3f5151"
+    },
+    {
+     "code": "REEF-4611",
+     "file": "reef-reef-4611.webp",
+     "color": "#394551"
+    },
+    {
+     "code": "REEF-4612",
+     "file": "reef-reef-4612.webp",
+     "color": "#20232b"
+    },
+    {
+     "code": "REEF-4613",
+     "file": "reef-reef-4613.webp",
+     "color": "#b8ada1"
+    },
+    {
+     "code": "REEF-4614",
+     "file": "reef-reef-4614.webp",
+     "color": "#948d84"
+    },
+    {
+     "code": "REEF-4615",
+     "file": "reef-reef-4615.webp",
+     "color": "#7e736c"
+    },
+    {
+     "code": "REEF-4616",
+     "file": "reef-reef-4616.webp",
+     "color": "#696660"
+    },
+    {
+     "code": "REEF-4617",
+     "file": "reef-reef-4617.webp",
+     "color": "#4a4740"
+    },
+    {
+     "code": "REEF-4618",
+     "file": "reef-reef-4618.webp",
+     "color": "#3d3b3b"
+    },
+    {
+     "code": "REEF-4619",
+     "file": "reef-reef-4619.webp",
+     "color": "#1e1e1e"
+    }
+   ]
+  },
+  {
+   "id": "flamingo",
+   "name": {
+    "he": "פלמינגו",
+    "en": "Flamingo"
+   },
+   "photo": 1003,
+   "swatches": [
+    {
+     "code": "Flamingo 2401",
+     "file": "flamingo-flamingo-2401.webp",
+     "color": "#b3ad9a"
+    },
+    {
+     "code": "Flamingo 2402",
+     "file": "flamingo-flamingo-2402.webp",
+     "color": "#bcb3a1"
+    },
+    {
+     "code": "Flamingo 2403",
+     "file": "flamingo-flamingo-2403.webp",
+     "color": "#988b7a"
+    },
+    {
+     "code": "Flamingo 2404",
+     "file": "flamingo-flamingo-2404.webp",
+     "color": "#736e6b"
+    },
+    {
+     "code": "Flamingo 2405",
+     "file": "flamingo-flamingo-2405.webp",
+     "color": "#70665c"
+    },
+    {
+     "code": "Flamingo 2406",
+     "file": "flamingo-flamingo-2406.webp",
+     "color": "#67655f"
+    },
+    {
+     "code": "Flamingo 2407",
+     "file": "flamingo-flamingo-2407.webp",
+     "color": "#5f5043"
+    },
+    {
+     "code": "Flamingo 2408",
+     "file": "flamingo-flamingo-2408.webp",
+     "color": "#3c4132"
+    },
+    {
+     "code": "Flamingo 2409",
+     "file": "flamingo-flamingo-2409.webp",
+     "color": "#435d64"
+    },
+    {
+     "code": "Flamingo 2410",
+     "file": "flamingo-flamingo-2410.webp",
+     "color": "#8a9892"
+    },
+    {
+     "code": "Flamingo 2411",
+     "file": "flamingo-flamingo-2411.webp",
+     "color": "#62717a"
+    },
+    {
+     "code": "Flamingo 2412",
+     "file": "flamingo-flamingo-2412.webp",
+     "color": "#223047"
+    },
+    {
+     "code": "Flamingo 2413",
+     "file": "flamingo-flamingo-2413.webp",
+     "color": "#986e1b"
+    },
+    {
+     "code": "Flamingo 2414",
+     "file": "flamingo-flamingo-2414.webp",
+     "color": "#8e4e4c"
+    },
+    {
+     "code": "Flamingo 2415",
+     "file": "flamingo-flamingo-2415.webp",
+     "color": "#927970"
+    },
+    {
+     "code": "Flamingo 2416",
+     "file": "flamingo-flamingo-2416.webp",
+     "color": "#99958b"
+    },
+    {
+     "code": "Flamingo 2417",
+     "file": "flamingo-flamingo-2417.webp",
+     "color": "#82807a"
+    },
+    {
+     "code": "Flamingo 2418",
+     "file": "flamingo-flamingo-2418.webp",
+     "color": "#404242"
+    },
+    {
+     "code": "Flamingo 2419",
+     "file": "flamingo-flamingo-2419.webp",
+     "color": "#52504d"
+    },
+    {
+     "code": "Flamingo 2420",
+     "file": "flamingo-flamingo-2420.webp",
+     "color": "#2e2b2c"
+    }
+   ]
+  },
+  {
+   "id": "dallas",
+   "name": {
+    "he": "דאלאס",
+    "en": "Dallas"
+   },
+   "photo": 1001,
+   "swatches": [
+    {
+     "code": "Dallas-601",
+     "file": "dallas-dallas-601.webp",
+     "color": "#d5d0c4"
+    },
+    {
+     "code": "Dallas-602",
+     "file": "dallas-dallas-602.webp",
+     "color": "#d7cfb9"
+    },
+    {
+     "code": "Dallas-603",
+     "file": "dallas-dallas-603.webp",
+     "color": "#b5a48c"
+    },
+    {
+     "code": "Dallas-604",
+     "file": "dallas-dallas-604.webp",
+     "color": "#aa9f90"
+    },
+    {
+     "code": "Dallas-605",
+     "file": "dallas-dallas-605.webp",
+     "color": "#76654e"
+    },
+    {
+     "code": "Dallas-606",
+     "file": "dallas-dallas-606.webp",
+     "color": "#3b1709"
+    },
+    {
+     "code": "Dallas-607",
+     "file": "dallas-dallas-607.webp",
+     "color": "#ac7723"
+    },
+    {
+     "code": "Dallas-608",
+     "file": "dallas-dallas-608.webp",
+     "color": "#554b30"
+    },
+    {
+     "code": "Dallas-609",
+     "file": "dallas-dallas-609.webp",
+     "color": "#424537"
+    },
+    {
+     "code": "Dallas-610",
+     "file": "dallas-dallas-610.webp",
+     "color": "#76786c"
+    },
+    {
+     "code": "Dallas-611",
+     "file": "dallas-dallas-611.webp",
+     "color": "#b3aea2"
+    },
+    {
+     "code": "Dallas-612",
+     "file": "dallas-dallas-612.webp",
+     "color": "#979797"
+    },
+    {
+     "code": "Dallas-613",
+     "file": "dallas-dallas-613.webp",
+     "color": "#6d6b69"
+    },
+    {
+     "code": "Dallas-614",
+     "file": "dallas-dallas-614.webp",
+     "color": "#0b1834"
+    },
+    {
+     "code": "Dallas-615",
+     "file": "dallas-dallas-615.webp",
+     "color": "#1e232c"
+    },
+    {
+     "code": "Dallas-616",
+     "file": "dallas-dallas-616.webp",
+     "color": "#131216"
+    }
+   ]
+  },
+  {
+   "id": "colors70",
+   "name": {
+    "he": "70 גוונים",
+    "en": "70 colours"
+   },
+   "photo": 1002,
+   "swatches": [
+    {
+     "code": "1",
+     "file": "colors70-1.webp",
+     "color": "#d1c8bb"
+    },
+    {
+     "code": "2",
+     "file": "colors70-2.webp",
+     "color": "#d2c2b1"
+    },
+    {
+     "code": "3",
+     "file": "colors70-3.webp",
+     "color": "#c8b9a4"
+    },
+    {
+     "code": "4",
+     "file": "colors70-4.webp",
+     "color": "#b19e88"
+    },
+    {
+     "code": "5",
+     "file": "colors70-5.webp",
+     "color": "#d4c4a9"
+    },
+    {
+     "code": "6",
+     "file": "colors70-6.webp",
+     "color": "#c3aa7b"
+    },
+    {
+     "code": "7",
+     "file": "colors70-7.webp",
+     "color": "#c2a36c"
+    },
+    {
+     "code": "8",
+     "file": "colors70-8.webp",
+     "color": "#8a6539"
+    },
+    {
+     "code": "9",
+     "file": "colors70-9.webp",
+     "color": "#503820"
+    },
+    {
+     "code": "10",
+     "file": "colors70-10.webp",
+     "color": "#413025"
+    },
+    {
+     "code": "11",
+     "file": "colors70-11.webp",
+     "color": "#37291e"
+    },
+    {
+     "code": "12",
+     "file": "colors70-12.webp",
+     "color": "#312927"
+    },
+    {
+     "code": "13",
+     "file": "colors70-13.webp",
+     "color": "#2c211b"
+    },
+    {
+     "code": "14",
+     "file": "colors70-14.webp",
+     "color": "#211a1a"
+    },
+    {
+     "code": "15",
+     "file": "colors70-15.webp",
+     "color": "#978065"
+    },
+    {
+     "code": "16",
+     "file": "colors70-16.webp",
+     "color": "#90826b"
+    },
+    {
+     "code": "17",
+     "file": "colors70-17.webp",
+     "color": "#8e7e70"
+    },
+    {
+     "code": "18",
+     "file": "colors70-18.webp",
+     "color": "#5a544d"
+    },
+    {
+     "code": "19",
+     "file": "colors70-19.webp",
+     "color": "#34302b"
+    },
+    {
+     "code": "20",
+     "file": "colors70-20.webp",
+     "color": "#78772f"
+    },
+    {
+     "code": "21",
+     "file": "colors70-21.webp",
+     "color": "#758a4b"
+    },
+    {
+     "code": "22",
+     "file": "colors70-22.webp",
+     "color": "#807734"
+    },
+    {
+     "code": "23",
+     "file": "colors70-23.webp",
+     "color": "#605f37"
+    },
+    {
+     "code": "24",
+     "file": "colors70-24.webp",
+     "color": "#686742"
+    },
+    {
+     "code": "25",
+     "file": "colors70-25.webp",
+     "color": "#182e28"
+    },
+    {
+     "code": "26",
+     "file": "colors70-26.webp",
+     "color": "#1f2923"
+    },
+    {
+     "code": "27",
+     "file": "colors70-27.webp",
+     "color": "#cba736"
+    },
+    {
+     "code": "28",
+     "file": "colors70-28.webp",
+     "color": "#816d27"
+    },
+    {
+     "code": "29",
+     "file": "colors70-29.webp",
+     "color": "#d4a33a"
+    },
+    {
+     "code": "30",
+     "file": "colors70-30.webp",
+     "color": "#b17f3e"
+    },
+    {
+     "code": "31",
+     "file": "colors70-31.webp",
+     "color": "#c9b8ae"
+    },
+    {
+     "code": "32",
+     "file": "colors70-32.webp",
+     "color": "#927d76"
+    },
+    {
+     "code": "33",
+     "file": "colors70-33.webp",
+     "color": "#926963"
+    },
+    {
+     "code": "34",
+     "file": "colors70-34.webp",
+     "color": "#8e502b"
+    },
+    {
+     "code": "35",
+     "file": "colors70-35.webp",
+     "color": "#614036"
+    },
+    {
+     "code": "36",
+     "file": "colors70-36.webp",
+     "color": "#a98f93"
+    },
+    {
+     "code": "37",
+     "file": "colors70-37.webp",
+     "color": "#796079"
+    },
+    {
+     "code": "38",
+     "file": "colors70-38.webp",
+     "color": "#523b68"
+    },
+    {
+     "code": "39",
+     "file": "colors70-39.webp",
+     "color": "#391832"
+    },
+    {
+     "code": "40",
+     "file": "colors70-40.webp",
+     "color": "#5c1d52"
+    },
+    {
+     "code": "41",
+     "file": "colors70-41.webp",
+     "color": "#9b366d"
+    },
+    {
+     "code": "42",
+     "file": "colors70-42.webp",
+     "color": "#6a1b36"
+    },
+    {
+     "code": "43",
+     "file": "colors70-43.webp",
+     "color": "#9a264f"
+    },
+    {
+     "code": "44",
+     "file": "colors70-44.webp",
+     "color": "#981e32"
+    },
+    {
+     "code": "45",
+     "file": "colors70-45.webp",
+     "color": "#3e0915"
+    },
+    {
+     "code": "46",
+     "file": "colors70-46.webp",
+     "color": "#430d1d"
+    },
+    {
+     "code": "47",
+     "file": "colors70-47.webp",
+     "color": "#380d15"
+    },
+    {
+     "code": "48",
+     "file": "colors70-48.webp",
+     "color": "#978985"
+    },
+    {
+     "code": "49",
+     "file": "colors70-49.webp",
+     "color": "#918477"
+    },
+    {
+     "code": "50",
+     "file": "colors70-50.webp",
+     "color": "#6c6865"
+    },
+    {
+     "code": "51",
+     "file": "colors70-51.webp",
+     "color": "#89867e"
+    },
+    {
+     "code": "52",
+     "file": "colors70-52.webp",
+     "color": "#73716d"
+    },
+    {
+     "code": "53",
+     "file": "colors70-53.webp",
+     "color": "#535154"
+    },
+    {
+     "code": "54",
+     "file": "colors70-54.webp",
+     "color": "#88a3a3"
+    },
+    {
+     "code": "55",
+     "file": "colors70-55.webp",
+     "color": "#c0c2bf"
+    },
+    {
+     "code": "56",
+     "file": "colors70-56.webp",
+     "color": "#989a97"
+    },
+    {
+     "code": "57",
+     "file": "colors70-57.webp",
+     "color": "#75818b"
+    },
+    {
+     "code": "58",
+     "file": "colors70-58.webp",
+     "color": "#65787a"
+    },
+    {
+     "code": "59",
+     "file": "colors70-59.webp",
+     "color": "#808c85"
+    },
+    {
+     "code": "60",
+     "file": "colors70-60.webp",
+     "color": "#1b3644"
+    },
+    {
+     "code": "61",
+     "file": "colors70-61.webp",
+     "color": "#2a3e4e"
+    },
+    {
+     "code": "62",
+     "file": "colors70-62.webp",
+     "color": "#53717d"
+    },
+    {
+     "code": "63",
+     "file": "colors70-63.webp",
+     "color": "#567282"
+    },
+    {
+     "code": "64",
+     "file": "colors70-64.webp",
+     "color": "#242f57"
+    },
+    {
+     "code": "65",
+     "file": "colors70-65.webp",
+     "color": "#18253a"
+    },
+    {
+     "code": "66",
+     "file": "colors70-66.webp",
+     "color": "#111d36"
+    },
+    {
+     "code": "67",
+     "file": "colors70-67.webp",
+     "color": "#111319"
+    },
+    {
+     "code": "68",
+     "file": "colors70-68.webp",
+     "color": "#b99793"
+    },
+    {
+     "code": "69",
+     "file": "colors70-69.webp",
+     "color": "#b19b94"
+    },
+    {
+     "code": "70",
+     "file": "colors70-70.webp",
+     "color": "#1e2645"
+    }
+   ]
+  }
+ ],
+ "products": {
+  "1682": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1897": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1686": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1861": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1856": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1702": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1838": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1837": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1916": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1926": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1873": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1865": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1881": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "2065": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1887": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1789": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1900": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1907": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1908": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1920": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1923": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1932": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1935": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1938": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1829": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1941": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1824": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1951": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "2020": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "2002": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1997": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1955": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1953": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1850": [
+   "rado",
+   "reef",
+   "flamingo",
+   "colors70"
+  ],
+  "1847": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1715": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1991": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1994": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "2004": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "2007": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "2067": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1986": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1672": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1859": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1876": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1870": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1884": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1890": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1674": [
+   "rado",
+   "reef"
+  ],
+  "1893": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1895": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1903": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1943": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1948": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1821": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1929": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1965": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1961": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1841": [
+   "rado",
+   "reef",
+   "flamingo",
+   "dallas",
+   "colors70"
+  ],
+  "1852": [
+   "rado",
+   "reef",
+   "flamingo",
+   "colors70"
+  ]
+ }
+}

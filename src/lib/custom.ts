@@ -1,6 +1,8 @@
 // "Make it yours": the sizes, seat division and fabric colour code a visitor may choose for an upholstered piece.
 import type { Product, ProductType } from "../data/catalog";
 import { footprint } from "./measure";
+import { swatchLabel } from "../data/fabrics";
+import type { Lang } from "../i18n/text";
 
 export type Side = "left" | "right";
 export type Firmness = "soft" | "medium" | "firm";
@@ -15,7 +17,7 @@ export interface Design {
   chaiseSide: Side;
   chaiseLength: number;
   chaiseDepth: number;
-  // The fabric colour code the visitor read off the product photos; empty until they type one.
+  // The fabric colour code the visitor picked in the fabric step (e.g. "REEF-4601"); empty until they pick one.
   colorCode: string;
   firmness: Firmness;
 }
@@ -95,32 +97,31 @@ export function designCode(product: Product, design: Design): string {
   const size = `${design.width}x${design.depth}`;
   // Chaise: side (R/L), then length x depth.
   const chaise = design.chaiseLength > 0 && `${design.chaiseSide[0].toUpperCase()}${design.chaiseLength}x${design.chaiseDepth}`;
-  // The fabric colour code, marked F, when the visitor typed one.
+  // The fabric colour code, marked F, when the visitor picked one.
   const color = cleanColorCode(design);
   return [product.sku ?? product.id, size, design.seats || null, chaise, color && `F(${color})`, design.firmness[0].toUpperCase()].filter(Boolean).join("-");
 }
 
 interface DesignWords {
   cm: string;
-  colorCodeLabel: string;
+  fabricLabel: string;
   firmness: Record<Firmness, string>;
   seatsCount: (seats: number) => string;
   chaiseOn: (side: Side, length: number, depth: number) => string;
 }
 
-// The fabric colour code as text, e.g. "Fabric colour code 1203" (null when not typed yet).
-export function fabricText(design: Design, words: Pick<DesignWords, "colorCodeLabel">): string | null {
-  const code = cleanColorCode(design);
-  return code ? `${words.colorCodeLabel} ${code}` : null;
+// The chosen fabric as text, e.g. "Fabric: Flamingo 2409" (null when not chosen yet).
+export function fabricText(design: Design, words: Pick<DesignWords, "fabricLabel">, lang: Lang): string | null {
+  return design.colorCode ? `${words.fabricLabel}: ${swatchLabel(design.colorCode, lang)}` : null;
 }
 
-// One line for the cart and the WhatsApp order, e.g. "250 × 95 cm · 3 seats · Fabric colour code 1203".
-export function describeDesign(design: Design, rules: DesignRules, words: DesignWords): string {
+// One line for the cart and the WhatsApp order, e.g. "250 × 95 cm · 3 seats · Fabric: REEF-4601".
+export function describeDesign(design: Design, rules: DesignRules, words: DesignWords, lang: Lang): string {
   return [
     `${design.width} × ${design.depth} ${words.cm}`,
     SHOW_SEATS && design.seats > 0 && words.seatsCount(design.seats),
     rules.chaise && words.chaiseOn(design.chaiseSide, design.chaiseLength, design.chaiseDepth),
-    fabricText(design, words),
+    fabricText(design, words, lang),
     words.firmness[design.firmness],
   ].filter(Boolean).join(" · ");
 }
