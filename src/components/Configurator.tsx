@@ -1,13 +1,16 @@
 import { useState, type ReactNode } from "react";
 import type { Product } from "../data/catalog";
-import { cleanColorCode, designCode, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
+import { swatchLabel } from "../data/fabrics";
+import { designCode, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
 import { useShop } from "../state/ShopContext";
 import { DesignDrawing } from "./DesignDrawing";
+import { FabricPicker } from "./FabricPicker";
 import { Fold } from "./Fold";
 
 type Step = "size" | "seats" | "fabric" | "firmness";
 
 interface ConfiguratorProps {
+  product: Product;
   design: Design;
   rules: DesignRules;
   onChange: (design: Design) => void;
@@ -34,11 +37,11 @@ function Slider({ label, value, range, unit, onChange }: SliderProps) {
 
 // What the visitor chose in each step, as short text.
 function useChosen(design: Design): Record<Step, string> {
-  const { t } = useShop();
+  const { t, lang } = useShop();
   return {
     size: `${design.width} × ${design.depth} ${t.cm}`,
     seats: t.seatsCount(design.seats),
-    fabric: cleanColorCode(design) || t.colorCodeMissing,
+    fabric: design.colorCode ? swatchLabel(design.colorCode, lang) : t.colorCodeMissing,
     firmness: t.firmness[design.firmness],
   };
 }
@@ -55,7 +58,7 @@ export function DesignSummary({ product, design, rules }: { product: Product; de
     [t.specSize, chosen.size],
     ...(SHOW_SEATS && rules.seats.length > 0 ? [[t.specSeats, chosen.seats] as [string, string]] : []),
     ...(rules.chaise ? [[t.configChaise, `${t.sides[design.chaiseSide]} · ${design.chaiseLength} ${t.cm}`] as [string, string], [t.configChaiseDepth, `${design.chaiseDepth} ${t.cm}`] as [string, string]] : []),
-    [t.specColorCode, cleanColorCode(design) || t.colorCodeMissing],
+    [t.specColorCode, chosen.fabric],
     [t.configSteps.firmness, chosen.firmness],
     [t.specCode, code],
   ];
@@ -79,7 +82,7 @@ export function DesignSummary({ product, design, rules }: { product: Product; de
 }
 
 // "Make it yours": numbered sections that expand in place; each closed row shows the current choice.
-export function Configurator({ design, rules, onChange, onReset }: ConfiguratorProps) {
+export function Configurator({ product, design, rules, onChange, onReset }: ConfiguratorProps) {
   const { t } = useShop();
   const steps: Step[] = SHOW_SEATS && rules.seats.length > 0 ? ["size", "seats", "fabric", "firmness"] : ["size", "fabric", "firmness"];
   const [open, setOpen] = useState<Step | null>("size");
@@ -139,16 +142,7 @@ export function Configurator({ design, rules, onChange, onReset }: ConfiguratorP
         ))}
       </div>
     ),
-    fabric: (
-      <>
-        {/* The colours are shown in the product photos, so the visitor types the code printed there. */}
-        <label className="config-code">
-          <span>{t.colorCodeLabel}</span>
-          <input type="text" dir="ltr" value={design.colorCode} maxLength={20} autoComplete="off" spellCheck={false} placeholder={t.colorCodePlaceholder} aria-describedby="color-code-hint" onChange={(event) => change({ colorCode: event.target.value })} />
-          <small className="muted" id="color-code-hint">{t.colorCodeHint}</small>
-        </label>
-      </>
-    ),
+    fabric: <FabricPicker product={product} code={design.colorCode} onPick={(colorCode) => change({ colorCode })} />,
   };
 
   return (

@@ -1,13 +1,14 @@
 import type { Design, DesignRules } from "../lib/custom";
 import { useShop } from "../state/ShopContext";
 import { Dimension } from "./FloorPlanDrawing";
+import { findSwatch } from "../data/fabrics";
 
 // Space around the piece for the dimension lines, and the thickness of arms and back, in centimetres.
 const MARGIN = 62;
 const ARM = 20;
 const BACK = 22;
 const GAP = 4;
-// One neutral upholstery tone: the real colour is the code the visitor typed, shown in the photos.
+// A neutral upholstery tone until the visitor picks a fabric colour.
 const FABRIC_TONE = "#cdbfa8";
 
 // A soft light-and-shade over the fabric tone, so the cushions look upholstered.
@@ -57,7 +58,7 @@ export function DesignDrawing({ design, rules, outline = false, dimensions = tru
   return (
     <svg className={outline ? "design-drawing outline" : "design-drawing"} viewBox={`${-margin} ${-margin} ${width + margin * 2} ${height + margin * (dimensions ? 1.6 : 2)}`} role="img" aria-label={`${width} × ${depth} ${t.cm}`}>
       {!outline && <Texture />}
-      <g className="design-piece" style={{ fill: outline ? "#fff" : FABRIC_TONE }}>
+      <g className="design-piece" style={{ fill: outline ? "#fff" : findSwatch(design.colorCode)?.swatch.color ?? FABRIC_TONE }}>
         <Block x={0} y={0} width={width} height={depth} radius={14} />
         {hasChaise && <Block x={chaiseX} y={0} width={chaiseWidth} height={chaiseLength} radius={14} />}
         {isBed ? (
