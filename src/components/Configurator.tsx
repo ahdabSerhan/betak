@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
 import type { Product } from "../data/catalog";
 import { swatchLabel } from "../data/fabrics";
-import { designCode, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
+import { CORNER_BASE, designCode, EXTRA_PER_STEP, EXTRA_STEP_CM, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
+import { money } from "../lib/format";
 import { useShop } from "../state/ShopContext";
 import { DesignDrawing } from "./DesignDrawing";
 import { FabricPicker } from "./FabricPicker";
@@ -93,7 +94,7 @@ export function Configurator({ product, design, rules, onChange, onReset }: Conf
   const panels: Record<Step, ReactNode> = {
     size: (
       <>
-        <Slider label={rules.shape === "bed" ? t.configMattress : t.configWidth} value={design.width} range={rules.width} unit={t.cm} onChange={(width) => onChange(withWidth(design, rules, width))} />
+        <Slider label={rules.shape === "bed" ? t.configMattress : rules.shape === "seat" ? t.configWidth : t.configSofaLength} value={design.width} range={rules.width} unit={t.cm} onChange={(width) => onChange(withWidth(design, rules, width))} />
         {rules.depths.length > 0 && (
           <div className="config-row">
             <span>{rules.shape === "bed" ? t.configLength : rules.chaise ? t.configSofaDepth : t.configDepth}</span>
@@ -118,6 +119,8 @@ export function Configurator({ product, design, rules, onChange, onReset }: Conf
                 {(["right", "left"] as const).map((side) => <button className="chip" aria-pressed={design.chaiseSide === side} onClick={() => change({ chaiseSide: side })} key={side}>{t.sides[side]}</button>)}
               </div>
             </div>
+            {/* Corner sofas cost more above the size their listed price is for. */}
+            <small className="muted">{t.sizePriceRule(CORNER_BASE.width, CORNER_BASE.chaiseLength, EXTRA_STEP_CM, money(EXTRA_PER_STEP))}</small>
           </>
         )}
       </>

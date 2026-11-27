@@ -5,6 +5,20 @@ const FIRST_ORDER_NUMBER = Number(process.env.FIRST_ORDER_NUMBER ?? 5001);
 const LIST_LIMIT = 300;
 const COMMIT_ATTEMPTS = 4;
 
+// The catalog price plus what the chosen sizes add; undefined for an unknown product or a size that cannot be made.
+// A line without a size is priced at the listed size.
+export function linePrice(price, extras, size) {
+  if (price === undefined || !extras || !size) return price;
+  let total = price;
+  for (const [measure, table] of Object.entries(extras)) {
+    if (size[measure] === undefined) continue;
+    const extra = table[size[measure]];
+    if (extra === undefined) return undefined;
+    total += extra;
+  }
+  return total;
+}
+
 // --- Checking what the visitor sent --------------------------------------------------------------
 
 const text = (value, max) => (typeof value === "string" ? value.trim().slice(0, max) : "");
@@ -31,7 +45,7 @@ export function cleanOrder(input, priceOf) {
       sku: text(line?.sku, 40),
       design: text(line?.design, 500),
       quantity: Math.min(99, Math.max(1, Math.trunc(Number(line?.quantity) || 1))),
-      price: priceOf ? priceOf(productId) : Math.max(0, Number(line?.price) || 0),
+      price: priceOf ? priceOf(productId, line?.size) : Math.max(0, Number(line?.price) || 0),
     };
   });
 

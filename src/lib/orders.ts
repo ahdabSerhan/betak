@@ -7,6 +7,8 @@ export interface OrderLine {
   design: string;
   quantity: number;
   price: number;
+  // The chosen sofa sizes in cm, so the server can add the size extra itself.
+  size?: { width: number; chaiseLength: number };
 }
 
 export interface Address {

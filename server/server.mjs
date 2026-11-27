@@ -7,7 +7,7 @@ import { createServer } from "node:http";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { adminConfig, checkAdmin } from "./admin-auth.mjs";
-import { cleanOrder, createOrderStore } from "./orders.mjs";
+import { cleanOrder, createOrderStore, linePrice } from "./orders.mjs";
 import { newPayment, paymentConfig, paymentsEnabled, paymentUrl, readReport } from "./upay.mjs";
 
 const PORT = Number(process.env.PORT ?? 8080);
@@ -87,7 +87,9 @@ function tooManyOrders(request) {
 
 // Catalog prices by product id, written by the build, so an order's total never trusts the browser.
 const PRICES = existsSync(join(SITE_ROOT, "prices.json")) ? JSON.parse(readFileSync(join(SITE_ROOT, "prices.json"), "utf8")) : {};
-const priceOf = (productId) => PRICES[productId];
+// What each chosen size adds, by product id and measure, e.g. { "1686": { "width": { "310": 100 } } }.
+const SIZE_PRICES = existsSync(join(SITE_ROOT, "size-prices.json")) ? JSON.parse(readFileSync(join(SITE_ROOT, "size-prices.json"), "utf8")) : {};
+const priceOf = (productId, size) => linePrice(PRICES[productId], SIZE_PRICES[productId], size);
 
 // This site's own address, for the links UPay sends the customer and its report back to.
 function siteUrl(request) {
