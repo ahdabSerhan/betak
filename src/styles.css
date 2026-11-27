@@ -196,6 +196,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 
 /* ---------- Motion ---------- */
 @keyframes rise { from { opacity: 0; transform: translateY(18px); } }
+/* Room pieces settle into place without fading, so a paused animation (a tab in the background) never leaves them invisible. */
+@keyframes piece-in { from { transform: translateY(18px); } }
 @keyframes fade { from { opacity: 0; } }
 @keyframes slide-in { from { transform: translateX(var(--from, 100%)); } }
 @keyframes pop { 0% { transform: scale(.6); } 60% { transform: scale(1.25); } }
@@ -569,7 +571,7 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 .scene-window { position: absolute; left: 0; top: 0; width: 23%; height: 62%; background: linear-gradient(90deg, transparent 48.5%, #3a3530 48.5% 51.5%, transparent 51.5%), linear-gradient(#bcd6ea, #e6f0f4 70%, #cfd9cf); border-right: 6px solid #3a3530; }
 .scene-curtain { position: absolute; left: 23.5%; top: 0; width: 9%; height: 63%; background: repeating-linear-gradient(90deg, #efe6d6 0 9px, #e2d6c2 9px 16px); opacity: .92; border-radius: 0 0 6px 6px; }
 .scene-light { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, rgba(255, 244, 220, .5), transparent 46%); }
-.scene-piece { position: absolute; padding: 0; border: 0; background: none; animation: rise .7s cubic-bezier(.2, .8, .2, 1) both; transition: scale .25s, filter .25s; filter: drop-shadow(0 16px 12px rgba(40, 26, 12, .28)); }
+.scene-piece { position: absolute; padding: 0; border: 0; background: none; animation: piece-in .7s cubic-bezier(.2, .8, .2, 1) both; transition: scale .25s, filter .25s; filter: drop-shadow(0 16px 12px rgba(40, 26, 12, .28)); }
 .scene-piece img { width: 100%; }
 .scene-piece:hover, .scene-piece:focus-visible { scale: 1.04; filter: drop-shadow(0 16px 12px rgba(40, 26, 12, .28)) drop-shadow(0 0 14px rgba(184, 134, 43, .9)); outline: 0; z-index: 6; }
 .scene-piece.framed img { aspect-ratio: 1; object-fit: cover; border: 5px solid #fff; border-radius: 6px; }
