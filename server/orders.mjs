@@ -76,7 +76,7 @@ function toValue(value) {
   return { mapValue: { fields: toFields(value) } };
 }
 
-const toFields = (object) => Object.fromEntries(Object.entries(object).map(([key, value]) => [key, toValue(value)]));
+export const toFields = (object) => Object.fromEntries(Object.entries(object).map(([key, value]) => [key, toValue(value)]));
 
 function fromValue(value) {
   if ("integerValue" in value) return Number(value.integerValue);
@@ -89,12 +89,12 @@ function fromValue(value) {
   return null;
 }
 
-const fromFields = (fields) => Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, fromValue(value)]));
+export const fromFields = (fields) => Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, fromValue(value)]));
 
 // --- Stores ---------------------------------------------------------------------------------------
 
-// Firestore store; getToken and getProject come from the server (metadata server on Cloud Run).
-function firestoreStore({ getToken, getProject }) {
+// A small Firestore REST client; getToken and getProject come from the server (metadata server on Cloud Run).
+export function firestore({ getToken, getProject }) {
   async function call(path, { method = "GET", body } = {}) {
     const root = `projects/${await getProject()}/databases/(default)/documents`;
     const response = await fetch(`https://firestore.googleapis.com/v1/${root}${path}`, {
@@ -107,7 +107,12 @@ function firestoreStore({ getToken, getProject }) {
     return response.json();
   }
   const docName = async (path) => `projects/${await getProject()}/databases/(default)/documents/${path}`;
+  return { call, docName };
+}
 
+// Firestore store for orders.
+function firestoreStore(cloud) {
+  const { call, docName } = firestore(cloud);
   return {
     // The next order number and the order are written together, so two orders never share a number.
     async add(order) {

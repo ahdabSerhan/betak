@@ -109,6 +109,23 @@ select { font: inherit; padding: 7px 10px; border: 1px solid var(--line); backgr
 
 /* Text pages */
 .page { max-width: 760px; padding-block: 32px 56px; }
+/* Contact page: details beside the form, stacked on small screens */
+.page.contact-page { max-width: 1100px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 40px; align-items: start; }
+.contact-other { font-size: 18px; margin: 8px 0 0; }
+.contact-form { display: grid; gap: 12px; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.contact-form h2 { margin: 0; }
+.contact-form p { margin: 0; }
+.contact-form label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
+.contact-form .required { color: #a3221b; }
+.contact-form :is(input, textarea) { inline-size: 100%; min-width: 0; box-sizing: border-box; font: inherit; font-weight: 400; padding: 9px 12px; border: 1px solid var(--muted); border-radius: 4px; background: var(--surface); }
+.contact-form input[dir="ltr"] { text-align: end; }
+.contact-form textarea { resize: vertical; }
+.contact-form button:disabled { opacity: .7; cursor: wait; }
+.contact-form .trap { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+.contact-sent { justify-items: start; font-size: 18px; }
+.contact-failed { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-weight: 600; }
+@media (max-width: 860px) { .page.contact-page { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .contact-form .form-row { grid-template-columns: 1fr; } }
 .contact-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; font-size: 18px; }
 
 /* Footer */
@@ -923,6 +940,11 @@ html.a11y-grayscale { filter: grayscale(1); }
 .orders-table tbody tr.unread { background: #fff8ea; }
 .orders-table tbody tr.unread th, .orders-table tbody tr.unread td:nth-child(4) { font-weight: 700; }
 .orders-table input[type="checkbox"] { inline-size: 20px; block-size: 20px; }
+.admin-tabs { display: flex; gap: 8px; margin-block: 16px 0; border-bottom: 1px solid var(--line); }
+.admin-tabs button { font: inherit; font-weight: 600; padding: 10px 16px; background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer; color: var(--ink); }
+.admin-tabs button[aria-pressed="true"] { border-bottom-color: var(--ink); }
+.admin-tabs .tab-count { display: inline-block; min-inline-size: 20px; padding: 0 6px; margin-inline-start: 6px; border-radius: 10px; background: #a3221b; color: #fff; font-size: 12px; line-height: 20px; text-align: center; }
+.message-text { margin: 0; max-width: 60ch; white-space: pre-wrap; }
 .contact-links { display: flex; flex-wrap: wrap; gap: 6px 12px; }
 .contact-links a { white-space: nowrap; }
 .order-note { margin: 6px 0 0; max-width: 32ch; }

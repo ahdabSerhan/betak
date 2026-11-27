@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { STORE } from "../data/store";
 import { money } from "../lib/format";
+import { listMessages, markMessageRead, type Message } from "../lib/messages";
 import { addressLine, adminConfig, listOrders, markRead, type AdminStatus, type Order } from "../lib/orders";
 import type { Text } from "../i18n/text";
 import { useShop } from "../state/ShopContext";
@@ -133,6 +134,74 @@ function OrderRow({ order, onRead }: { order: Order; onRead: (order: Order, read
   );
 }
 
+// One contact form message: who wrote, how to reach them, and what they asked.
+function MessageRow({ message, onRead }: { message: Message; onRead: (message: Message, read: boolean) => void }) {
+  const { t, lang } = useShop();
+  const a = t.admin;
+  return (
+    <tr className={message.read ? "" : "unread"}>
+      <td><input type="checkbox" checked={message.read} onChange={(event) => onRead(message, event.target.checked)} aria-label={a.markMessageRead(message.name)} /></td>
+      <td>{new Date(message.createdAt).toLocaleString(lang === "he" ? "he-IL" : "en-GB", { dateStyle: "short", timeStyle: "short" })}</td>
+      <th scope="row">{message.name}</th>
+      <td>
+        <div className="contact-links">
+          <a href={`https://wa.me/${whatsappNumber(message.phone)}`} target="_blank" rel="noopener">{a.whatsapp}</a>
+          <a href={`tel:${digits(message.phone)}`} dir="ltr">{message.phone}</a>
+          {message.email && <a href={`mailto:${message.email}`}>{a.email}</a>}
+        </div>
+      </td>
+      <td><p className="message-text">{message.message}</p></td>
+    </tr>
+  );
+}
+
+// Contact form messages, newest first, with the same search and unread filter as the orders.
+function MessagesPanel({ status, messages, onRead, onRefresh }: { status: string; messages: Message[]; onRead: (message: Message, read: boolean) => void; onRefresh: () => void }) {
+  const a = useShop().t.admin;
+  const [unreadOnly, setUnreadOnly] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const shown = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const queryDigits = digits(query);
+    const matches = (message: Message) => !query
+      || message.name.toLowerCase().includes(query)
+      || message.message.toLowerCase().includes(query)
+      || message.email.toLowerCase().includes(query)
+      || (queryDigits !== "" && digits(message.phone).includes(queryDigits));
+    return messages.filter((message) => (!unreadOnly || !message.read) && matches(message));
+  }, [messages, unreadOnly, search]);
+
+  return (
+    <>
+      <div className="admin-tools">
+        <label className="admin-search">
+          <span className="sr-only">{a.searchMessages}</span>
+          <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={a.searchMessages} />
+        </label>
+        <label className="admin-check"><input type="checkbox" checked={unreadOnly} onChange={(event) => setUnreadOnly(event.target.checked)} /> {a.unreadMessagesOnly}</label>
+        <button className="btn ghost small" onClick={onRefresh}>{a.refresh}</button>
+      </div>
+      <p role="status" className="muted">
+        {status === "loading" ? a.messagesLoading : status === "not-allowed" ? a.notAllowed : status === "error" ? a.error : a.messagesCount(shown.length, messages.filter((message) => !message.read).length)}
+      </p>
+      {status === "ok" && shown.length === 0 && <p className="empty">{a.messagesEmpty}</p>}
+      {shown.length > 0 && (
+        <div className="table-scroll" tabIndex={0} role="region" aria-label={a.messagesTitle}>
+          <table className="orders-table">
+            <thead>
+              <tr><th scope="col">{a.read}</th><th scope="col">{a.date}</th><th scope="col">{a.customer}</th><th scope="col">{a.contact}</th><th scope="col">{a.message}</th></tr>
+            </thead>
+            <tbody>
+              {shown.map((message) => <MessageRow message={message} onRead={onRead} key={message.id} />)}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
+}
+
 // The store's private orders page, at /admin/orders. Only the Google accounts in ADMIN_EMAILS see orders.
 export function AdminOrders() {
   const { t } = useShop();
@@ -142,6 +211,9 @@ export function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [search, setSearch] = useState("");
+  const [view, setView] = useState<"orders" | "messages">("orders");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [messagesStatus, setMessagesStatus] = useState<AdminStatus | "loading">("loading");
   const buttonRef = useRef<HTMLDivElement>(null);
 
   const signIn = useCallback((next: string) => {
@@ -175,7 +247,23 @@ export function AdminOrders() {
     setOrders(result.orders);
   }, [token, signIn]);
 
+  const loadMessages = useCallback(async () => {
+    if (!token) return;
+    setMessagesStatus("loading");
+    const result = await listMessages(token);
+    setMessagesStatus(result.status);
+    setMessages(result.messages);
+  }, [token]);
+
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { loadMessages(); }, [loadMessages]);
+
+  const onMessageRead = async (message: Message, read: boolean) => {
+    setMessages((current) => current.map((item) => (item.id === message.id ? { ...item, read } : item)));
+    if (!(await markMessageRead(token, message.id, read))) loadMessages();
+  };
+
+  const unreadMessages = messages.filter((message) => !message.read).length;
 
   const onRead = async (order: Order, read: boolean) => {
     setOrders((current) => current.map((item) => (item.id === order.id ? { ...item, read } : item)));
@@ -186,6 +274,7 @@ export function AdminOrders() {
     window.google?.accounts.id.disableAutoSelect();
     signIn("");
     setOrders([]);
+    setMessages([]);
   };
 
   const shown = useMemo(() => {
@@ -216,6 +305,17 @@ export function AdminOrders() {
       )}
 
       {token && (
+        <div className="admin-tabs">
+          <button type="button" aria-pressed={view === "orders"} onClick={() => setView("orders")}>{a.tabOrders}</button>
+          <button type="button" aria-pressed={view === "messages"} onClick={() => setView("messages")}>
+            {a.tabMessages}{unreadMessages > 0 && <span className="tab-count">{unreadMessages}</span>}
+          </button>
+        </div>
+      )}
+
+      {token && view === "messages" && <MessagesPanel status={messagesStatus} messages={messages} onRead={onMessageRead} onRefresh={loadMessages} />}
+
+      {token && view === "orders" && (
         <>
           <div className="admin-tools">
             <label className="admin-search">
