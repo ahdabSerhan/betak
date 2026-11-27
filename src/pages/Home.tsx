@@ -14,7 +14,7 @@ import { ALL_REVIEWS } from "../data/details";
 import { GOOGLE_REVIEWS_URL } from "../data/reviewLinks";
 import { useShop } from "../state/ShopContext";
 import { asset } from "../lib/asset";
-import { calm } from "../lib/motion";
+import { calm, smallScreen } from "../lib/motion";
 import { href, productHref } from "../lib/routes";
 
 const FEATURED = PRODUCTS.filter((product) => product.featured);
@@ -34,6 +34,8 @@ export function Home() {
   // The list is doubled so the marquee can loop without a gap.
   const marquee = [...t.values, ...t.values, ...t.values, ...t.values];
   const hero = useRef<HTMLElement>(null);
+  // The featured cards slide in sideways on wide screens; on phones they only fade up, so swiping the row stays steady.
+  const phone = smallScreen();
 
   // As the visitor scrolls past the showroom, its headline drifts up and fades out.
   useGSAP(() => {
@@ -75,7 +77,7 @@ export function Home() {
           <h2>{t.featured}</h2>
           <a href={href("sofas")}>{t.allModels}</a>
         </div>
-        <AnimatedContent className="carousel" direction="horizontal" reverse distance={60} duration={0.8} stagger={0.08}>
+        <AnimatedContent className="carousel" direction={phone ? "vertical" : "horizontal"} reverse={!phone} distance={phone ? 16 : 60} duration={phone ? 0.45 : 0.8} stagger={phone ? 0.04 : 0.08}>
           {FEATURED.map((product) => <ProductCard product={product} key={product.id} />)}
         </AnimatedContent>
       </section>

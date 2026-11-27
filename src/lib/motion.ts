@@ -12,6 +12,11 @@ export function calm(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains(STILL_CLASS);
 }
 
+// Phones get lighter animations: a blur while scrolling looks out of focus and costs frames there.
+export function smallScreen(): boolean {
+  return window.matchMedia("(max-width: 760px)").matches;
+}
+
 let lenis: Lenis | null = null;
 const tick = (seconds: number) => lenis?.raf(seconds * 1000);
 
