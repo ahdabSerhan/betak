@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { productById, type Product } from "../data/catalog";
 import { navigate } from "../hooks/useRoute";
 import { usePersistentState } from "../hooks/usePersistentState";
-import { describeDesign, rulesFor, sizeExtra, standardDesign, type Design } from "../lib/custom";
+import { describeDesign, rulesFor, savedDesign, sizeExtra, type Design } from "../lib/custom";
 import type { Piece } from "../lib/designer";
 import type { RoomDimensions } from "../lib/measure";
 import { askEsentrix, esentrixEnabled, loadEsentrixWidget } from "../lib/esentrix";
@@ -98,7 +98,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     // Choices saved before a newer option existed are completed with the standard ones.
     const designOf = (product: Product) => {
       const rules = rulesFor(product);
-      return rules && { ...standardDesign(product, rules), ...designs[product.id] };
+      return rules && savedDesign(product, rules, designs[product.id]);
     };
     const extraOf = (product: Product) => {
       const rules = rulesFor(product);
