@@ -146,97 +146,116 @@
     {
      "code": "REEF-4601",
      "file": "reef-reef-4601.webp",
-     "color": "#c0b0a1"
+     "color": "#c0b0a1",
+     "zoom": true
     },
     {
      "code": "REEF-4602",
      "file": "reef-reef-4602.webp",
-     "color": "#9c8a79"
+     "color": "#9c8a79",
+     "zoom": true
     },
     {
      "code": "REEF-4603",
      "file": "reef-reef-4603.webp",
-     "color": "#98846b"
+     "color": "#98846b",
+     "zoom": true
     },
     {
      "code": "REEF-4604",
      "file": "reef-reef-4604.webp",
-     "color": "#948474"
+     "color": "#948474",
+     "zoom": true
     },
     {
      "code": "REEF-4605",
      "file": "reef-reef-4605.webp",
-     "color": "#998370"
+     "color": "#998370",
+     "zoom": true
     },
     {
      "code": "REEF-4606",
      "file": "reef-reef-4606.webp",
-     "color": "#483e35"
+     "color": "#483e35",
+     "zoom": true
     },
     {
      "code": "REEF-4607",
      "file": "reef-reef-4607.webp",
-     "color": "#ab8124"
+     "color": "#ab8124",
+     "zoom": true
     },
     {
      "code": "REEF-4608",
      "file": "reef-reef-4608.webp",
-     "color": "#65341e"
+     "color": "#65341e",
+     "zoom": true
     },
     {
      "code": "REEF-4609",
      "file": "reef-reef-4609.webp",
-     "color": "#805e5a"
+     "color": "#805e5a",
+     "zoom": true
     },
     {
      "code": "REEF-4610",
      "file": "reef-reef-4610.webp",
-     "color": "#3f5151"
+     "color": "#3f5151",
+     "zoom": true
     },
     {
      "code": "REEF-4611",
      "file": "reef-reef-4611.webp",
-     "color": "#394551"
+     "color": "#394551",
+     "zoom": true
     },
     {
      "code": "REEF-4612",
      "file": "reef-reef-4612.webp",
-     "color": "#20232b"
+     "color": "#20232b",
+     "zoom": true
     },
     {
      "code": "REEF-4613",
      "file": "reef-reef-4613.webp",
-     "color": "#b8ada1"
+     "color": "#b8ada1",
+     "zoom": true
     },
     {
      "code": "REEF-4614",
      "file": "reef-reef-4614.webp",
-     "color": "#948d84"
+     "color": "#948d84",
+     "zoom": true
     },
     {
      "code": "REEF-4615",
      "file": "reef-reef-4615.webp",
-     "color": "#7e736c"
+     "color": "#7e736c",
+     "zoom": true
     },
     {
      "code": "REEF-4616",
      "file": "reef-reef-4616.webp",
-     "color": "#696660"
+     "color": "#696660",
+     "zoom": true
     },
     {
      "code": "REEF-4617",
      "file": "reef-reef-4617.webp",
-     "color": "#4a4740"
+     "color": "#4a4740",
+     "zoom": true
     },
     {
      "code": "REEF-4618",
      "file": "reef-reef-4618.webp",
-     "color": "#3d3b3b"
+     "color": "#3d3b3b",
+     "zoom": true
     },
     {
      "code": "REEF-4619",
      "file": "reef-reef-4619.webp",
-     "color": "#1e1e1e"
+     "color": "#1e1e1e",
+     "zoom": true
     }
    ]
   },
@@ -251,102 +270,122 @@
     {
      "code": "Flamingo 2401",
      "file": "flamingo-flamingo-2401.webp",
-     "color": "#e3e1d2"
+     "color": "#e3e1d2",
+     "zoom": true
     },
     {
      "code": "Flamingo 2402",
      "file": "flamingo-flamingo-2402.webp",
-     "color": "#bcb3a1"
+     "color": "#bcb3a1",
+     "zoom": true
     },
     {
      "code": "Flamingo 2403",
      "file": "flamingo-flamingo-2403.webp",
-     "color": "#988b7a"
+     "color": "#988b7a",
+     "zoom": true
     },
     {
      "code": "Flamingo 2404",
      "file": "flamingo-flamingo-2404.webp",
-     "color": "#736e6b"
+     "color": "#736e6b",
+     "zoom": true
     },
     {
      "code": "Flamingo 2405",
      "file": "flamingo-flamingo-2405.webp",
-     "color": "#70665c"
+     "color": "#70665c",
+     "zoom": true
     },
     {
      "code": "Flamingo 2406",
      "file": "flamingo-flamingo-2406.webp",
-     "color": "#67655f"
+     "color": "#67655f",
+     "zoom": true
     },
     {
      "code": "Flamingo 2407",
      "file": "flamingo-flamingo-2407.webp",
-     "color": "#5f5043"
+     "color": "#5f5043",
+     "zoom": true
     },
     {
      "code": "Flamingo 2408",
      "file": "flamingo-flamingo-2408.webp",
-     "color": "#3c4132"
+     "color": "#3c4132",
+     "zoom": true
     },
     {
      "code": "Flamingo 2409",
      "file": "flamingo-flamingo-2409.webp",
-     "color": "#435d64"
+     "color": "#435d64",
+     "zoom": true
     },
     {
      "code": "Flamingo 2410",
      "file": "flamingo-flamingo-2410.webp",
-     "color": "#8a9892"
+     "color": "#8a9892",
+     "zoom": true
     },
     {
      "code": "Flamingo 2411",
      "file": "flamingo-flamingo-2411.webp",
-     "color": "#62717a"
+     "color": "#62717a",
+     "zoom": true
     },
     {
      "code": "Flamingo 2412",
      "file": "flamingo-flamingo-2412.webp",
-     "color": "#223047"
+     "color": "#223047",
+     "zoom": true
     },
     {
      "code": "Flamingo 2413",
      "file": "flamingo-flamingo-2413.webp",
-     "color": "#986e1b"
+     "color": "#986e1b",
+     "zoom": true
     },
     {
      "code": "Flamingo 2414",
      "file": "flamingo-flamingo-2414.webp",
-     "color": "#8e4e4c"
+     "color": "#8e4e4c",
+     "zoom": true
     },
     {
      "code": "Flamingo 2415",
      "file": "flamingo-flamingo-2415.webp",
-     "color": "#927970"
+     "color": "#927970",
+     "zoom": true
     },
     {
      "code": "Flamingo 2416",
      "file": "flamingo-flamingo-2416.webp",
-     "color": "#99958b"
+     "color": "#99958b",
+     "zoom": true
     },
     {
      "code": "Flamingo 2417",
      "file": "flamingo-flamingo-2417.webp",
-     "color": "#82807a"
+     "color": "#82807a",
+     "zoom": true
     },
     {
      "code": "Flamingo 2418",
      "file": "flamingo-flamingo-2418.webp",
-     "color": "#404242"
+     "color": "#404242",
+     "zoom": true
     },
     {
      "code": "Flamingo 2419",
      "file": "flamingo-flamingo-2419.webp",
-     "color": "#52504d"
+     "color": "#52504d",
+     "zoom": true
     },
     {
      "code": "Flamingo 2420",
      "file": "flamingo-flamingo-2420.webp",
-     "color": "#2e2b2c"
+     "color": "#2e2b2c",
+     "zoom": true
     }
    ]
   },

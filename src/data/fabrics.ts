@@ -10,6 +10,8 @@ export interface Swatch {
   file: string;
   // The swatch's typical colour, used to tint the sofa preview.
   color: string;
+  // True when a large close-up photo of the fabric exists, for the zoom view.
+  zoom?: boolean;
 }
 
 export interface FabricCatalog {
@@ -30,6 +32,8 @@ export function catalogsFor(product: Product): FabricCatalog[] {
 }
 
 export const swatchImage = (swatch: Swatch) => asset(`img/fabrics/${swatch.file}`);
+// The large close-up of a swatch, or null when only the small chart crop exists.
+export const zoomImage = (swatch: Swatch) => (swatch.zoom ? asset(`img/fabrics/zoom/${swatch.file}`) : null);
 
 // The picture for the fabric preview, and a mask of its props (tables, vases, plants), which stay uncoloured.
 export function previewOf(product: Product): { photo: string; props: string | null } | null {

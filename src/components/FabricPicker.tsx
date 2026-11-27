@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { Product } from "../data/catalog";
 import { cutoutOf } from "../data/cutouts";
-import { catalogsFor, findSwatch, previewOf, swatchImage, swatchLabel, type Swatch } from "../data/fabrics";
+import { catalogsFor, findSwatch, previewOf, swatchImage, swatchLabel, zoomImage, type Swatch } from "../data/fabrics";
 import { useShop } from "../state/ShopContext";
 import { Dialog } from "./Dialog";
 
@@ -122,6 +123,8 @@ function FabricDialog({ product, code, onPick, onClose }: FabricPickerProps & { 
   const start = findSwatch(code);
   const [catalogId, setCatalogId] = useState(start && catalogs.includes(start.catalog) ? start.catalog.id : catalogs[0].id);
   const [selected, setSelected] = useState<Swatch>(start?.swatch ?? catalogs[0].swatches[0]);
+  // The swatch shown full size over the dialog, if any.
+  const [zoomed, setZoomed] = useState<Swatch | null>(null);
   const catalog = catalogs.find((item) => item.id === catalogId)!;
   // The sharp preview cut-out, or else the smaller one the room designer uses.
   const preview = previewOf(product);
@@ -156,18 +159,59 @@ function FabricDialog({ product, code, onPick, onClose }: FabricPickerProps & { 
 
         <div className="fabric-grid" role="group" aria-label={catalog.name[lang]}>
           {catalog.swatches.map((swatch) => (
-            <button aria-pressed={swatch.code === selected.code} aria-label={swatch.code} onClick={() => setSelected(swatch)} key={swatch.code}>
-              <img src={swatchImage(swatch)} alt="" loading="lazy" />
-              {/* The tab already names the catalog, so the tile shows the number only. */}
-              <span dir="ltr">{swatch.code.replace(/^\D+/, "")}</span>
-            </button>
+            <div className="fabric-tile" key={swatch.code}>
+              <button aria-pressed={swatch.code === selected.code} aria-label={swatch.code} onClick={() => setSelected(swatch)}>
+                <img src={swatchImage(swatch)} alt="" loading="lazy" />
+                {/* The tab already names the catalog, so the tile shows the number only. */}
+                <span dir="ltr">{swatch.code.replace(/^\D+/, "")}</span>
+              </button>
+              {swatch.zoom && (
+                <button className="fabric-zoom-btn" aria-label={t.fabricZoom(swatch.code)} onClick={() => setZoomed(swatch)}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M15.5 15.5 21 21" /></svg>
+                </button>
+              )}
+            </div>
           ))}
         </div>
+        {zoomed && <FabricZoom swatch={zoomed} label={swatchLabel(zoomed.code, lang)} onClose={() => setZoomed(null)} />}
 
         <button className="btn fabric-confirm" onClick={() => onPick(selected.code)}>
           {t.fabricConfirm} ·{" "}<span dir="auto">{label}</span>
         </button>
       </div>
     </Dialog>
+  );
+}
+
+// A swatch's close-up photo over the whole screen, with its code; Escape or a click outside closes it.
+function FabricZoom({ swatch, label, onClose }: { swatch: Swatch; label: string; onClose: () => void }) {
+  const { t } = useShop();
+  const close = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    close.current?.focus();
+    // Caught before the fabric dialog's own Escape handler, so only the zoom closes.
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.stopPropagation();
+      onClose();
+    };
+    document.addEventListener("keydown", onKey, true);
+    return () => {
+      document.removeEventListener("keydown", onKey, true);
+      opener?.focus();
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div className="fabric-zoom" role="dialog" aria-modal="true" aria-label={label} onClick={(event) => event.target === event.currentTarget && onClose()}>
+      <button ref={close} className="fabric-zoom-close" onClick={onClose} aria-label={t.close}>✕</button>
+      <figure>
+        <img src={zoomImage(swatch) ?? swatchImage(swatch)} alt={label} />
+        <figcaption dir="auto">{label}</figcaption>
+      </figure>
+    </div>,
+    document.body,
   );
 }
