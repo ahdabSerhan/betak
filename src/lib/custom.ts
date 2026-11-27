@@ -37,6 +37,8 @@ export interface DesignRules {
   chaise: Range | null;
   // The sizes the listed price is for, per measure that changes the price (empty when the size never changes it).
   priceBase: PriceBase;
+  // Where the length starts when it is not the price base (an armchair's listed length).
+  standardWidth?: number;
 }
 
 type PriceBase = Partial<Record<"width" | "chaiseLength", number>>;
@@ -46,7 +48,10 @@ const SOFA_TYPES: ProductType[] = ["three", "two", "lounge", "sofa", "set32", "s
 const SOFA_BED_TYPES: ProductType[] = ["sofabed", "twobed", "chairbed"];
 export const isSofaBed = (product: Product) => SOFA_BED_TYPES.includes(product.type);
 const CORNER_TYPES: ProductType[] = ["corner", "cornerlux"];
-const SEAT_TYPES: ProductType[] = ["armchair", "tv", "ottoman", "bench"];
+// Armchairs: length 70-125 cm and a choice of depths; ottomans and benches: width only.
+const ARMCHAIR_TYPES: ProductType[] = ["armchair", "tv"];
+const ARMCHAIR_DEPTHS = [85, 90, 95, 100, 105, 110];
+const SEAT_TYPES: ProductType[] = ["ottoman", "bench"];
 const BED_TYPES: ProductType[] = ["dbed", "bed"];
 // A seat cushion narrower or wider than this is uncomfortable.
 const SEAT_WIDTH = { min: 55, max: 115 };
@@ -81,6 +86,11 @@ export function rulesFor(product: Product): DesignRules | null {
     // Straight sofas cost more above the length in their description; without one, the size never changes the price.
     const listed = listedLength(product);
     return { shape: "sofa", width: sofaWidth(listed), depths: SOFA_DEPTHS, seats: [1, 2, 3, 4], chaise: null, priceBase: listed ? { width: listed } : {} };
+  }
+  if (ARMCHAIR_TYPES.includes(type)) {
+    const width = { min: 70, max: 125, step: 5 };
+    const listed = listedLength(product);
+    return { shape: "seat", width, depths: ARMCHAIR_DEPTHS, seats: [], chaise: null, priceBase: {}, standardWidth: listed ? within(listed, width) : undefined };
   }
   if (SEAT_TYPES.includes(type)) return { shape: "seat", width: { min: 50, max: 160, step: 5 }, depths: [], seats: [], chaise: null, priceBase: {} };
   if (BED_TYPES.includes(type)) return { shape: "bed", width: { min: 120, max: 200, step: 20 }, depths: [190, 200], seats: [], chaise: null, priceBase: {} };
@@ -126,7 +136,7 @@ export function standardDesign(product: Product, rules: DesignRules): Design {
   const typical = footprint(product);
   // Sofas start at the size their listed price is for.
   const base = rules.priceBase;
-  const width = base.width ?? within(typical.width, rules.width);
+  const width = base.width ?? rules.standardWidth ?? within(typical.width, rules.width);
   const seats = seatChoices(rules, width);
   return {
     width,

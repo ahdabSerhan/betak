@@ -94,7 +94,7 @@ export function Configurator({ product, design, rules, onChange, onReset }: Conf
   const panels: Record<Step, ReactNode> = {
     size: (
       <>
-        <Slider label={rules.shape === "bed" ? t.configMattress : rules.shape === "seat" ? t.configWidth : t.configSofaLength} value={design.width} range={rules.width} unit={t.cm} onChange={(width) => onChange(withWidth(design, rules, width))} />
+        <Slider label={rules.shape === "bed" ? t.configMattress : rules.shape === "seat" && rules.depths.length === 0 ? t.configWidth : t.configSofaLength} value={design.width} range={rules.width} unit={t.cm} onChange={(width) => onChange(withWidth(design, rules, width))} />
         {rules.depths.length > 0 && (
           <div className="config-row">
             <span>{rules.shape === "bed" ? t.configLength : rules.chaise ? t.configSofaDepth : t.configDepth}</span>
