@@ -41,9 +41,12 @@ export interface DesignRules {
 
 type PriceBase = Partial<Record<"width" | "chaiseLength", number>>;
 
-const SOFA_TYPES: ProductType[] = ["three", "two", "lounge", "sofa", "set32", "sofaotto", "sofabed", "twobed"];
+const SOFA_TYPES: ProductType[] = ["three", "two", "lounge", "sofa", "set32", "sofaotto"];
+// Sofa and armchair beds are not designed on the site: a customer who wants changes contacts the store.
+const SOFA_BED_TYPES: ProductType[] = ["sofabed", "twobed", "chairbed"];
+export const isSofaBed = (product: Product) => SOFA_BED_TYPES.includes(product.type);
 const CORNER_TYPES: ProductType[] = ["corner", "cornerlux"];
-const SEAT_TYPES: ProductType[] = ["armchair", "tv", "chairbed", "ottoman", "bench"];
+const SEAT_TYPES: ProductType[] = ["armchair", "tv", "ottoman", "bench"];
 const BED_TYPES: ProductType[] = ["dbed", "bed"];
 // A seat cushion narrower or wider than this is uncomfortable.
 const SEAT_WIDTH = { min: 55, max: 115 };
