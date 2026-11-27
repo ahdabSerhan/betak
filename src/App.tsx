@@ -87,7 +87,7 @@ export function App() {
         <Page route={route} />
       </main>
       <Footer />
-      {!esentrixEnabled && <AgentWidget viewing={product} />}
+      {!esentrixEnabled && <AgentWidget viewing={product} route={route} />}
       <FloatingContact />
       <AccessibilityMenu />
       <CookieNotice />

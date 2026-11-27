@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { type Product } from "../data/catalog";
+import { CATEGORIES, type Product } from "../data/catalog";
 import { askAgent, type ChatMessage } from "../lib/agent";
 import { buildRoom, NO_TASTE, roomTotal, type Piece } from "../lib/designer";
 import { navigate } from "../hooks/useRoute";
+import { pageKind } from "../lib/agentPages";
+import { smallScreen } from "../lib/motion";
 import { money, quantitySuffix } from "../lib/format";
 import { useShop } from "../state/ShopContext";
+import { Orb } from "./Orb";
 import { PhotoButton } from "./PhotoButton";
 import { productHref } from "../lib/routes";
 
@@ -14,6 +17,81 @@ const DEFAULT_ROOM = { wall: 4.5, depth: 3.8 };
 interface Turn extends ChatMessage {
   // Products the agent suggested with this answer.
   pieces?: Piece[];
+  // A page of the site the agent pointed to.
+  page?: string;
+}
+
+// How long after a page opens the closed assistant offers a tip for it, and how long the tip stays.
+const HINT_DELAY_MS = 4000;
+const HINT_SHOW_MS = 12000;
+// Each page offers its tip once per visit, and none after the visitor dismisses one.
+const hintedRoutes = new Set<string>();
+let hintsDismissed = false;
+
+// The closed assistant: an orb that follows the visitor, shrinks while they scroll down and offers a tip for the page.
+function Launcher({ route }: { route: string }) {
+  const { t, lang, nameOf, openAgent } = useShop();
+  const [compact, setCompact] = useState(false);
+  const [hint, setHint] = useState<string | null>(null);
+
+  // Scrolling down tucks the label away; scrolling up brings it back.
+  useEffect(() => {
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (Math.abs(y - last) < 6) return;
+      setCompact(y > last && y > 240);
+      last = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // A short tip about the page the visitor just opened.
+  useEffect(() => {
+    setHint(null);
+    if (hintsDismissed || hintedRoutes.has(route)) return;
+    const page = pageKind(route, lang, nameOf);
+    const text = page.kind === "product" || page.kind === "category" ? t.agentHint[page.kind](page.name) : t.agentHint[page.kind];
+    const show = window.setTimeout(() => {
+      hintedRoutes.add(route);
+      setHint(text);
+    }, HINT_DELAY_MS);
+    const hide = window.setTimeout(() => setHint(null), HINT_DELAY_MS + HINT_SHOW_MS);
+    return () => {
+      window.clearTimeout(show);
+      window.clearTimeout(hide);
+    };
+  }, [route, lang, nameOf, t]);
+
+  const dismiss = () => {
+    hintsDismissed = true;
+    setHint(null);
+  };
+
+  return (
+    <div className={`agent-dock${compact && !hint ? " compact" : ""}`}>
+      {hint && (
+        <div className="agent-hint">
+          <button className="agent-hint-text" onClick={() => openAgent()}>{hint}</button>
+          <button className="agent-hint-close" onClick={dismiss} aria-label={t.agentHintClose}>✕</button>
+        </div>
+      )}
+      <button className="agent-launcher" onClick={() => openAgent()}>
+        <Orb size={26} />
+        <span className="agent-launcher-text">{t.agentLauncher}</span>
+      </button>
+    </div>
+  );
+}
+
+// The name of a page the agent links to, e.g. "מיטות והדומים" or "מדיניות משלוחים".
+function pageLabel(route: string, t: ReturnType<typeof useShop>["t"], lang: "he" | "en"): string {
+  const category = CATEGORIES.find((item) => item.id === route);
+  if (category) return category[lang];
+  if (route === "home") return t.showroomLabel;
+  const label = (t as unknown as Record<string, unknown>)[route];
+  return typeof label === "string" ? label : route;
 }
 
 // The products of one answer, with actions to buy them or see them together in 3D.
@@ -43,8 +121,8 @@ function Suggestions({ pieces }: { pieces: Piece[] }) {
 }
 
 // Floating chat with the store's AI agent. It stays open while the visitor moves between pages.
-export function AgentWidget({ viewing }: { viewing?: Product }) {
-  const { t, lang, agentOpen, openAgent, closeAgent, agentPrompt, clearAgentPrompt, agentRoom, setAgentRoom, agentBrief, setAgentBrief, showInRoom, setRoomPhoto } = useShop();
+export function AgentWidget({ viewing, route }: { viewing?: Product; route: string }) {
+  const { t, lang, nameOf, agentOpen, closeAgent, agentPrompt, clearAgentPrompt, agentRoom, setAgentRoom, agentBrief, setAgentBrief, showInRoom, setRoomPhoto } = useShop();
   const [turns, setTurns] = useState<Turn[]>([]);
   const [draft, setDraft] = useState("");
   const [thinking, setThinking] = useState(false);
@@ -62,8 +140,8 @@ export function AgentWidget({ viewing }: { viewing?: Product }) {
 
     const messages = history.map(({ role, content }) => ({ role, content }));
     const dimensions = { wall: agentBrief.wall ?? DEFAULT_ROOM.wall, depth: agentBrief.depth ?? DEFAULT_ROOM.depth };
-    const reply = await askAgent(messages, { pieces: agentRoom ?? [], budget: agentBrief.budget ?? DEFAULT_BUDGET, dimensions, lang, viewing });
-    setTurns([...history, { role: "assistant", content: reply.message, pieces: reply.pieces ?? undefined }]);
+    const reply = await askAgent(messages, { pieces: agentRoom ?? [], budget: agentBrief.budget ?? DEFAULT_BUDGET, dimensions, lang, viewing, route });
+    setTurns([...history, { role: "assistant", content: reply.message, pieces: reply.pieces ?? undefined, page: reply.page && reply.page !== route ? reply.page : undefined }]);
     setOffline(reply.source === "rules");
     setThinking(false);
     setAgentBrief({ ...agentBrief, ...reply.dimensions, ...(reply.budget ? { budget: reply.budget } : {}) });
@@ -97,19 +175,22 @@ export function AgentWidget({ viewing }: { viewing?: Product }) {
     showInRoom(agentRoom ?? buildRoom("living", "medium", agentBrief.budget ?? DEFAULT_BUDGET, NO_TASTE));
   };
 
+  // Opens the page the agent pointed to; on a phone the chat steps aside so the page is visible.
+  const goTo = (page: string) => {
+    navigate(page);
+    if (smallScreen()) closeAgent();
+  };
+
+  // Questions that fit the page the visitor is on.
+  const page = pageKind(route, lang, nameOf);
+  const chips = page.kind === "product" ? t.agentChips.product : page.kind === "category" ? t.agentChips.category(page.name) : page.kind === "designer" ? t.agentChips.designer : t.agentSuggestions;
+
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
     void send(draft);
   };
 
-  if (!agentOpen) {
-    return (
-      <button className="agent-launcher" onClick={() => openAgent()}>
-        <span className="agent-dot" />
-        ✦ {t.agentLauncher}
-      </button>
-    );
-  }
+  if (!agentOpen) return <Launcher route={route} />;
 
   return (
     <section className="agent agent-panel" aria-label={t.agentTitle}>
@@ -125,12 +206,17 @@ export function AgentWidget({ viewing }: { viewing?: Product }) {
           <div className="agent-turn" key={index}>
             <p className={`bubble ${turn.role}`}>{turn.content}</p>
             {turn.pieces && <Suggestions pieces={turn.pieces} />}
+            {turn.page && (
+              <button className="agent-go" onClick={() => goTo(turn.page!)}>
+                {t.agentGo}: {pageLabel(turn.page, t, lang)} <span aria-hidden="true">{lang === "he" ? "←" : "→"}</span>
+              </button>
+            )}
           </div>
         ))}
         {thinking && <p className="bubble assistant thinking">{t.agentThinking}<i /><i /><i /></p>}
         {turns.length === 0 && !thinking && (
           <div className="chips">
-            {t.agentSuggestions.map((suggestion) => <button className="chip" onClick={() => void send(suggestion)} key={suggestion}>{suggestion}</button>)}
+            {chips.map((suggestion) => <button className="chip" onClick={() => void send(suggestion)} key={suggestion}>{suggestion}</button>)}
           </div>
         )}
       </div>

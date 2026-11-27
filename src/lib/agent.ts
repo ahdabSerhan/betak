@@ -3,6 +3,7 @@ import { PRODUCTS, productById, type Product } from "../data/catalog";
 import { cutoutOf } from "../data/cutouts";
 import { POLICIES } from "../data/details";
 import { TEXT, type Lang } from "../i18n/text";
+import { agentPagesText, describePage, isAgentPage } from "./agentPages";
 import { buildRoom, roomTotal, slotForProduct, type Piece, type RoomKey } from "./designer";
 import { DEPTH_RANGE, sizeOf, WALL_RANGE, type RoomDimensions } from "./measure";
 
@@ -18,6 +19,8 @@ export interface AgentReply {
   budget: number | null;
   // The room's measurements, when the visitor gave them.
   dimensions: RoomDimensions | null;
+  // A page of the site that answers the question better, e.g. "shipping" or "beds".
+  page: string | null;
   source: "ai" | "rules";
 }
 
@@ -29,6 +32,8 @@ interface AgentContext {
   lang: Lang;
   // The product page the visitor is on, if any.
   viewing?: Product;
+  // The page the visitor is on right now.
+  route: string;
 }
 
 type Ask = (system: string, messages: ChatMessage[]) => Promise<string>;
@@ -40,7 +45,7 @@ const MAX_QUANTITY = 8;
 // Like the designer, the agent offers pieces that can be shown standing in the room (any rug works).
 const CATALOG = PRODUCTS.filter((product) => product.category === "rugs" || cutoutOf(product)).map((product) => `${product.id}|${product.category}|${product.name.en}|${product.name.he}|${product.price}`).join("\n");
 
-function instructions({ pieces, budget, dimensions, lang, viewing }: AgentContext): string {
+function instructions({ pieces, budget, dimensions, lang, viewing, route }: AgentContext): string {
   const current = pieces.map((piece) => `${piece.product.id} x${piece.quantity}`).join(", ") || "none";
   return [
     "You are the sales and interior design assistant of Betak, a furniture store in Israel. You help visitors find furniture, answer questions and design rooms, using only Betak's catalog.",
@@ -49,6 +54,9 @@ function instructions({ pieces, budget, dimensions, lang, viewing }: AgentContex
     `Products suggested so far (product id x quantity): ${current}. Budget for a room: ${budget} ILS.`,
     `The room is ${dimensions.wall} m along its main wall and ${dimensions.depth} m deep, unless the visitor gives other measurements.`,
     viewing ? `The visitor is looking at product ${viewing.id} (${viewing.name.en}) right now.` : "",
+    `The visitor is on: ${describePage(route)}. Help with what that page is about first.`,
+    "Pages of the site, one per line as key: what it is:",
+    agentPagesText(),
     "Delivery notes:",
     ...POLICIES.en.delivery,
     "Rules:",
@@ -59,8 +67,9 @@ function instructions({ pieces, budget, dimensions, lang, viewing }: AgentContex
     "- Size the room to its measurements: under 15 square metres take 2 or 3 pieces and no corner sofa; over 25 take more. Leave an 80 cm walkway.",
     "- For anything the catalog and the delivery notes do not cover (stock, fabrics, exact dates), say the store will confirm on WhatsApp.",
     `- Write to the visitor in their language (default: ${lang === "he" ? "Hebrew" : "English"}), warm and brief: 2 or 3 sentences.`,
+    "- When a page of the site answers the visitor better (all the beds, the shipping policy, the terms, the room designer), set \"page\" to its key so they get a button to it. Do not link to the page they are already on.",
     "Answer with one JSON object and nothing else:",
-    '{"message": string, "pieces": [{"id": number, "quantity": number}] | null, "budget": number | null, "wall": number | null, "depth": number | null}',
+    '{"message": string, "pieces": [{"id": number, "quantity": number}] | null, "budget": number | null, "wall": number | null, "depth": number | null, "page": string | null}',
     '"wall" and "depth" are the room measurements in metres, only when the visitor states them.',
     'Set "pieces" to the products you suggest (for a room: the full room), or to null when no products are involved.',
   ].filter(Boolean).join("\n");
@@ -96,7 +105,7 @@ function toDimensions(wall?: number | null, depth?: number | null): RoomDimensio
 
 function parseReply(text: string): AgentReply {
   const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
-  const answer = JSON.parse(json) as { message?: string; pieces?: { id: number; quantity?: number }[] | null; budget?: number | null; wall?: number | null; depth?: number | null };
+  const answer = JSON.parse(json) as { message?: string; pieces?: { id: number; quantity?: number }[] | null; budget?: number | null; wall?: number | null; depth?: number | null; page?: unknown };
   if (!answer.message) throw new Error("The agent's answer had no message");
 
   // Anything the model invented is dropped; only real catalog products stay.
@@ -110,6 +119,8 @@ function parseReply(text: string): AgentReply {
     pieces: pieces.length > 0 ? pieces.slice(0, MAX_PIECES) : null,
     budget: typeof answer.budget === "number" && answer.budget > 0 ? answer.budget : null,
     dimensions: toDimensions(answer.wall, answer.depth),
+    // Only real pages of the site; anything else the model names is dropped.
+    page: isAgentPage(answer.page) ? answer.page : null,
     source: "ai",
   };
 }
@@ -128,7 +139,7 @@ function rulesReply(request: string, { budget, dimensions, lang }: AgentContext)
   const newBudget = stated ? Number(stated[0]) : cheaper ? Math.round(budget * 0.8) : budget;
   const pieces = buildRoom(room, size, newBudget, { liked: [], skipped: [] }, 3);
 
-  return { message: TEXT[lang].agentRules(roomTotal(pieces)), pieces, budget: newBudget, dimensions: statedRoom, source: "rules" };
+  return { message: TEXT[lang].agentRules(roomTotal(pieces)), pieces, budget: newBudget, dimensions: statedRoom, page: null, source: "rules" };
 }
 
 // Uses Claude inside the Claude preview, the store's server everywhere else, and rules if both fail.
