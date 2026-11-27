@@ -10,6 +10,8 @@ import { useShop } from "../state/ShopContext";
 import { AgentBuddy } from "./AgentBuddy";
 import { PhotoButton } from "./PhotoButton";
 import { productHref } from "../lib/routes";
+import { usePersistentState } from "../hooks/usePersistentState";
+import { canListen, canSpeak, listen, speak, stopSpeaking } from "../lib/voice";
 
 const DEFAULT_BUDGET = 9000;
 const DEFAULT_ROOM = { wall: 4.5, depth: 3.8 };
@@ -67,6 +69,12 @@ export function AgentWidget({ viewing, route }: { viewing?: Product; route: stri
   const [focus, setFocus] = useState<Product>();
   const about = viewing ?? focus;
   const log = useRef<HTMLDivElement>(null);
+  // Voice: the visitor can talk instead of typing, and hear the answers.
+  const [readAloud, setReadAloud] = usePersistentState("betak.voice", false);
+  const [listening, setListening] = useState(false);
+  const stopListening = useRef<() => void>(() => undefined);
+  // A question asked by voice is answered by voice too.
+  const askedByVoice = useRef(false);
 
   // A request typed in the home page box ("Design my room") opens the designed room by itself.
   const send = async (text: string, openRoom = false) => {
@@ -82,6 +90,8 @@ export function AgentWidget({ viewing, route }: { viewing?: Product; route: stri
     const reply = await askAgent(messages, { pieces: agentRoom ?? [], budget: agentBrief.budget ?? DEFAULT_BUDGET, dimensions, lang, viewing: about, route });
     setTurns([...history, { role: "assistant", content: reply.message, pieces: reply.pieces ?? undefined, page: reply.page && reply.page !== route ? reply.page : undefined }]);
     setOffline(reply.source === "rules");
+    if (readAloud || askedByVoice.current) speak(reply.message, lang);
+    askedByVoice.current = false;
     setThinking(false);
     setAgentBrief({ ...agentBrief, ...reply.dimensions, ...(reply.budget ? { budget: reply.budget } : {}) });
     // The designer page shows the agent's latest room, with the same plan and fit check.
@@ -124,6 +134,30 @@ export function AgentWidget({ viewing, route }: { viewing?: Product; route: stri
   const page = pageKind(route, lang, nameOf);
   const chips = page.kind === "product" || about ? t.agentChips.product : page.kind === "category" ? t.agentChips.category(page.name) : page.kind === "designer" ? t.agentChips.designer : t.agentSuggestions;
 
+  // The words appear in the box while the visitor talks; the finished sentence is sent.
+  const toggleMic = () => {
+    if (listening) return stopListening.current();
+    stopSpeaking();
+    setListening(true);
+    stopListening.current = listen(lang, (text, final) => {
+      setDraft(text);
+      if (!final) return;
+      askedByVoice.current = true;
+      void send(text);
+    }, () => setListening(false));
+  };
+
+  // Nothing keeps talking or listening once the chat is closed.
+  useEffect(() => () => {
+    stopListening.current();
+    stopSpeaking();
+  }, []);
+
+  const toggleReadAloud = () => {
+    if (readAloud) stopSpeaking();
+    setReadAloud(!readAloud);
+  };
+
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
     void send(draft);
@@ -142,6 +176,7 @@ export function AgentWidget({ viewing, route }: { viewing?: Product; route: stri
       <header className="agent-head">
         <span className="agent-dot" />
         <b>{t.agentTitle}</b>
+        {canSpeak() && <button className="agent-voice" onClick={toggleReadAloud} aria-pressed={readAloud} aria-label={t.agentReadAloud} title={t.agentReadAloud}>{readAloud ? "🔊" : "🔈"}</button>}
         <button className="agent-close" onClick={closeAgent} aria-label={t.close}>✕</button>
       </header>
       <button className="agent-design" onClick={startDesigner}>✦ {t.agentDesign}</button>
@@ -169,8 +204,13 @@ export function AgentWidget({ viewing, route }: { viewing?: Product; route: stri
       {offline && <small className="agent-note">{t.agentOffline}</small>}
       <form className="agent-form" onSubmit={onSubmit}>
         <PhotoButton className="agent-photo" label={t.photoUpload} onPhoto={onPhoto}>📷</PhotoButton>
+        {canListen() && (
+          <button type="button" className={`agent-photo agent-mic${listening ? " on" : ""}`} onClick={toggleMic} aria-pressed={listening} aria-label={listening ? t.agentMicStop : t.agentMic} title={listening ? t.agentMicStop : t.agentMic}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1a7 7 0 0 0 6-6.9h-2Z" /></svg>
+          </button>
+        )}
         <label className="sr-only" htmlFor="agent-input">{t.agentPlaceholder}</label>
-        <input id="agent-input" value={draft} onChange={(event) => setDraft(event.target.value)} placeholder={t.agentPlaceholder} autoComplete="off" />
+        <input id="agent-input" value={draft} onChange={(event) => setDraft(event.target.value)} placeholder={listening ? t.agentListening : t.agentPlaceholder} autoComplete="off" />
         <button className="btn gold" disabled={thinking || !draft.trim()}>{t.agentSend}</button>
       </form>
     </section>

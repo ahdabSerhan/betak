@@ -496,7 +496,8 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 /* The open chat sits above the side accessibility button, which would otherwise cover its messages on phones. */
 .agent-panel { position: fixed; inset-block-end: 22px; inset-inline-start: 22px; z-index: 28; width: min(400px, calc(100vw - 32px)); height: min(620px, calc(100dvh - 44px)); box-shadow: 0 30px 60px -20px rgba(29, 22, 18, .75); animation: sheet-in .3s cubic-bezier(.2, .7, .2, 1) both; }
 .agent-panel .agent-log { flex: 1; height: auto; }
-.agent-close { margin-inline-start: auto; background: none; border: 0; color: inherit; font-size: 18px; padding: 4px 8px; border-radius: 8px; }
+.agent-head b { margin-inline-end: auto; }
+.agent-close { background: none; border: 0; color: inherit; font-size: 18px; padding: 4px 8px; border-radius: 8px; }
 .agent-close:hover { background: rgba(255, 255, 255, .14); }
 .agent-turn { display: flex; flex-direction: column; gap: 8px; }
 .agent-cards { display: grid; gap: 6px; }
@@ -674,6 +675,13 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 .photo-button { cursor: pointer; }
 .photo-button:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 .agent-photo { display: grid; place-items: center; width: 40px; flex: none; border: 1px solid rgba(255, 255, 255, .18); border-radius: 50%; background: rgba(255, 255, 255, .08); font-size: 17px; }
+/* Voice: the mic glows while it listens; the speaker in the header turns reading aloud on and off. */
+@keyframes mic-on { 50% { box-shadow: 0 0 0 7px rgba(214, 69, 65, 0); } }
+.agent-mic { color: var(--cream); cursor: pointer; }
+.agent-mic svg { width: 18px; height: 18px; fill: currentColor; }
+.agent-mic.on { background: #c0392b; border-color: #c0392b; box-shadow: 0 0 0 0 rgba(214, 69, 65, .7); animation: mic-on 1.2s infinite; }
+.agent-voice { background: none; border: 0; color: inherit; font-size: 18px; padding: 4px 8px; border-radius: 8px; cursor: pointer; }
+.agent-voice:hover, .agent-voice[aria-pressed="true"] { background: rgba(255, 255, 255, .14); }
 
 /* ---------- Product configurator: calm and neutral, so the choices are the only colour on the page ---------- */
 .product-view { display: grid; gap: 12px; min-width: 0; }

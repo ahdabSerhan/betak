@@ -1,7 +1,7 @@
 // The store's AI agent: sends the chat to the AI model and turns its answer into product suggestions.
 import { PRODUCTS, productById, type Product } from "../data/catalog";
 import { cutoutOf } from "../data/cutouts";
-import { POLICIES } from "../data/details";
+import { detailsOf, POLICIES } from "../data/details";
 import { TEXT, type Lang } from "../i18n/text";
 import { agentPagesText, describePage, isAgentPage } from "./agentPages";
 import { buildRoom, roomTotal, slotForProduct, type Piece, type RoomKey } from "./designer";
@@ -45,6 +45,16 @@ const MAX_QUANTITY = 8;
 // Like the designer, the agent offers pieces that can be shown standing in the room (any rug works).
 const CATALOG = PRODUCTS.filter((product) => product.category === "rugs" || cutoutOf(product)).map((product) => `${product.id}|${product.category}|${product.name.en}|${product.name.he}|${product.price}`).join("\n");
 
+// What the store says about one product, for the AI.
+function productFacts(product: Product): string[] {
+  const details = detailsOf(product, "he");
+  return [
+    `About product ${product.id} (${product.name.he} / ${product.name.en}), price ${product.price} ILS${product.listPrice > product.price ? `, was ${product.listPrice} ILS` : ""}:`,
+    ...details.paragraphs,
+    ...details.specs,
+  ];
+}
+
 function instructions({ pieces, budget, dimensions, lang, viewing, route }: AgentContext): string {
   const current = pieces.map((piece) => `${piece.product.id} x${piece.quantity}`).join(", ") || "none";
   return [
@@ -54,6 +64,7 @@ function instructions({ pieces, budget, dimensions, lang, viewing, route }: Agen
     `Products suggested so far (product id x quantity): ${current}. Budget for a room: ${budget} ILS.`,
     `The room is ${dimensions.wall} m along its main wall and ${dimensions.depth} m deep, unless the visitor gives other measurements.`,
     viewing ? `The visitor is looking at product ${viewing.id} (${viewing.name.en}) right now.` : "",
+    ...(viewing ? productFacts(viewing) : []),
     `The visitor is on: ${describePage(route)}. Help with what that page is about first.`,
     "Pages of the site, one per line as key: what it is:",
     agentPagesText(),
@@ -65,6 +76,7 @@ function instructions({ pieces, budget, dimensions, lang, viewing, route }: Agen
     "- When designing a room, keep the total within the budget unless the visitor says otherwise. If they name a budget, use it.",
     "- Match what the visitor describes: room type, size, colours, mood, who lives there.",
     "- Size the room to its measurements: under 15 square metres take 2 or 3 pieces and no corner sofa; over 25 take more. Leave an 80 cm walkway.",
+    "- Answer questions about the product the visitor is looking at from its description and specs above. Never invent details or customer reviews; for reviews, point to the store's Google reviews.",
     "- For anything the catalog and the delivery notes do not cover (stock, fabrics, exact dates), say the store will confirm on WhatsApp.",
     `- Write to the visitor in their language (default: ${lang === "he" ? "Hebrew" : "English"}), warm and brief: 2 or 3 sentences.`,
     "- When a page of the site answers the visitor better (all the beds, the shipping policy, the terms, the room designer), set \"page\" to its key so they get a button to it. Do not link to the page they are already on.",
