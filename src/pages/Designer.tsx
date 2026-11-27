@@ -228,7 +228,7 @@ export function Designer() {
         </header>
 
         {view === "room" ? (
-          <div className="studio-scene">
+          <div className="studio-scene" data-buddy="room">
             <RoomScene pieces={pieces} photo={roomPhoto} onSwap={setSwapping} onRemove={removePiece} />
             {/* The upload sits on the room itself, where the photo will appear. */}
             <PhotoButton className="scene-upload" label={t.photoUpload} onPhoto={setRoomPhoto}>📷 {roomPhoto ? t.photoChange : t.photoDesign}</PhotoButton>
@@ -251,7 +251,7 @@ export function Designer() {
         <p className="muted small">{t.disclaimer}</p>
       </section>
 
-      <aside className="studio-side">
+      <aside className="studio-side" data-buddy="choices">
         <div className="config">
           <header className="config-head">
             <b>✦ {t.studioTitle}</b>

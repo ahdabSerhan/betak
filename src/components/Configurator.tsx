@@ -146,7 +146,7 @@ export function Configurator({ product, design, rules, onChange, onReset }: Conf
   };
 
   return (
-    <section className="config" aria-label={t.configTitle}>
+    <section className="config" aria-label={t.configTitle} data-buddy="configure">
       <header className="config-head">
         <b>✦ {t.configTitle}</b>
         <button className="link small" onClick={onReset}>{t.configReset}</button>

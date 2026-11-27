@@ -28,7 +28,9 @@ const KEEP_CLEAR = { top: 190, bottom: 100, side: 8 };
 const EYE_REACH = 3;
 
 // Kept for the whole visit, across pages: what was already said, and whether the visitor asked for quiet.
-const told = { routes: new Set<string>(), products: new Set<number>(), count: 0, lastAt: 0, quiet: false };
+const told = { routes: new Set<string>(), products: new Set<number>(), spots: new Set<string>(), count: 0, lastAt: 0, quiet: false };
+// Parts of pages the buddy comes to help with, marked with data-buddy="room" and so on.
+type Spot = "room" | "choices" | "configure";
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
@@ -59,28 +61,52 @@ export function AgentBuddy({ route, onOpen }: { route: string; onOpen: (about?: 
     return t.agentSay.plain(name, money(product.price));
   }, [nameOf, t]);
 
+  // Walks to the corner of an element, so it stands beside what the visitor uses instead of covering it.
+  const walkTo = useCallback((element: HTMLElement, remark: Remark) => {
+    if (!dock.current || !face.current) return;
+    const say = () => setRemark(remark);
+    // With "less motion" the buddy speaks from its corner.
+    if (calm()) return say();
+    const box = element.getBoundingClientRect();
+    const faceBox = face.current.getBoundingClientRect();
+    // The element's top corner on the reading side's end: the left edge in Hebrew, the right edge in English.
+    const edge = lang === "he" ? box.left : box.right;
+    const targetX = clamp(edge - faceBox.width / 2, KEEP_CLEAR.side, window.innerWidth - faceBox.width - KEEP_CLEAR.side);
+    const targetY = clamp(box.top - faceBox.height / 2, KEEP_CLEAR.top, window.innerHeight - faceBox.height - KEEP_CLEAR.bottom);
+    setRemark(null);
+    setAway(true);
+    gsap.to(dock.current, { x: `+=${targetX - faceBox.left}`, y: `+=${targetY - faceBox.top}`, duration: 0.8, ease: "power3.inOut", overwrite: true, onComplete: say });
+  }, [lang]);
+
   // Walks to a product card and says a line about it.
   const visit = useCallback((card: HTMLElement) => {
     const product = productById(Number(card.dataset.product));
     const now = Date.now();
     if (!product || told.quiet || told.products.has(product.id) || told.count >= MAX_REMARKS || now - told.lastAt < REMARK_GAP_MS) return;
-    if (!dock.current || !face.current) return;
     told.products.add(product.id);
     told.count += 1;
     told.lastAt = now;
-    const say = () => setRemark({ text: lineFor(product), about: product });
-    // With "less motion" the buddy speaks from its corner.
-    if (calm()) return say();
+    walkTo(card, { text: lineFor(product), about: product });
+  }, [lineFor, walkTo]);
 
-    // Stand on the card's top edge, kept inside the screen.
-    const cardBox = card.getBoundingClientRect();
-    const faceBox = face.current.getBoundingClientRect();
-    const targetX = clamp(cardBox.left + cardBox.width / 2 - faceBox.width / 2, KEEP_CLEAR.side, window.innerWidth - faceBox.width - KEEP_CLEAR.side);
-    const targetY = clamp(cardBox.top - faceBox.height / 2, KEEP_CLEAR.top, window.innerHeight - faceBox.height - KEEP_CLEAR.bottom);
-    setRemark(null);
-    setAway(true);
-    gsap.to(dock.current, { x: `+=${targetX - faceBox.left}`, y: `+=${targetY - faceBox.top}`, duration: 0.8, ease: "power3.inOut", overwrite: true, onComplete: say });
-  }, [lineFor]);
+  // When the visitor starts using the room, the designer's choices or a product's options, the buddy comes beside them once, right away.
+  useEffect(() => {
+    const onUse = (event: Event) => {
+      const element = (event.target as Element).closest?.<HTMLElement>("[data-buddy]");
+      const spot = element?.dataset.buddy as Spot | undefined;
+      if (!element || !spot || told.quiet || told.spots.has(spot) || told.count >= MAX_REMARKS) return;
+      told.spots.add(spot);
+      told.count += 1;
+      told.lastAt = Date.now();
+      walkTo(element, { text: t.agentSay.spot[spot] });
+    };
+    document.addEventListener("pointerdown", onUse);
+    document.addEventListener("focusin", onUse);
+    return () => {
+      document.removeEventListener("pointerdown", onUse);
+      document.removeEventListener("focusin", onUse);
+    };
+  }, [t, walkTo]);
 
   // Scrolling tucks the label away and sends the buddy home; when scrolling stops it looks at the product in the middle.
   useEffect(() => {
