@@ -54,7 +54,9 @@ const ARMS_CM = 40;
 
 // Listed corner sofa prices are for a 300 cm sofa with a 200 cm chaise.
 const CORNER_BASE = { width: 300, chaiseLength: 200 };
-const SOFA_WIDTH = { min: 140, max: 340, step: 10 };
+const SOFA_WIDTH = { min: 180, max: 340, step: 10 };
+// Straight sofa depths the store offers; depth never changes the price.
+const SOFA_DEPTHS = [90, 95, 100, 105, 110, 115, 120];
 
 // The length in the product description ("אורך: 220 ס"מ"), which a straight sofa's listed price is for.
 function listedLength(product: Product): number | null {
@@ -62,10 +64,11 @@ function listedLength(product: Product): number | null {
   return line ? Number(line.match(/\d+/)![0]) : null;
 }
 
-// The sofa slider in 10 cm steps that pass through the listed length (e.g. 145-335 for a 215 cm sofa).
+// The sofa slider in 10 cm steps that pass through the listed length (e.g. 185-335 for a 215 cm sofa).
+// A sofa listed shorter than the usual minimum starts at its own length.
 function sofaWidth(listed: number | null): Range {
   if (!listed) return SOFA_WIDTH;
-  const below = Math.floor((listed - SOFA_WIDTH.min) / SOFA_WIDTH.step) * SOFA_WIDTH.step;
+  const below = Math.floor(Math.max(0, listed - SOFA_WIDTH.min) / SOFA_WIDTH.step) * SOFA_WIDTH.step;
   const above = Math.floor((SOFA_WIDTH.max - listed) / SOFA_WIDTH.step) * SOFA_WIDTH.step;
   return { min: listed - below, max: listed + above, step: SOFA_WIDTH.step };
 }
@@ -77,7 +80,7 @@ export function rulesFor(product: Product): DesignRules | null {
   if (SOFA_TYPES.includes(type)) {
     // Straight sofas cost more above the length in their description; without one, the size never changes the price.
     const listed = listedLength(product);
-    return { shape: "sofa", width: sofaWidth(listed), depths: [85, 95, 105], seats: [1, 2, 3, 4], chaise: null, priceBase: listed ? { width: listed } : {} };
+    return { shape: "sofa", width: sofaWidth(listed), depths: SOFA_DEPTHS, seats: [1, 2, 3, 4], chaise: null, priceBase: listed ? { width: listed } : {} };
   }
   if (SEAT_TYPES.includes(type)) return { shape: "seat", width: { min: 50, max: 160, step: 5 }, depths: [], seats: [], chaise: null, priceBase: {} };
   if (BED_TYPES.includes(type)) return { shape: "bed", width: { min: 120, max: 200, step: 20 }, depths: [190, 200], seats: [], chaise: null, priceBase: {} };
@@ -140,7 +143,7 @@ export function standardDesign(product: Product, rules: DesignRules): Design {
 // A saved design completed with choices added since, and its sizes moved onto this product's slider steps.
 export function savedDesign(product: Product, rules: DesignRules, saved: Partial<Design> = {}): Design {
   const design = { ...standardDesign(product, rules), ...saved };
-  return { ...design, width: within(design.width, rules.width), chaiseLength: rules.chaise ? within(design.chaiseLength, rules.chaise) : design.chaiseLength };
+  return { ...design, width: within(design.width, rules.width), depth: rules.depths.length > 0 ? nearest(design.depth, rules.depths) : design.depth, chaiseLength: rules.chaise ? within(design.chaiseLength, rules.chaise) : design.chaiseLength };
 }
 
 // Keeps the seat division valid after the width changes.
