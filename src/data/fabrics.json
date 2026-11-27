@@ -11,127 +11,152 @@
     {
      "code": "RADO-1",
      "file": "rado-rado-1.webp",
-     "color": "#cdc1ac"
+     "color": "#cdc1ac",
+     "zoom": true
     },
     {
      "code": "RADO-2",
      "file": "rado-rado-2.webp",
-     "color": "#c5b6a2"
+     "color": "#c5b6a2",
+     "zoom": true
     },
     {
      "code": "RADO-3",
      "file": "rado-rado-3.webp",
-     "color": "#9e8d7a"
+     "color": "#9e8d7a",
+     "zoom": true
     },
     {
      "code": "RADO-4",
      "file": "rado-rado-4.webp",
-     "color": "#83776b"
+     "color": "#83776b",
+     "zoom": true
     },
     {
      "code": "RADO-5",
      "file": "rado-rado-5.webp",
-     "color": "#564e45"
+     "color": "#564e45",
+     "zoom": true
     },
     {
      "code": "RADO-6",
      "file": "rado-rado-6.webp",
-     "color": "#4f443c"
+     "color": "#4f443c",
+     "zoom": true
     },
     {
      "code": "RADO-7",
      "file": "rado-rado-7.webp",
-     "color": "#313f33"
+     "color": "#313f33",
+     "zoom": true
     },
     {
      "code": "RADO-8",
      "file": "rado-rado-8.webp",
-     "color": "#424c46"
+     "color": "#424c46",
+     "zoom": true
     },
     {
      "code": "RADO-9",
      "file": "rado-rado-9.webp",
-     "color": "#656c65"
+     "color": "#656c65",
+     "zoom": true
     },
     {
      "code": "RADO-10",
      "file": "rado-rado-10.webp",
-     "color": "#3c434e"
+     "color": "#3c434e",
+     "zoom": true
     },
     {
      "code": "RADO-11",
      "file": "rado-rado-11.webp",
-     "color": "#2b3d4a"
+     "color": "#2b3d4a",
+     "zoom": true
     },
     {
      "code": "RADO-12",
      "file": "rado-rado-12.webp",
-     "color": "#757880"
+     "color": "#757880",
+     "zoom": true
     },
     {
      "code": "RADO-13",
      "file": "rado-rado-13.webp",
-     "color": "#151725"
+     "color": "#151725",
+     "zoom": true
     },
     {
      "code": "RADO-14",
      "file": "rado-rado-14.webp",
-     "color": "#aa7c1f"
+     "color": "#aa7c1f",
+     "zoom": true
     },
     {
      "code": "RADO-15",
      "file": "rado-rado-15.webp",
-     "color": "#7b3e26"
+     "color": "#7b3e26",
+     "zoom": true
     },
     {
      "code": "RADO-16",
      "file": "rado-rado-16.webp",
-     "color": "#5a1b1a"
+     "color": "#5a1b1a",
+     "zoom": true
     },
     {
      "code": "RADO-17",
      "file": "rado-rado-17.webp",
-     "color": "#dbc9bb"
+     "color": "#dbc9bb",
+     "zoom": true
     },
     {
      "code": "RADO-18",
      "file": "rado-rado-18.webp",
-     "color": "#ba9e95"
+     "color": "#ba9e95",
+     "zoom": true
     },
     {
      "code": "RADO-19",
      "file": "rado-rado-19.webp",
-     "color": "#82544a"
+     "color": "#82544a",
+     "zoom": true
     },
     {
      "code": "RADO-20",
      "file": "rado-rado-20.webp",
-     "color": "#653c35"
+     "color": "#653c35",
+     "zoom": true
     },
     {
      "code": "RADO-21",
      "file": "rado-rado-21.webp",
-     "color": "#7b7267"
+     "color": "#7b7267",
+     "zoom": true
     },
     {
      "code": "RADO-22",
      "file": "rado-rado-22.webp",
-     "color": "#6a6662"
+     "color": "#6a6662",
+     "zoom": true
     },
     {
      "code": "RADO-23",
      "file": "rado-rado-23.webp",
-     "color": "#44403d"
+     "color": "#44403d",
+     "zoom": true
     },
     {
      "code": "RADO-24",
      "file": "rado-rado-24.webp",
-     "color": "#323132"
+     "color": "#323132",
+     "zoom": true
     },
     {
      "code": "RADO-25",
      "file": "rado-rado-25.webp",
-     "color": "#070709"
+     "color": "#070709",
+     "zoom": true
     }
    ]
   },
