@@ -99,6 +99,30 @@ function ProductRow({ title, products }: { title: string; products: Product[] })
   );
 }
 
+// Text longer than this is folded to its opening lines until the visitor asks for the rest.
+const SHORT_DESCRIPTION = 160;
+
+// The product description, folded to its first paragraph with a button that opens the full text.
+function Description({ paragraphs }: { paragraphs: string[] }) {
+  const { t } = useShop();
+  const [open, setOpen] = useState(false);
+  const foldable = paragraphs.length > 1 || paragraphs[0].length > SHORT_DESCRIPTION;
+  const shown = open || !foldable ? paragraphs : paragraphs.slice(0, 1);
+
+  return (
+    <div className="description">
+      <div id="product-description" className={foldable && !open ? "folded" : undefined}>
+        {shown.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+      </div>
+      {foldable && (
+        <button type="button" className="link-button" aria-expanded={open} aria-controls="product-description" onClick={() => setOpen(!open)}>
+          {open ? t.descLess : t.descMore}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function ProductPage({ product }: { product: Product }) {
   const { t, lang, nameOf, addToCart, openCart, isSaved, toggleSaved, designs, setDesign, designNote } = useShop();
   const [quantity, setQuantity] = useState(1);
@@ -189,7 +213,7 @@ export function ProductPage({ product }: { product: Product }) {
             {reviews.length > 0 && <a className="review-link" href="#reviews" onClick={(event) => { event.preventDefault(); document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth" }); }}>{t.reviewsCount(reviews.length)}</a>}
           </div>
 
-          {details.paragraphs.length > 0 ? details.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>) : <p className="muted">{t.intro}</p>}
+          {details.paragraphs.length > 0 ? <Description paragraphs={details.paragraphs} key={`${product.id}-${lang}`} /> : <p className="muted">{t.intro}</p>}
 
           {details.specs.length > 0 && (
             <ul className="specs" aria-label={t.sizesTitle}>

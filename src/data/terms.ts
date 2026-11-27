@@ -53,7 +53,7 @@ export const TERMS: Record<Lang, Statement> = {
         ],
         items: [
           "מוצר שהורכב בבית הלקוח, בין אם על ידו או על ידי מרכיב מוסמך, לא יהיה ניתן לביטול עסקה.",
-          "החזרת המוצר היא באחריותך ועל חשבונך ועליך לוודא כי לא ייגרם לו נזק במהלך ההובלה. אם יתברר כי במוצר שהוחזר נגרם פגם או נזק, נהיה רשאים לתבוע ממך פיצוי בגין כך. אם תבקש כי החזרת המוצר תיעשה על ידינו הדבר כרוך בתשלום דמי הובלה בסך 350 ₪ בצירוף תוספת עבור הובלה מאזורים מרוחקים, לפי הפירוט הקבוע בסע' 28 שלעיל.",
+          "החזרת המוצר היא באחריותך ועל חשבונך ועליך לוודא כי לא ייגרם לו נזק במהלך ההובלה. אם יתברר כי במוצר שהוחזר נגרם פגם או נזק, נהיה רשאים לתבוע ממך פיצוי בגין כך. אם תבקש כי החזרת המוצר תיעשה על ידינו הדבר כרוך בתשלום דמי הובלה בסך 350 ₪ בצירוף תוספת עבור הובלה מאזורים מרוחקים, לפי הפירוט במדיניות המשלוחים.",
           "כספך יוחזר לך בתוך 14 ימים מיום קבלת ההודעה על הביטול, למעט דמי ביטול בשיעור של 5% ממחיר המוצר ועד 100 ₪.",
           "במקרה של פגם במוצר רשאית החברה לתקן את הפגם או לספק מוצר חדש זהה וכל זאת בהתאם לשיקול החברה.",
           "סעיף יסוד - ביתאק תהיה רשאית לבטל כל עסקה במידה והדגם השתנה, נגמר מהמלאי/לא ניתן להשיג אותו עוד. במידה ואירוע מסוג זה מתרחש מבצע ההזמנה מצהיר כי הוא מודע לכך כי יהיה איחור בזמן האספקה או ביטול העסקה ללא פיצוי ותמורה כלשהי.",
@@ -123,7 +123,7 @@ export const TERMS: Record<Lang, Statement> = {
         ],
         items: [
           "A product assembled in the customer's home, by the customer or by a qualified installer, cannot be cancelled.",
-          "Returning the product is your responsibility and at your cost, and you must make sure it is not damaged in transport. If the returned product turns out to be damaged, we may claim compensation from you. If you ask us to collect the product, there is a delivery charge of ₪350 plus a supplement for remote areas, as set out in section 28 above.",
+          "Returning the product is your responsibility and at your cost, and you must make sure it is not damaged in transport. If the returned product turns out to be damaged, we may claim compensation from you. If you ask us to collect the product, there is a delivery charge of ₪350 plus a supplement for remote areas, as set out in the shipping policy.",
           "Your money will be refunded within 14 days of receiving the cancellation notice, less a cancellation fee of 5% of the product's price, up to ₪100.",
           "If a product is faulty, the company may repair it or supply an identical new product, at its discretion.",
           "Fundamental clause: Betak may cancel any purchase if the model has changed, is out of stock or can no longer be obtained. If this happens, the customer confirms they know that delivery may be delayed or the purchase cancelled without any compensation.",
