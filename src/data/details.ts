@@ -3,7 +3,6 @@ import type { Lang } from "../i18n/text";
 import type { Product } from "./catalog";
 import rawDetails from "./details.json";
 import rawGalleries from "./galleries.json";
-import rawReviews from "./reviews.json";
 import rawPolicies from "./policies.json";
 import { asset } from "../lib/asset";
 
@@ -22,23 +21,12 @@ export interface ProductDetails {
   photos: string[];
 }
 
-export interface Review {
-  name: string;
-  text: string;
-}
-
 const DETAILS: Record<string, RawDetails | undefined> = rawDetails;
 // Extra photos of each product, by their image number on the store's image server.
 const GALLERIES: Record<string, number[] | undefined> = rawGalleries;
-const REVIEWS: Record<string, Review[] | undefined> = rawReviews;
 // Extra product photos, copied from betak.co.il into public/img/g and named by their number there.
 const storePhoto = (imageId: number) => asset(`img/g/${imageId}.webp`);
 
-// What customers wrote about this product on the store's site (in Hebrew).
-export const reviewsOf = (product: Product): Review[] => REVIEWS[product.id] ?? [];
-
-// Every review with the id of the product it was written about, for the home page.
-export const ALL_REVIEWS = Object.entries(REVIEWS).flatMap(([productId, reviews]) => (reviews ?? []).map((review) => ({ ...review, productId: Number(productId) })));
 export function detailsOf(product: Product, lang: Lang = "he"): ProductDetails {
   const raw = DETAILS[product.id];
   const paragraphs = raw?.description[lang] ?? [];

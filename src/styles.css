@@ -775,29 +775,11 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
   .studio-room { position: static; }
 }
 
-/* Customer recommendations on the product page */
-.reviews { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-.reviews li { display: grid; gap: 8px; align-content: start; padding: 18px 20px; background: #fff; border: 1px solid var(--line); }
-.reviews p { margin: 0; }
+/* Link to the store's Google reviews, next to the price */
 .review-link { font-size: 14px; color: var(--muted); }
-.card-reviews { margin-inline-start: auto; font-size: 13px; color: var(--muted); }
-.review-card { flex: none; width: min(320px, 82vw); display: grid; gap: 8px; align-content: start; padding: 20px; background: #fff; border: 1px solid var(--line); color: inherit; text-decoration: none; scroll-snap-align: start; }
-.review-card p { margin: 0; }
 
-/* Reviews glide past on their own (rightward in Hebrew, leftward in English) and stop while pointed at. */
-.review-belt { overflow: hidden; direction: ltr; }
-.review-track { display: flex; gap: 14px; width: max-content; padding-block: 4px; }
-.review-belt:not(.glides) .review-track { width: auto; flex-wrap: wrap; justify-content: center; }
-.review-belt.glides { mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
-.review-belt.glides .review-track { animation: review-glide 70s linear infinite; }
-.review-belt.glides.rightward .review-track { animation-direction: reverse; }
-.review-belt:hover .review-track, .review-belt:focus-within .review-track { animation-play-state: paused; }
-.review-card { direction: rtl; text-align: start; }
-@keyframes review-glide { to { transform: translateX(calc(-50% - 7px)); } }
-@media (prefers-reduced-motion: reduce) {
-  .review-belt.glides { overflow-x: auto; mask-image: none; }
-  .review-belt.glides .review-track { animation: none; }
-}
+/* The Google reviews widget keeps room while it loads, so the page does not jump. */
+.google-reviews { min-height: 320px; }
 
 /* Product page: the choices and the buy buttons stay in view while the photo column scrolls. */
 .product-view .config-sheet { border: 1px solid var(--rule); }
@@ -816,13 +798,6 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 .scene-upload:hover { background: var(--ink); }
 .chip.gold { background: #e3b85c; border-color: #e3b85c; color: var(--ink); font-weight: 600; }
 
-/* Adding a review, and the link to the store's Google reviews */
-.review-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; margin-top: 18px; }
-.review-form { display: grid; gap: 12px; width: min(100%, 460px); padding: 20px; background: #fff; border: 1px solid var(--line); }
-.review-form label { display: grid; gap: 6px; font-weight: 600; }
-.review-form input, .review-form textarea { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); }
-.btn.google { background: #fff; border: 1px solid var(--line); color: var(--ink); }
-.btn.google b { color: #4285f4; font-family: Arial, sans-serif; font-size: 18px; }
 
 /* A product's 3D model, turned by dragging */
 .model-sheet { display: grid; gap: 10px; padding: 16px; background: var(--pale); text-align: center; }
@@ -873,7 +848,6 @@ html.a11y-grayscale { filter: grayscale(1); }
 .a11y-links a { text-decoration: underline !important; text-underline-offset: 3px; }
 .a11y-links a:not(.btn) { outline: 1px dashed currentColor; outline-offset: 2px; }
 .a11y-still *, .a11y-still *::before, .a11y-still *::after { animation: none !important; transition: none !important; }
-.a11y-still .review-belt.glides { overflow-x: auto; mask-image: none; }
 
 /* Cookie notice: a bar at the bottom until the visitor agrees. */
 .cookie-notice { position: fixed; inset-inline: 16px; inset-block-end: 16px; z-index: 28; max-width: 760px; margin-inline: auto; display: flex; align-items: center; gap: 16px; padding: 14px 18px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 20px 40px -16px rgba(29, 22, 18, .45); font-size: 15px; }

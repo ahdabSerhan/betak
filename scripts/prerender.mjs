@@ -4,7 +4,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ACCESSIBILITY, CATEGORIES, PRIVACY, SHIPPING, TERMS, PRODUCTS, detailsOf, pathOf, productRoute, productsIn, reviewsOf } from "../seo-build/entry.js";
+import { ACCESSIBILITY, CATEGORIES, PRIVACY, SHIPPING, TERMS, PRODUCTS, detailsOf, pathOf, productRoute, productsIn } from "../seo-build/entry.js";
 
 const SITE_URL = (process.env.SITE_URL ?? "https://betak.co.il").replace(/\/$/, "");
 const DIST = join(dirname(fileURLToPath(import.meta.url)), "../dist");
@@ -62,7 +62,6 @@ const productLine = (product) => `<li>${link(productRoute(product), product.name
 function productPage(product) {
   const category = CATEGORIES.find((item) => item.id === product.category);
   const details = detailsOf(product);
-  const reviews = reviewsOf(product);
   const route = productRoute(product);
   const summary = details.paragraphs[0] ?? `${product.name.he} מבית ${BRAND}, ${shekels(product.price)}. כל הדגמים זמינים להזמנה, עם אפשרות למידה, בד וצבע לבחירה.`;
 
@@ -78,7 +77,6 @@ function productPage(product) {
       ...details.paragraphs.map((paragraph) => `<p>${escape(paragraph)}</p>`),
       details.specs.length ? `<ul>${details.specs.map((spec) => `<li>${escape(spec)}</li>`).join("")}</ul>` : "",
       details.photos.map((photo, index) => `<img src="${photo}" alt="${escape(product.name.he)}${index ? ` ${index + 1}` : ""}" width="600" height="600" />`).join(""),
-      reviews.length ? `<h2>לקוחות ממליצים</h2><ul>${reviews.map((review) => `<li>${escape(review.text)} – ${escape(review.name)}</li>`).join("")}</ul>` : "",
     ].join(""),
     data: [
       {

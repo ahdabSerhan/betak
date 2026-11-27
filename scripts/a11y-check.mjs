@@ -55,6 +55,8 @@ try {
   for (const lang of LANGS) {
     // Reduced motion shows the settled page, so fade-ins can't cause false contrast failures.
     const context = await browser.newContext({ reducedMotion: "reduce" });
+    // The Google reviews widget is blocked so checks don't use up its 5,000 monthly views.
+    await context.route(/elfsight/, (route) => route.abort());
     // The site keeps the chosen language in localStorage (see usePersistentState).
     await context.addInitScript((value) => localStorage.setItem("betak.lang", JSON.stringify(value)), lang);
     const queue = [...paths];

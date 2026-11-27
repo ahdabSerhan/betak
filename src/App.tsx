@@ -5,6 +5,7 @@ import { CartDrawer } from "./components/CartDrawer";
 import { CookieNotice } from "./components/CookieNotice";
 import { FloatingContact } from "./components/FloatingContact";
 import { Footer } from "./components/Footer";
+import { GoogleReviews } from "./components/GoogleReviews";
 import { Header } from "./components/Header";
 import { CATEGORIES } from "./data/catalog";
 import { useRoute } from "./hooks/useRoute";
@@ -85,6 +86,7 @@ export function App() {
       <Header route={route} />
       <main id="main" tabIndex={-1}>
         <Page route={route} />
+        <GoogleReviews />
       </main>
       <Footer />
       {!esentrixEnabled && <AgentWidget viewing={product} route={route} />}

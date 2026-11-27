@@ -2,10 +2,8 @@ import { lazy, Suspense, useState, type PointerEvent } from "react";
 import { Configurator, DesignSummary } from "../components/Configurator";
 import { DesignDrawing } from "../components/DesignDrawing";
 import { discountPercent, ProductCard } from "../components/ProductCard";
-import { ReviewBelt } from "../components/ReviewBelt";
-import { ReviewForm } from "../components/ReviewForm";
 import { CATEGORIES, isOnSale, PRODUCTS, productsIn, type Product } from "../data/catalog";
-import { detailsOf, POLICIES, reviewsOf, type Review } from "../data/details";
+import { detailsOf, POLICIES } from "../data/details";
 import { modelOf } from "../data/models";
 import { GOOGLE_REVIEWS_URL } from "../data/reviewLinks";
 import { fabricText, rulesFor, standardDesign, type Design, type DesignRules } from "../lib/custom";
@@ -75,20 +73,6 @@ function DesignSheet({ design, rules, summary }: { design: Design; rules: Design
 }
 
 // What customers wrote about the product, as on the store's site.
-function Reviews({ reviews, productName }: { reviews: Review[]; productName: string }) {
-  const { t } = useShop();
-  return (
-    <section className="block flush-top" id="reviews">
-      <div className="section-head"><h2>{t.reviewsTitle} {reviews.length > 0 && <small className="muted">({reviews.length})</small>}</h2></div>
-      {reviews.length > 0 ? <ReviewBelt reviews={reviews} /> : <p className="muted">{t.reviewFirst}</p>}
-      <div className="review-actions">
-        <ReviewForm productName={productName} />
-        <a className="btn google" href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener"><b aria-hidden="true">G</b> {t.reviewGoogle}</a>
-      </div>
-    </section>
-  );
-}
-
 function ProductRow({ title, products }: { title: string; products: Product[] }) {
   if (products.length === 0) return null;
   return (
@@ -134,7 +118,6 @@ export function ProductPage({ product }: { product: Product }) {
   const summary = designNote(product);
   const category = CATEGORIES.find((item) => item.id === product.category)!;
   const details = detailsOf(product, lang);
-  const reviews = reviewsOf(product);
   const title = nameOf(product);
   const saved = isSaved(product.id);
   const question = `${t.waAsk} ${title}${product.sku ? ` (${product.sku})` : ""}${summary ? `\n${t.waDesign} ${summary}` : ""}`;
@@ -210,7 +193,7 @@ export function ProductPage({ product }: { product: Product }) {
             <span className="now xl">{money(product.price)}</span>
             {isOnSale(product) && <span className="was">{money(product.listPrice)}</span>}
             {product.sku && <span className="muted sku">{t.sku}: {product.sku}</span>}
-            {reviews.length > 0 && <a className="review-link" href="#reviews" onClick={(event) => { event.preventDefault(); document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth" }); }}>{t.reviewsCount(reviews.length)}</a>}
+            <a className="review-link" href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener">{t.reviewGoogle}</a>
           </div>
 
           {details.paragraphs.length > 0 ? <Description paragraphs={details.paragraphs} key={`${product.id}-${lang}`} /> : <p className="muted">{t.intro}</p>}
@@ -233,7 +216,6 @@ export function ProductPage({ product }: { product: Product }) {
         </div>
       </div>
 
-      <Reviews reviews={reviews} productName={title} />
       <ProductRow title={t.collectionOf(product.model)} products={sameCollection(product)} />
       <ProductRow title={t.alsoLike} products={sameCategory(product)} />
 
