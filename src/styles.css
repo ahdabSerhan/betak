@@ -471,7 +471,8 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 /* ---------- Agent widget: a launcher pill that opens a chat panel, on every page ---------- */
 .agent-launcher { position: fixed; inset-block-end: 22px; inset-inline-start: 22px; z-index: 26; display: inline-flex; align-items: center; gap: 10px; padding: 13px 20px; border: 0; border-radius: 999px; background: var(--ink); color: var(--cream); font-weight: 700; box-shadow: 0 16px 34px -12px rgba(29, 22, 18, .7); animation: rise .5s ease both; transition: transform .2s, background .2s; }
 .agent-launcher:hover { transform: translateY(-3px); background: #45311f; }
-.agent-panel { position: fixed; inset-block-end: 22px; inset-inline-start: 22px; z-index: 27; width: min(400px, calc(100vw - 32px)); height: min(620px, calc(100dvh - 44px)); box-shadow: 0 30px 60px -20px rgba(29, 22, 18, .75); animation: sheet-in .3s cubic-bezier(.2, .7, .2, 1) both; }
+/* The open chat sits above the side accessibility button, which would otherwise cover its messages on phones. */
+.agent-panel { position: fixed; inset-block-end: 22px; inset-inline-start: 22px; z-index: 28; width: min(400px, calc(100vw - 32px)); height: min(620px, calc(100dvh - 44px)); box-shadow: 0 30px 60px -20px rgba(29, 22, 18, .75); animation: sheet-in .3s cubic-bezier(.2, .7, .2, 1) both; }
 .agent-panel .agent-log { flex: 1; height: auto; }
 .agent-close { margin-inline-start: auto; background: none; border: 0; color: inherit; font-size: 18px; padding: 4px 8px; border-radius: 8px; }
 .agent-close:hover { background: rgba(255, 255, 255, .14); }
