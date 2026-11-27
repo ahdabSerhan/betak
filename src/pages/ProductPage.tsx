@@ -6,7 +6,7 @@ import { CATEGORIES, isOnSale, PRODUCTS, productsIn, type Product } from "../dat
 import { detailsOf, POLICIES } from "../data/details";
 import { modelOf } from "../data/models";
 import { GOOGLE_REVIEWS_URL } from "../data/reviewLinks";
-import { fabricText, rulesFor, standardDesign, type Design, type DesignRules } from "../lib/custom";
+import { fabricText, rulesFor, type Design, type DesignRules } from "../lib/custom";
 import { money, whatsappLink } from "../lib/format";
 import { useShop } from "../state/ShopContext";
 import { href } from "../lib/routes";
@@ -108,13 +108,15 @@ function Description({ paragraphs }: { paragraphs: string[] }) {
 }
 
 export function ProductPage({ product }: { product: Product }) {
-  const { t, lang, nameOf, addToCart, openCart, isSaved, toggleSaved, designs, setDesign, designNote } = useShop();
+  const { t, lang, nameOf, addToCart, openCart, isSaved, toggleSaved, setDesign, designNote, designOf, extraOf, priceOf } = useShop();
   const [quantity, setQuantity] = useState(1);
   const [view, setView] = useState<View>("photos");
   const model = modelOf(product.id);
   const rules = rulesFor(product);
-  // Choices saved before a newer option existed are completed with the standard ones.
-  const design = rules && { ...standardDesign(product, rules), ...designs[product.id] };
+  const design = designOf(product);
+  // A larger size than the listed one costs more.
+  const extra = extraOf(product);
+  const price = priceOf(product);
   const summary = designNote(product);
   const category = CATEGORIES.find((item) => item.id === product.category)!;
   const details = detailsOf(product, lang);
@@ -140,7 +142,7 @@ export function ProductPage({ product }: { product: Product }) {
         <span>{quantity}</span>
         <button onClick={() => setQuantity(quantity + 1)} aria-label="+">+</button>
       </div>
-      <button className="btn grow" onClick={addAndShowCart}>{t.add} · {money(product.price * quantity)}</button>
+      <button className="btn grow" onClick={addAndShowCart}>{t.add} · {money(price * quantity)}</button>
       <button className="round light" onClick={() => toggleSaved(product.id)} aria-pressed={saved} aria-label={saved ? t.unsave : t.save}>{saved ? "♥" : "♡"}</button>
     </div>
   );
@@ -190,11 +192,12 @@ export function ProductPage({ product }: { product: Product }) {
           <a className="eyebrow ink" href={href(category.id)}>{category[lang]}</a>
           <h1>{title}</h1>
           <div className="row price">
-            <span className="now xl">{money(product.price)}</span>
-            {isOnSale(product) && <span className="was">{money(product.listPrice)}</span>}
+            <span className="now xl">{money(price)}</span>
+            {isOnSale(product) && <span className="was">{money(product.listPrice + extra)}</span>}
             {product.sku && <span className="muted sku">{t.sku}: {product.sku}</span>}
             <a className="review-link" href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener">{t.reviewGoogle}</a>
           </div>
+          {extra > 0 && <small className="muted">{t.sizeExtraNote(money(extra))}</small>}
 
           {details.paragraphs.length > 0 ? <Description paragraphs={details.paragraphs} key={`${product.id}-${lang}`} /> : <p className="muted">{t.intro}</p>}
 
@@ -220,7 +223,7 @@ export function ProductPage({ product }: { product: Product }) {
       <ProductRow title={t.alsoLike} products={sameCategory(product)} />
 
       <div className="buy-bar">
-        <div><b>{title}</b><span className="price">{money(product.price)}</span></div>
+        <div><b>{title}</b><span className="price">{money(price)}</span></div>
         <button className="btn gold" onClick={addAndShowCart}>{t.add}</button>
       </div>
     </div>

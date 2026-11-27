@@ -63,17 +63,51 @@ export function seatChoices(rules: DesignRules, width: number): number[] {
 const nearest = (value: number, choices: number[]) => choices.reduce((best, choice) => (Math.abs(choice - value) < Math.abs(best - value) ? choice : best));
 const within = (value: number, range: Range) => Math.min(range.max, Math.max(range.min, Math.round(value / range.step) * range.step));
 
+// Listed corner sofa prices are for a 300 cm sofa with a 200 cm chaise.
+export const CORNER_BASE = { width: 300, chaiseLength: 200 };
+// Every 10 cm (or part of it) above the base size adds 100 ₪; smaller sizes and other depths cost the same.
+export const EXTRA_STEP_CM = 10;
+export const EXTRA_PER_STEP = 100;
+
+// The sizes the listed price is for, per measure that changes the price (empty when the size never changes it).
+function priceBase(rules: DesignRules): Partial<Record<"width" | "chaiseLength", number>> {
+  return rules.shape === "corner" ? CORNER_BASE : {};
+}
+
+// How much one measure adds to the price, e.g. a 330 cm corner sofa adds 300 ₪.
+const extraFor = (size: number, base: number) => Math.ceil(Math.max(0, size - base) / EXTRA_STEP_CM) * EXTRA_PER_STEP;
+
+// What the chosen size adds to the listed price.
+export function sizeExtra(rules: DesignRules, design: Design): number {
+  return Object.entries(priceBase(rules)).reduce((sum, [key, base]) => sum + extraFor(design[key as keyof typeof CORNER_BASE], base), 0);
+}
+
+// Each size the visitor can pick and what it adds, for the server to price orders with, e.g. { width: { "310": 100 } }.
+export function sizeExtraTable(product: Product): Record<string, Record<number, number>> | null {
+  const rules = rulesFor(product);
+  if (!rules) return null;
+  const ranges: Record<string, Range | null> = { width: rules.width, chaiseLength: rules.chaise };
+  const entries = Object.entries(priceBase(rules)).map(([key, base]) => {
+    const range = ranges[key]!;
+    const sizes = Array.from({ length: (range.max - range.min) / range.step + 1 }, (_, index) => range.min + index * range.step);
+    return [key, Object.fromEntries(sizes.map((size) => [size, extraFor(size, base)]))];
+  });
+  return entries.length > 0 ? Object.fromEntries(entries) : null;
+}
+
 // The product as the store usually makes it, before the visitor changes anything.
 export function standardDesign(product: Product, rules: DesignRules): Design {
   const typical = footprint(product);
-  const width = within(typical.width, rules.width);
+  // Corner sofas start at the size their listed price is for.
+  const base = priceBase(rules);
+  const width = base.width ?? within(typical.width, rules.width);
   const seats = seatChoices(rules, width);
   return {
     width,
     depth: rules.depths.length > 0 ? nearest(rules.shape === "corner" ? 100 : typical.depth, rules.depths) : typical.depth,
     seats: seats.length > 0 ? nearest(3, seats) : 0,
     chaiseSide: "right",
-    chaiseLength: rules.chaise ? within(typical.depth, rules.chaise) : 0,
+    chaiseLength: rules.chaise ? base.chaiseLength ?? within(typical.depth, rules.chaise) : 0,
     chaiseDepth: rules.chaise ? nearest(100, rules.depths) : 0,
     colorCode: "",
     firmness: "medium",

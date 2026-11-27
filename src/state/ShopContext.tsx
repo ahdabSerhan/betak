@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { productById, type Product } from "../data/catalog";
 import { navigate } from "../hooks/useRoute";
 import { usePersistentState } from "../hooks/usePersistentState";
-import { describeDesign, rulesFor, standardDesign, type Design } from "../lib/custom";
+import { describeDesign, rulesFor, sizeExtra, standardDesign, type Design } from "../lib/custom";
 import type { Piece } from "../lib/designer";
 import type { RoomDimensions } from "../lib/measure";
 import { askEsentrix, esentrixEnabled, loadEsentrixWidget } from "../lib/esentrix";
@@ -44,6 +44,11 @@ interface Shop {
   designs: Record<number, Design>;
   setDesign: (productId: number, design: Design | null) => void;
   designNote: (product: Product) => string | null;
+  // The full design (with standard choices filled in), or null for a product sold as it is.
+  designOf: (product: Product) => Design | null;
+  // What the chosen size adds to the listed price, and the price with it.
+  extraOf: (product: Product) => number;
+  priceOf: (product: Product) => number;
   // The visitor's own room photo, used as the backdrop of the designed room (kept only for this visit).
   roomPhoto: string | null;
   setRoomPhoto: (photo: string | null) => void;
@@ -90,6 +95,17 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   }, [setSaved]);
 
   const shop = useMemo<Shop>(() => {
+    // Choices saved before a newer option existed are completed with the standard ones.
+    const designOf = (product: Product) => {
+      const rules = rulesFor(product);
+      return rules && { ...standardDesign(product, rules), ...designs[product.id] };
+    };
+    const extraOf = (product: Product) => {
+      const rules = rulesFor(product);
+      const design = designOf(product);
+      return rules && design ? sizeExtra(rules, design) : 0;
+    };
+    const priceOf = (product: Product) => product.price + extraOf(product);
     const cartLines = Object.entries(cart).flatMap(([id, quantity]) => {
       const product = productById(Number(id));
       return product ? [{ product, quantity }] : [];
@@ -101,7 +117,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       toggleLang: () => setLang(lang === "he" ? "en" : "he"),
       cartLines,
       cartCount: cartLines.reduce((sum, line) => sum + line.quantity, 0),
-      cartTotal: cartLines.reduce((sum, line) => sum + line.product.price * line.quantity, 0),
+      cartTotal: cartLines.reduce((sum, line) => sum + priceOf(line.product) * line.quantity, 0),
       addToCart,
       clearCart,
       saved,
@@ -125,10 +141,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       setDesign: (productId, design) => setDesigns(({ [productId]: _old, ...others }) => (design ? { ...others, [productId]: design } : others)),
       designNote: (product) => {
         const rules = rulesFor(product);
-        const design = designs[product.id];
-        // Fill in choices added after the design was saved (e.g. the chaise depth).
-        return rules && design ? describeDesign({ ...standardDesign(product, rules), ...design }, rules, TEXT[lang], lang) : null;
+        const design = designOf(product);
+        return rules && design && designs[product.id] ? describeDesign(design, rules, TEXT[lang], lang) : null;
       },
+      designOf,
+      extraOf,
+      priceOf,
       roomPhoto,
       setRoomPhoto,
       setAgentRoom,

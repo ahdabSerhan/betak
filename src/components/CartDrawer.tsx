@@ -3,10 +3,11 @@ import { slotForProduct } from "../lib/designer";
 import { money, whatsappLink } from "../lib/format";
 import { addressLine, paymentConfig, saveOrder, type Address, type NewOrder, type PayWith } from "../lib/orders";
 import { href } from "../lib/routes";
+import type { Product } from "../data/catalog";
 import { useShop, type CartLine } from "../state/ShopContext";
 
 function CartRow({ line }: { line: CartLine }) {
-  const { t, nameOf, addToCart, designNote } = useShop();
+  const { t, nameOf, addToCart, designNote, priceOf } = useShop();
   const { product, quantity } = line;
 
   return (
@@ -15,7 +16,7 @@ function CartRow({ line }: { line: CartLine }) {
       <div>
         <b>{nameOf(product)}</b>
         {designNote(product) && <small className="line-design">{designNote(product)}</small>}
-        <div className="price muted">{money(product.price)}</div>
+        <div className="price muted">{money(priceOf(product))}</div>
         <div className="qty">
           <button onClick={() => addToCart(product.id, -1)} aria-label="-">−</button>
           <span>{quantity}</span>
@@ -23,7 +24,7 @@ function CartRow({ line }: { line: CartLine }) {
         </div>
         <button className="link small" onClick={() => addToCart(product.id, -quantity)}>{t.remove}</button>
       </div>
-      <b className="price">{money(product.price * quantity)}</b>
+      <b className="price">{money(priceOf(product) * quantity)}</b>
     </div>
   );
 }
@@ -37,7 +38,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
 }
 
 export function CartDrawer() {
-  const { t, lang, nameOf, cartLines, cartTotal, closeCart, clearCart, showInRoom, designNote } = useShop();
+  const { t, lang, nameOf, cartLines, cartTotal, closeCart, clearCart, showInRoom, designNote, designOf, priceOf } = useShop();
   const c = t.checkout;
   const [details, setDetails] = useState(EMPTY_DETAILS);
   const [address, setAddress] = useState(EMPTY_ADDRESS);
@@ -76,17 +77,23 @@ export function CartDrawer() {
     `${c.email}: ${details.email}`,
     `${c.address}: ${addressLine(address, c)}`,
     `${c.elevator} ${details.elevator === "yes" ? c.yes : c.no}`,
-    ...cartLines.map(({ product, quantity }) => `• ${nameOf(product)}${product.sku ? ` (${product.sku})` : ""} ×${quantity} ${money(product.price * quantity)}${designNote(product) ? `\n   ${designNote(product)}` : ""}`),
+    ...cartLines.map(({ product, quantity }) => `• ${nameOf(product)}${product.sku ? ` (${product.sku})` : ""} ×${quantity} ${money(priceOf(product) * quantity)}${designNote(product) ? `\n   ${designNote(product)}` : ""}`),
     `${t.total}: ${money(cartTotal)}`,
     ...(details.note.trim() ? [details.note.trim()] : []),
   ].join("\n");
+
+  // The sofa sizes the server prices the line by (none for a product sold as it is).
+  const sizeOf = (product: Product) => {
+    const design = designOf(product);
+    return design ? { width: design.width, chaiseLength: design.chaiseLength } : undefined;
+  };
 
   const newOrder = (): NewOrder => ({
     ...details,
     address,
     payWith,
     lang,
-    lines: cartLines.map(({ product, quantity }) => ({ productId: product.id, name: product.name.he, sku: product.sku, design: designNote(product) ?? "", quantity, price: product.price })),
+    lines: cartLines.map(({ product, quantity }) => ({ productId: product.id, name: product.name.he, sku: product.sku, design: designNote(product) ?? "", quantity, price: priceOf(product), size: sizeOf(product) })),
   });
 
   // A card order is saved, then the customer moves to UPay's payment page. The card never touches this site.

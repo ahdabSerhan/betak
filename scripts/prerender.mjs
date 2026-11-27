@@ -4,7 +4,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ACCESSIBILITY, CATEGORIES, PRIVACY, SHIPPING, TERMS, PRODUCTS, detailsOf, pathOf, productRoute, productsIn } from "../seo-build/entry.js";
+import { ACCESSIBILITY, CATEGORIES, PRIVACY, SHIPPING, TERMS, PRODUCTS, detailsOf, pathOf, productRoute, productsIn, sizeExtraTable } from "../seo-build/entry.js";
 
 const SITE_URL = (process.env.SITE_URL ?? "https://betak.co.il").replace(/\/$/, "");
 const DIST = join(dirname(fileURLToPath(import.meta.url)), "../dist");
@@ -144,6 +144,11 @@ writeFileSync(join(DIST, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /api
 // The server uses this to send the old site's product addresses to the new ones.
 // Catalog prices for the server, which works out each order's total from them.
 writeFileSync(join(DIST, "prices.json"), JSON.stringify(Object.fromEntries(PRODUCTS.map((product) => [product.id, product.price]))));
+// What each size adds to a corner sofa's price, so the server prices custom sizes too.
+writeFileSync(join(DIST, "size-prices.json"), JSON.stringify(Object.fromEntries(PRODUCTS.flatMap((product) => {
+  const table = sizeExtraTable(product);
+  return table ? [[product.id, table]] : [];
+}))));
 writeFileSync(join(DIST, "routes.json"), JSON.stringify(Object.fromEntries(PRODUCTS.map((product) => [product.id, pathOf(productRoute(product))]))));
 
 console.log(`Pre-built ${pages.length} pages (${indexed.length} in the sitemap) for ${SITE_URL}`);
