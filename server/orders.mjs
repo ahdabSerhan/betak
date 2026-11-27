@@ -2,7 +2,7 @@
 // Firestore is reached over its REST API with the Cloud Run service account, so there are no dependencies.
 
 const FIRST_ORDER_NUMBER = Number(process.env.FIRST_ORDER_NUMBER ?? 5001);
-const LIST_LIMIT = 300;
+const LIST_LIMIT = 1000;
 const COMMIT_ATTEMPTS = 4;
 
 // The catalog price plus what the chosen sizes add; undefined for an unknown product or a size that cannot be made.

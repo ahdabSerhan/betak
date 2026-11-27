@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { STORE } from "../data/store";
 import { money } from "../lib/format";
+import { listCheckouts, markHandled, type Checkout } from "../lib/checkouts";
 import { listMessages, markMessageRead, type Message } from "../lib/messages";
 import { addressLine, adminConfig, listOrders, markRead, type AdminStatus, type Order } from "../lib/orders";
 import type { Text } from "../i18n/text";
@@ -202,8 +203,159 @@ function MessagesPanel({ status, messages, onRead, onRefresh }: { status: string
   );
 }
 
-// The store's private orders page, at /admin/orders. Only the Google accounts in ADMIN_EMAILS see orders.
-export function AdminOrders() {
+// A checkout with no change for this long counts as left; until then the customer may still be filling it in.
+const LEFT_AFTER_MS = 30 * 60_000;
+
+type Stage = "done" | "paid" | "paying" | "filling" | "left-form" | "left-payment" | "payment-failed";
+const DONE_STAGES: Stage[] = ["done", "paid"];
+
+// One row of the tracking page: a sent order, or a checkout that was started and not sent.
+interface Tracked {
+  key: string;
+  stage: Stage;
+  time: string;
+  startedAt?: string;
+  name: string;
+  phone: string;
+  email: string;
+  city: string;
+  lines: { name: string; sku: string; design: string; quantity: number }[];
+  total: number;
+  handled: boolean;
+  number?: number;
+  payWith?: string;
+  draft?: Checkout;
+  order?: Order;
+}
+
+const isRecent = (time: string) => Date.now() - Date.parse(time) < LEFT_AFTER_MS;
+
+// Where an order stands: a phone order is done; a card order depends on what UPay reported.
+function orderStage(order: Order): Stage {
+  const status = order.payment?.status;
+  if (!status) return "done";
+  if (status === "reported" || status === "amount-mismatch") return "paid";
+  if (status === "failed") return "payment-failed";
+  return isRecent(order.createdAt) ? "paying" : "left-payment";
+}
+
+// Every order and every checkout that never became one, newest first.
+function trackedOf(checkouts: Checkout[], orders: Order[]): Tracked[] {
+  const startOf = new Map(checkouts.filter((draft) => draft.orderNumber).map((draft) => [draft.orderNumber, draft.startedAt]));
+  const sent = orders.map((order): Tracked => ({
+    key: `o${order.id}`, stage: orderStage(order), time: order.createdAt, startedAt: startOf.get(order.number),
+    name: order.name, phone: order.phone, email: order.email, city: order.address?.city ?? "", lines: order.lines, total: order.total,
+    handled: order.read, number: order.number, payWith: order.payWith, order,
+  }));
+  const drafts = checkouts.filter((draft) => !draft.orderNumber).map((draft): Tracked => ({
+    key: `d${draft.id}`, stage: isRecent(draft.updatedAt) ? "filling" : "left-form", time: draft.updatedAt, startedAt: draft.startedAt,
+    name: draft.name, phone: draft.phone, email: draft.email, city: draft.city, lines: draft.lines, total: draft.total,
+    handled: draft.handled, payWith: draft.payWith, draft,
+  }));
+  return [...sent, ...drafts].sort((a, b) => b.time.localeCompare(a.time));
+}
+
+function TrackedRow({ item, onHandled }: { item: Tracked; onHandled: (item: Tracked, handled: boolean) => void }) {
+  const { t, lang } = useShop();
+  const a = t.admin;
+  const when = (time: string) => new Date(time).toLocaleString(lang === "he" ? "he-IL" : "en-GB", { dateStyle: "short", timeStyle: "short" });
+  return (
+    <tr className={item.handled ? "" : "unread"}>
+      <td><input type="checkbox" checked={item.handled} onChange={(event) => onHandled(item, event.target.checked)} aria-label={a.markHandled(item.name || item.phone || item.email)} /></td>
+      <td>
+        <div className={`checkout-stage ${item.stage}`}><b>{a.stages[item.stage]}</b></div>
+        {item.number && <small className="muted">{a.number} {item.number}</small>}
+        {item.payWith && <small className="muted">{a.chosePay[item.payWith]}</small>}
+      </td>
+      <td>
+        {when(item.time)}
+        {item.startedAt && item.startedAt !== item.time && <small className="muted stage-start">{a.started} {when(item.startedAt)}</small>}
+      </td>
+      <th scope="row">{item.name || a.noName}{item.city && <small className="muted stage-start">{item.city}</small>}</th>
+      <td>
+        <div className="contact-links">
+          {item.phone && <a href={`https://wa.me/${whatsappNumber(item.phone)}`} target="_blank" rel="noopener">{a.whatsapp}</a>}
+          {item.phone && <a href={`tel:${digits(item.phone)}`} dir="ltr">{item.phone}</a>}
+          {item.email && <a href={`mailto:${item.email}`} dir="ltr">{item.email}</a>}
+        </div>
+      </td>
+      <td>
+        <ul className="order-lines">
+          {item.lines.map((line, index) => (
+            <li key={index}>{line.name}{line.sku && ` (${line.sku})`} ×{line.quantity}{line.design && <small className="muted"> {line.design}</small>}</li>
+          ))}
+        </ul>
+      </td>
+      <td><span className="price">{money(item.total)}</span></td>
+    </tr>
+  );
+}
+
+type Show = "all" | "open" | "done";
+
+// The tracking page: every order the customers made and every one they started and did not finish.
+function TrackingPanel({ status, items, onHandled, onRefresh }: { status: string; items: Tracked[]; onHandled: (item: Tracked, handled: boolean) => void; onRefresh: () => void }) {
+  const a = useShop().t.admin;
+  const [show, setShow] = useState<Show>("all");
+  const [notHandledOnly, setNotHandledOnly] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const isDone = (item: Tracked) => DONE_STAGES.includes(item.stage);
+  const done = items.filter(isDone).length;
+
+  const shown = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const queryDigits = digits(query);
+    const matches = (item: Tracked) => !query
+      || item.name.toLowerCase().includes(query)
+      || item.email.toLowerCase().includes(query)
+      || item.lines.some((line) => line.name.toLowerCase().includes(query))
+      || (queryDigits !== "" && (digits(item.phone).includes(queryDigits) || String(item.number ?? "").includes(queryDigits)));
+    const inView = (item: Tracked) => show === "all" || (show === "done") === DONE_STAGES.includes(item.stage);
+    return items.filter((item) => inView(item) && (!notHandledOnly || !item.handled) && matches(item));
+  }, [items, show, notHandledOnly, search]);
+
+  return (
+    <>
+      <p className="admin-intro muted">{a.trackIntro}</p>
+      <div className="admin-tabs">
+        {(["all", "open", "done"] as Show[]).map((key) => (
+          <button type="button" key={key} aria-pressed={show === key} onClick={() => setShow(key)}>
+            {a.show[key]}<span className={key === "open" ? "tab-count" : "tab-count quiet"}>{key === "all" ? items.length : key === "done" ? done : items.length - done}</span>
+          </button>
+        ))}
+      </div>
+      <div className="admin-tools">
+        <label className="admin-search">
+          <span className="sr-only">{a.searchUnfinished}</span>
+          <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={a.searchUnfinished} />
+        </label>
+        <label className="admin-check"><input type="checkbox" checked={notHandledOnly} onChange={(event) => setNotHandledOnly(event.target.checked)} /> {a.openOnly}</label>
+        <button className="btn ghost small" onClick={onRefresh}>{a.refresh}</button>
+      </div>
+      <p role="status" className="muted">
+        {status === "loading" ? a.unfinishedLoading : status === "not-allowed" ? a.notAllowed : status === "error" ? a.error : a.unfinishedCount(shown.length, shown.filter((item) => !item.handled).length)}
+      </p>
+      {status === "ok" && shown.length === 0 && <p className="empty">{a.unfinishedEmpty}</p>}
+      {shown.length > 0 && (
+        <div className="table-scroll" tabIndex={0} role="region" aria-label={a.trackTitle}>
+          <table className="orders-table">
+            <thead>
+              <tr><th scope="col">{a.handled}</th><th scope="col">{a.stage}</th><th scope="col">{a.lastActivity}</th><th scope="col">{a.customer}</th><th scope="col">{a.contact}</th><th scope="col">{a.items}</th><th scope="col">{a.total}</th></tr>
+            </thead>
+            <tbody>
+              {shown.map((item) => <TrackedRow item={item} onHandled={onHandled} key={item.key} />)}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
+}
+
+// The store's private pages: /admin/orders (orders and messages) and /admin/checkouts (order tracking).
+// Only the Google accounts in ADMIN_EMAILS see anything; the sign-in is shared by both pages.
+export function AdminOrders({ page = "orders" }: { page?: "orders" | "checkouts" }) {
   const { t } = useShop();
   const a = t.admin;
   const [token, setToken] = useState(storedToken);
@@ -212,6 +364,8 @@ export function AdminOrders() {
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"orders" | "messages">("orders");
+  const [checkouts, setCheckouts] = useState<Checkout[]>([]);
+  const [checkoutsStatus, setCheckoutsStatus] = useState<AdminStatus | "loading">("loading");
   const [messages, setMessages] = useState<Message[]>([]);
   const [messagesStatus, setMessagesStatus] = useState<AdminStatus | "loading">("loading");
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -255,7 +409,16 @@ export function AdminOrders() {
     setMessages(result.messages);
   }, [token]);
 
+  const loadCheckouts = useCallback(async () => {
+    if (!token) return;
+    setCheckoutsStatus("loading");
+    const result = await listCheckouts(token);
+    setCheckoutsStatus(result.status);
+    setCheckouts(result.checkouts);
+  }, [token]);
+
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { loadCheckouts(); }, [loadCheckouts]);
   useEffect(() => { loadMessages(); }, [loadMessages]);
 
   const onMessageRead = async (message: Message, read: boolean) => {
@@ -264,6 +427,19 @@ export function AdminOrders() {
   };
 
   const unreadMessages = messages.filter((message) => !message.read).length;
+
+  // The tracking page joins the orders and the checkouts, so it waits for both lists.
+  const tracked = useMemo(() => trackedOf(checkouts, orders), [checkouts, orders]);
+  const trackedStatus = checkoutsStatus === "ok" ? status : checkoutsStatus;
+
+  // "Handled" on an order is the order's own read mark.
+  const onHandled = async (item: Tracked, handled: boolean) => {
+    if (item.order) return onRead(item.order, handled);
+    if (!item.draft) return;
+    const id = item.draft.id;
+    setCheckouts((current) => current.map((draft) => (draft.id === id ? { ...draft, handled } : draft)));
+    if (!(await markHandled(token, id, handled))) loadCheckouts();
+  };
 
   const onRead = async (order: Order, read: boolean) => {
     setOrders((current) => current.map((item) => (item.id === order.id ? { ...item, read } : item)));
@@ -275,6 +451,7 @@ export function AdminOrders() {
     signIn("");
     setOrders([]);
     setMessages([]);
+    setCheckouts([]);
   };
 
   const shown = useMemo(() => {
@@ -292,8 +469,13 @@ export function AdminOrders() {
   return (
     <section className="wrap admin-orders">
       <header className="admin-head">
-        <h1>{a.title}</h1>
-        {token && <button className="btn ghost small" onClick={signOut}>{a.signOut}</button>}
+        <h1>{page === "checkouts" ? a.trackTitle : a.title}</h1>
+        {token && (
+          <div className="admin-head-actions">
+            <a className="btn ghost small" href={page === "checkouts" ? "/admin/orders" : "/admin/checkouts"}>{page === "checkouts" ? a.title : a.trackTitle}</a>
+            <button className="btn ghost small" onClick={signOut}>{a.signOut}</button>
+          </div>
+        )}
       </header>
 
       {!token && (
@@ -304,7 +486,9 @@ export function AdminOrders() {
         </div>
       )}
 
-      {token && (
+      {token && page === "checkouts" && <TrackingPanel status={trackedStatus} items={tracked} onHandled={onHandled} onRefresh={() => { load(); loadCheckouts(); }} />}
+
+      {token && page === "orders" && (
         <div className="admin-tabs">
           <button type="button" aria-pressed={view === "orders"} onClick={() => setView("orders")}>{a.tabOrders}</button>
           <button type="button" aria-pressed={view === "messages"} onClick={() => setView("messages")}>
@@ -313,9 +497,9 @@ export function AdminOrders() {
         </div>
       )}
 
-      {token && view === "messages" && <MessagesPanel status={messagesStatus} messages={messages} onRead={onMessageRead} onRefresh={loadMessages} />}
+      {token && page === "orders" && view === "messages" && <MessagesPanel status={messagesStatus} messages={messages} onRead={onMessageRead} onRefresh={loadMessages} />}
 
-      {token && view === "orders" && (
+      {token && page === "orders" && view === "orders" && (
         <>
           <div className="admin-tools">
             <label className="admin-search">

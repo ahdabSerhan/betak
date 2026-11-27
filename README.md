@@ -134,6 +134,20 @@ gcloud projects add-iam-policy-binding $PROJECT --member serviceAccount:<run ser
   `gcloud run services update betak-website --region me-west1 --project $PROJECT --update-env-vars GOOGLE_CLIENT_ID=<client id>,ADMIN_EMAILS=<gmail>`
   (several emails: separate with `\,` or use `--env-vars-file`).
 
+### Order tracking
+
+`/admin/checkouts` (same Google sign-in, linked only from `/admin/orders`) lists every order and every checkout that
+was started and not sent, with filters for all / not finished / finished:
+- Form drafts: once a phone or email is typed in the cart form, the browser saves a short draft
+  (`PUT /api/checkouts/<random id>`, `server/checkouts.mjs`, Firestore collection `checkouts`): name, phone,
+  email, city and cart only, never the street address or note. Sending the order marks the draft with the order
+  number. Drafts are kept with the order records (no automatic deletion). A draft with no change for 30 minutes
+  counts as left.
+- Card orders that went to UPay and were not paid within 30 minutes, or whose payment failed (from `orders`).
+
+The "טופל" checkbox marks a row as handled (for an order it is the order's "read" mark). No setup needed beyond
+the orders setup above.
+
 ### Contact form and email alerts
 
 The contact page form saves each message in Firestore (`messages`, `server/messages.mjs`); they show in the
