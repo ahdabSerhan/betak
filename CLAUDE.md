@@ -6,8 +6,9 @@ Vite + React 19 + TypeScript, plain CSS, three.js. Hebrew (RTL) and English.
 ## Commands
 - `npm install` then `npm run dev`: local development (the AI agent falls back to simple rules, there is no server).
 - `npm run build`: builds the app, pre-builds one HTML page per route (SEO), sitemap.xml, robots.txt and routes.json into `dist/`.
+- `npm run check:a11y`: after a build, runs axe on every page in Hebrew and English; fails on any violation.
 - `PORT=8080 node server/server.mjs`: serves `dist/` like production, including 301 redirects and `/api/designer`.
-- Deploy: every push to `main` deploys to the live site automatically (Cloud Build trigger). Before pushing, run `npm run build` and make sure it passes.
+- Deploy: every push to `main` deploys to the live site automatically (Cloud Build trigger). Before pushing, run `npm run build` and `npm run check:a11y` and make sure they pass. GitHub Actions (`.github/workflows/checks.yml`) runs both on every pull request and push to main.
   Live: https://betak-website-230492521256.me-west1.run.app (noindex until the betak.co.il domain points here).
 
 ## Layout

@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build && vite build --ssr src/seo/entry.ts --outDir seo-build && node scripts/prerender.mjs",
     "preview": "vite preview",
     "start": "node server/server.mjs",
-    "build:preview": "SITE_BASE=./ vite build"
+    "build:preview": "SITE_BASE=./ vite build",
+    "check:a11y": "node scripts/a11y-check.mjs"
   },
   "dependencies": {
     "react": "^19.3.1",
@@ -20,6 +21,8 @@
     "@types/react-dom": "^19.3.0",
     "@types/three": "^0.187.0",
     "@vitejs/plugin-react": "^6.3.0",
+    "axe-core": "4.14.1",
+    "playwright": "1.63.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.8"
   }

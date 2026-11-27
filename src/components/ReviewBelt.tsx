@@ -16,13 +16,15 @@ interface ReviewBeltProps<T extends Review> {
 
 // Customer reviews in a row that glides by itself: to the right in Hebrew, to the left in English.
 export function ReviewBelt<T extends Review>({ reviews, linkOf, noteOf }: ReviewBeltProps<T>) {
-  const { lang } = useShop();
+  const { lang, t } = useShop();
   const glides = reviews.length >= MIN_TO_GLIDE;
   // The row is doubled so it can loop without a gap; the copy is hidden from screen readers.
   const cards = glides ? [...reviews, ...reviews] : reviews;
+  // With motion off the row scrolls instead; cards without links leave nothing to tab to, so the row itself takes focus.
+  const scrollFocus = glides && !linkOf ? { tabIndex: 0, role: "region", "aria-label": t.reviewsTitle } : {};
 
   return (
-    <div className={`review-belt ${glides ? "glides" : ""} ${lang === "he" ? "rightward" : ""}`}>
+    <div className={`review-belt ${glides ? "glides" : ""} ${lang === "he" ? "rightward" : ""}`} {...scrollFocus}>
       <div className="review-track" style={glides ? { animationDuration: `${reviews.length * SECONDS_PER_CARD}s` } : undefined}>
         {cards.map((review, index) => {
           const copy = index >= reviews.length;
