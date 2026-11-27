@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Product } from "../data/catalog";
 import { swatchLabel } from "../data/fabrics";
-import { CORNER_BASE, designCode, EXTRA_PER_STEP, EXTRA_STEP_CM, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
+import { designCode, EXTRA_PER_STEP, EXTRA_STEP_CM, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
 import { money } from "../lib/format";
 import { useShop } from "../state/ShopContext";
 import { DesignDrawing } from "./DesignDrawing";
@@ -119,9 +119,15 @@ export function Configurator({ product, design, rules, onChange, onReset }: Conf
                 {(["right", "left"] as const).map((side) => <button className="chip" aria-pressed={design.chaiseSide === side} onClick={() => change({ chaiseSide: side })} key={side}>{t.sides[side]}</button>)}
               </div>
             </div>
-            {/* Corner sofas cost more above the size their listed price is for. */}
-            <small className="muted">{t.sizePriceRule(CORNER_BASE.width, CORNER_BASE.chaiseLength, EXTRA_STEP_CM, money(EXTRA_PER_STEP))}</small>
           </>
+        )}
+        {/* Sofas cost more above the size their listed price is for. */}
+        {rules.priceBase.width && (
+          <small className="muted">
+            {rules.priceBase.chaiseLength
+              ? t.sizePriceRule(rules.priceBase.width, rules.priceBase.chaiseLength, EXTRA_STEP_CM, money(EXTRA_PER_STEP))
+              : t.lengthPriceRule(rules.priceBase.width, EXTRA_STEP_CM, money(EXTRA_PER_STEP))}
+          </small>
         )}
       </>
     ),
