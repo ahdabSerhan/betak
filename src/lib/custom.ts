@@ -39,6 +39,13 @@ export interface DesignRules {
   priceBase: PriceBase;
   // Where the length starts when it is not the price base (an armchair's listed length).
   standardWidth?: number;
+  // Beds sold in set mattress sizes: each size (width x length) and what it adds; the first is the listed one.
+  sizes?: SizeOption[];
+}
+
+export interface SizeOption {
+  size: string;
+  extra: number;
 }
 
 type PriceBase = Partial<Record<"width" | "chaiseLength", number>>;
@@ -79,12 +86,26 @@ function sofaWidth(listed: number | null): Range {
 }
 
 // Mattress sizes (width x length, cm) and what each adds to the listed price, as betak.co.il lists them.
-export const MATTRESS_SIZES = [
+export const MATTRESS_SIZES: SizeOption[] = [
   { size: "140x190", extra: 0 },
   { size: "160x190", extra: 349 },
   { size: "160x200", extra: 499 },
   { size: "180x200", extra: 650 },
 ];
+// The longer list some beds give on betak.co.il.
+const BED_SIZES: SizeOption[] = [
+  { size: "140x190", extra: 0 },
+  { size: "140x200", extra: 310 },
+  { size: "160x190", extra: 350 },
+  { size: "160x200", extra: 450 },
+  { size: "180x200", extra: 650 },
+  { size: "200x200", extra: 750 },
+];
+// The beds whose description lists mattress sizes, and which list (Noble and Georgia use the mattresses' one).
+const BED_SIZE_LISTS: Record<number, SizeOption[]> = {
+  1715: BED_SIZES, 1991: BED_SIZES, 1997: BED_SIZES, 2004: BED_SIZES, 2007: BED_SIZES, 2020: BED_SIZES,
+  1994: MATTRESS_SIZES, 2002: MATTRESS_SIZES,
+};
 export const isMattress = (product: Product) => product.type === "mattress";
 // A saved size that is no longer offered falls back to the listed one.
 export const mattressSize = (saved?: string) => MATTRESS_SIZES.find((option) => option.size === saved) ?? MATTRESS_SIZES[0];
@@ -106,7 +127,7 @@ export function rulesFor(product: Product): DesignRules | null {
     return { shape: "seat", width, depths: ARMCHAIR_DEPTHS, seats: [], chaise: null, priceBase: {}, standardWidth: listed ? within(listed, width) : undefined };
   }
   if (SEAT_TYPES.includes(type)) return { shape: "seat", width: { min: 50, max: 160, step: 5 }, depths: [], seats: [], chaise: null, priceBase: {} };
-  if (BED_TYPES.includes(type)) return { shape: "bed", width: { min: 120, max: 200, step: 20 }, depths: [190, 200], seats: [], chaise: null, priceBase: {} };
+  if (BED_TYPES.includes(type)) return { shape: "bed", width: { min: 120, max: 200, step: 20 }, depths: [190, 200], seats: [], chaise: null, priceBase: {}, sizes: BED_SIZE_LISTS[product.id] };
   return null;
 }
 
@@ -126,8 +147,12 @@ export const EXTRA_PER_STEP = 100;
 // How much one measure adds to the price, e.g. a 330 cm corner sofa adds 300 ₪.
 const extraFor = (size: number, base: number) => Math.ceil(Math.max(0, size - base) / EXTRA_STEP_CM) * EXTRA_PER_STEP;
 
+// A design's size as a size list names it, e.g. "160x200".
+export const sizeKey = (design: Pick<Design, "width" | "depth">) => `${design.width}x${design.depth}`;
+
 // What the chosen size adds to the listed price.
 export function sizeExtra(rules: DesignRules, design: Design): number {
+  if (rules.sizes) return rules.sizes.find((option) => option.size === sizeKey(design))?.extra ?? 0;
   return Object.entries(rules.priceBase).reduce((sum, [key, base]) => sum + extraFor(design[key as keyof PriceBase], base), 0);
 }
 
@@ -136,6 +161,7 @@ export function sizeExtraTable(product: Product): Record<string, Record<string, 
   if (isMattress(product)) return { mattress: Object.fromEntries(MATTRESS_SIZES.map((option) => [option.size, option.extra])) };
   const rules = rulesFor(product);
   if (!rules) return null;
+  if (rules.sizes) return { size: Object.fromEntries(rules.sizes.map((option) => [option.size, option.extra])) };
   const ranges: Record<string, Range | null> = { width: rules.width, chaiseLength: rules.chaise };
   const entries = Object.entries(rules.priceBase).map(([key, base]) => {
     const range = ranges[key]!;
@@ -150,11 +176,13 @@ export function standardDesign(product: Product, rules: DesignRules): Design {
   const typical = footprint(product);
   // Sofas start at the size their listed price is for.
   const base = rules.priceBase;
-  const width = base.width ?? rules.standardWidth ?? within(typical.width, rules.width);
+  // A bed with set sizes starts at the first one, which the listed price is for.
+  const [listedWidth, listedDepth] = rules.sizes ? rules.sizes[0].size.split("x").map(Number) : [];
+  const width = base.width ?? rules.standardWidth ?? listedWidth ?? within(typical.width, rules.width);
   const seats = seatChoices(rules, width);
   return {
     width,
-    depth: rules.depths.length > 0 ? nearest(rules.shape === "corner" ? 100 : typical.depth, rules.depths) : typical.depth,
+    depth: listedDepth ? listedDepth : rules.depths.length > 0 ? nearest(rules.shape === "corner" ? 100 : typical.depth, rules.depths) : typical.depth,
     seats: seats.length > 0 ? nearest(3, seats) : 0,
     chaiseSide: "right",
     chaiseLength: rules.chaise ? base.chaiseLength ?? within(typical.depth, rules.chaise) : 0,
@@ -166,7 +194,10 @@ export function standardDesign(product: Product, rules: DesignRules): Design {
 
 // A saved design completed with choices added since, and its sizes moved onto this product's slider steps.
 export function savedDesign(product: Product, rules: DesignRules, saved: Partial<Design> = {}): Design {
-  const design = { ...standardDesign(product, rules), ...saved };
+  const standard = standardDesign(product, rules);
+  const design = { ...standard, ...saved };
+  // A bed size that is not on its list goes back to the listed one.
+  if (rules.sizes && !rules.sizes.some((option) => option.size === sizeKey(design))) return { ...design, width: standard.width, depth: standard.depth };
   return { ...design, width: within(design.width, rules.width), depth: rules.depths.length > 0 ? nearest(design.depth, rules.depths) : design.depth, chaiseLength: rules.chaise ? within(design.chaiseLength, rules.chaise) : design.chaiseLength };
 }
 

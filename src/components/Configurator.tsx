@@ -1,7 +1,13 @@
 import { useState, type ReactNode } from "react";
 import type { Product } from "../data/catalog";
 import { swatchLabel } from "../data/fabrics";
-import { designCode, EXTRA_PER_STEP, EXTRA_STEP_CM, FIRMNESS, seatChoices, SHOW_SEATS, withWidth, type Design, type DesignRules } from "../lib/custom";
+import { designCode, EXTRA_PER_STEP, EXTRA_STEP_CM, FIRMNESS, seatChoices, SHOW_SEATS, sizeKey, sizeLabel, withWidth, type Design, type DesignRules } from "../lib/custom";
+
+// "160x200" as the width and length of a design.
+const sizeOf = (size: string) => {
+  const [width, depth] = size.split("x").map(Number);
+  return { width, depth };
+};
 import { money } from "../lib/format";
 import { useShop } from "../state/ShopContext";
 import { DesignDrawing } from "./DesignDrawing";
@@ -94,8 +100,21 @@ export function Configurator({ product, design, rules, onChange, onReset }: Conf
   const panels: Record<Step, ReactNode> = {
     size: (
       <>
-        <Slider label={rules.shape === "bed" ? t.configMattress : rules.shape === "seat" && rules.depths.length === 0 ? t.configWidth : t.configSofaLength} value={design.width} range={rules.width} unit={t.cm} onChange={(width) => onChange(withWidth(design, rules, width))} />
-        {rules.depths.length > 0 && (
+        {/* Beds sold in set mattress sizes: one choice per size, with what it adds. */}
+        {rules.sizes && (
+          <div className="config-row">
+            <span>{t.mattressSizes}</span>
+            <div className="chips">
+              {rules.sizes.map(({ size, extra }) => (
+                <button className="chip" aria-pressed={sizeKey(design) === size} onClick={() => change(sizeOf(size))} key={size}>
+                  <span dir="ltr">{sizeLabel(size)}</span>{extra > 0 && <small> · <bdi dir="ltr">+{money(extra)}</bdi></small>}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {!rules.sizes && <Slider label={rules.shape === "bed" ? t.configMattress : rules.shape === "seat" && rules.depths.length === 0 ? t.configWidth : t.configSofaLength} value={design.width} range={rules.width} unit={t.cm} onChange={(width) => onChange(withWidth(design, rules, width))} />}
+        {rules.depths.length > 0 && !rules.sizes && (
           <div className="config-row">
             <span>{rules.shape === "bed" ? t.configLength : rules.chaise ? t.configSofaDepth : t.configDepth}</span>
             <div className="chips">

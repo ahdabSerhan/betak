@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { productById, type Product } from "../data/catalog";
 import { navigate } from "../hooks/useRoute";
 import { usePersistentState } from "../hooks/usePersistentState";
-import { describeDesign, isMattress, mattressSize, rulesFor, savedDesign, sizeExtra, sizeLabel, type Design } from "../lib/custom";
+import { describeDesign, isMattress, mattressSize, rulesFor, savedDesign, sizeExtra, sizeKey, sizeLabel, type Design } from "../lib/custom";
 import type { Piece } from "../lib/designer";
 import type { RoomDimensions } from "../lib/measure";
 import { askEsentrix, esentrixEnabled, loadEsentrixWidget } from "../lib/esentrix";
@@ -63,7 +63,7 @@ interface Shop {
   showInRoom: (pieces: Piece[]) => void;
 }
 
-export type OrderSize = { width: number; chaiseLength: number } | { mattress: string };
+export type OrderSize = { width: number; chaiseLength: number; size: string } | { mattress: string };
 
 const ShopContext = createContext<Shop | null>(null);
 
@@ -162,7 +162,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       sizeOf: (product) => {
         if (isMattress(product)) return { mattress: mattressOf(product) };
         const design = designOf(product);
-        return design ? { width: design.width, chaiseLength: design.chaiseLength } : undefined;
+        return design ? { width: design.width, chaiseLength: design.chaiseLength, size: sizeKey(design) } : undefined;
       },
       extraOf,
       priceOf,
