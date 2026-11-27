@@ -1,6 +1,7 @@
 import { keepWheel } from "../lib/motion";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
 import { type Product } from "../data/catalog";
 import { cutoutAspect, cutoutOf } from "../data/cutouts";
 import { navigate } from "../hooks/useRoute";
@@ -28,6 +29,17 @@ const TURN = { drag: 0.012, wheel: 0.004 };
 // A press that moves less than this many pixels is a click, not a drag.
 const CLICK_SLOP = 5;
 const RIGHT_BUTTON = 2;
+// A selected piece can be lifted this high (metres) and moved or turned on every axis.
+const MAX_LIFT = 2;
+
+// How the selected piece is changed: moved along any axis, or turned around any axis.
+type EditMode = "translate" | "rotate";
+
+// The starting place of each piece, so the visitor can put it back.
+interface Rest {
+  position: THREE.Vector3;
+  rotation: THREE.Euler;
+}
 
 // What the visitor is dragging: a piece of furniture (moved or turned) or the view itself.
 interface Drag {
@@ -77,6 +89,9 @@ export default function Showroom() {
   const [focused, setFocused] = useState<Product | null>(null);
   const [hover, setHover] = useState<Hover | null>(null);
   const [failed, setFailed] = useState(false);
+  // The selected piece's edit mode, or null when no piece is selected.
+  const [editing, setEditing] = useState<EditMode | null>(null);
+  const edit = useRef<{ mode: (mode: EditMode) => void; reset: () => void; done: () => void }>({ mode: () => {}, reset: () => {}, done: () => {} });
 
   const goTo = (index: number, byVisitor = true) => {
     const next = (index + ZONES.length) % ZONES.length;
@@ -133,6 +148,44 @@ export default function Showroom() {
     billboard.visible = shadow.visible = false;
     showroom.scene.add(shadow, billboard);
 
+    // Clicking a piece selects it and shows handles to move it along, or turn it around, any axis.
+    const transform = new TransformControls(camera, renderer.domElement);
+    transform.setSize(0.8);
+    showroom.scene.add(transform.getHelper());
+    const rest = new Map<THREE.Object3D, Rest>(showroom.movables.map((piece) => [piece, { position: piece.position.clone(), rotation: piece.rotation.clone() }]));
+    // The piece stays inside its room and never sinks below the floor.
+    transform.addEventListener("objectChange", () => {
+      const piece = transform.object;
+      if (!piece) return;
+      touched.current = true;
+      piece.position.set(
+        THREE.MathUtils.clamp(piece.position.x, -showroom.floor.x, showroom.floor.x),
+        THREE.MathUtils.clamp(piece.position.y, 0, MAX_LIFT),
+        THREE.MathUtils.clamp(piece.position.z, showroom.floor.back, showroom.floor.front),
+      );
+    });
+    const select = (piece: THREE.Object3D | null) => {
+      // Editing a piece stops the automatic tour, so the room stays put.
+      if (piece) touched.current = true;
+      if (piece) transform.attach(piece);
+      else transform.detach();
+      setEditing(piece ? (transform.mode as EditMode) : null);
+    };
+    edit.current = {
+      mode: (mode) => {
+        transform.setMode(mode);
+        setEditing(mode);
+      },
+      reset: () => {
+        const piece = transform.object;
+        const start = piece && rest.get(piece);
+        if (!piece || !start) return;
+        piece.position.copy(start.position);
+        piece.rotation.copy(start.rotation);
+      },
+      done: () => select(null),
+    };
+
     focusOn.current = (photo) => {
       view.current.focus = photo;
       Object.assign(look, { x: 0, y: 0, angle: 0, distance: 1, walked: false });
@@ -188,6 +241,8 @@ export default function Showroom() {
     };
 
     const onPointerDown = (event: PointerEvent) => {
+      // A press on the handles belongs to them.
+      if (transform.axis || transform.dragging) return;
       const { hit } = aim(event);
       const piece = hit ? null : pieceUnderPointer();
       const grip = (piece && floorPoint(piece)?.sub(piece.position)) || new THREE.Vector3();
@@ -207,7 +262,7 @@ export default function Showroom() {
         piece.rotation.y += deltaX * TURN.drag;
       } else if (piece) {
         const point = floorPoint(piece)?.sub(held.grip);
-        if (point) piece.position.set(THREE.MathUtils.clamp(point.x, -showroom.floor.x, showroom.floor.x), 0, THREE.MathUtils.clamp(point.z, showroom.floor.back, showroom.floor.front));
+        if (point) piece.position.set(THREE.MathUtils.clamp(point.x, -showroom.floor.x, showroom.floor.x), piece.position.y, THREE.MathUtils.clamp(point.z, showroom.floor.back, showroom.floor.front));
       } else if (view.current.focus) {
         look.walked = true;
         look.angle = THREE.MathUtils.clamp(look.angle - deltaX * WALK.speed, -WALK.angle, WALK.angle);
@@ -221,6 +276,7 @@ export default function Showroom() {
     const onPointerMove = (event: PointerEvent) => {
       const { box, hit } = aim(event);
       if (drag) return onDrag(event, drag);
+      if (transform.dragging) return;
       gaze.copy(pointer);
       hovered = hit;
       host.style.cursor = hovered ? "pointer" : pieceUnderPointer() ? "grab" : "";
@@ -230,8 +286,11 @@ export default function Showroom() {
     const onPointerUp = (event: PointerEvent) => {
       const held = drag;
       drag = null;
-      // A press without movement is a click: fly in to the product, or back out from empty space.
-      if (held && !held.moved && !held.piece) focusOn.current(aim(event).hit);
+      if (!held || held.moved) return;
+      // A click on a piece selects it; a click on a photo flies in to it; a click on empty space lets go.
+      if (held.piece) return select(held.piece);
+      select(null);
+      focusOn.current(aim(event).hit);
     };
 
     // The wheel turns the piece under the pointer and zooms a focused product; elsewhere the page scrolls as usual.
@@ -307,6 +366,7 @@ export default function Showroom() {
     }, AUTO_TOUR_MS);
 
     return () => {
+      transform.dispose();
       cancelAnimationFrame(frame);
       window.clearInterval(tour);
       watcher.disconnect();
@@ -328,7 +388,15 @@ export default function Showroom() {
           <span className="price">{money(hover.product.price)}</span>
         </div>
       )}
-      {focused ? (
+      {editing && !focused ? (
+        <div className="showroom-focus showroom-edit" role="group" aria-label={t.showroomEdit}>
+          <span className="muted-light">{editing === "translate" ? t.showroomMoveHint : t.showroomTurnHint}</span>
+          <button className="btn small" aria-pressed={editing === "translate"} onClick={() => edit.current.mode("translate")}>{t.showroomMove}</button>
+          <button className="btn small" aria-pressed={editing === "rotate"} onClick={() => edit.current.mode("rotate")}>{t.showroomTurn}</button>
+          <button className="btn ghost small" onClick={() => edit.current.reset()}>{t.showroomReset}</button>
+          <button className="btn gold small" onClick={() => edit.current.done()}>{t.showroomDone}</button>
+        </div>
+      ) : focused ? (
         <div className="showroom-focus">
           <div>
             <b>{nameOf(focused)}</b>

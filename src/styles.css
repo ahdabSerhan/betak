@@ -651,6 +651,12 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 /* Showroom: the card shown while the camera is close to one product */
 .showroom-focus { position: absolute; z-index: 2; inset-block-end: 158px; left: 50%; translate: -50% 0; display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 20px; padding-inline: 20px 12px; border-radius: 999px; background: rgba(29, 22, 18, .82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); animation: rise .4s ease both; white-space: nowrap; }
 .showroom-focus div { display: grid; }
+/* The toolbar for a selected piece: move or turn it on any axis, put it back, or finish. */
+.showroom-edit { gap: 8px; padding-inline: 16px 10px; inset-block: 24px auto; left: auto; translate: none; inset-inline-end: 24px; flex-wrap: wrap; max-width: calc(100% - 48px); }
+@media (max-width: 860px) { .showroom-edit { inset-block: auto 108px; inset-inline: 16px; } }
+.showroom-edit .muted-light { color: #e4d8c5; font-size: 14px; }
+.showroom-edit .btn:not(.gold):not(.ghost) { background: rgba(255, 255, 255, .1); color: var(--cream); border-color: rgba(255, 255, 255, .35); }
+.showroom-edit .btn[aria-pressed="true"] { background: var(--cream); color: var(--ink); }
 .showroom-focus .btn.ghost { color: var(--cream); border-color: rgba(255, 255, 255, .35); }
 @media (max-width: 760px) {
   .showroom-focus { inset-block-end: 108px; flex-wrap: wrap; justify-content: center; border-radius: 22px; white-space: normal; width: calc(100% - 32px); }
