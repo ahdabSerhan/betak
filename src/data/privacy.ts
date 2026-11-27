@@ -25,7 +25,7 @@ export const PRIVACY: Record<Lang, Statement> = {
         paragraphs: ["אינך חייב למסור מידע זה על פי חוק. עם זאת, ללא מסירת פרטים מסוימים ייתכן שלא נוכל לספק שירותים מסוימים."],
         items: [
           "מידע שנמסר על ידך: שם מלא, דוא\"ל, טלפון, כתובת מגורים, כתובת למשלוח וחשבונית, פרטי תשלום (מעובדים ע\"י ספקי סליקה חיצוניים, לא נשמרים באתרנו), ופניות, הודעות, תגובות או תוכן שאתה יוצר באתר.",
-          "באתר זה, כשמתחילים למלא את טופס ההזמנה ומזינים טלפון או דוא\"ל, נשמרים אצלנו השם, הטלפון, הדוא\"ל, העיר ותוכן העגלה, כדי שנוכל לחזור אליך אם ההזמנה לא הושלמה. הם נמחקים כשההזמנה נשלחת, או אחרי 30 יום.",
+          "באתר זה, כשמתחילים למלא את טופס ההזמנה ומזינים טלפון או דוא\"ל, נשמרים אצלנו השם, הטלפון, הדוא\"ל, העיר ותוכן העגלה, כדי שנוכל לחזור אליך אם ההזמנה לא הושלמה, והם נשמרים יחד עם רישום ההזמנות שלנו.",
           "מידע שנאסף אוטומטית: נתונים טכניים (כתובת IP, סוג דפדפן, מערכת הפעלה, מכשיר קצה), נתוני שימוש וגלישה (עמודים בהם ביקרת, משך שהייה, מקורות הגעה), נתוני מיקום כלליים (מדינה/עיר) על ידי גוגל ופייסבוק, ועוגיות (Cookies) ומזהים דיגיטליים אחרים.",
           "מידע מצדדים שלישיים: אם תבחר להתחבר באמצעות רשתות חברתיות (כגון Google או Facebook), נקבל מידע בהתאם להרשאות שקבעת בחשבונך.",
         ],
@@ -132,7 +132,7 @@ export const PRIVACY: Record<Lang, Statement> = {
         paragraphs: ["You are not required by law to give this information. Without some details, however, we may not be able to provide some services."],
         items: [
           "Information you give us: full name, email, phone, home address, delivery and invoice address, payment details (processed by external payment providers and not stored on our site), and enquiries, messages, comments or content you create on the site.",
-          "On this site, once you start the order form and type a phone or email, we keep your name, phone, email, city and cart, so we can get back to you if the order is not finished. They are deleted when the order is sent, or after 30 days.",
+          "On this site, once you start the order form and type a phone or email, we keep your name, phone, email, city and cart, so we can get back to you if the order is not finished. They are kept with our order records.",
           "Information collected automatically: technical data (IP address, browser, operating system, device), usage and browsing data (pages visited, time spent, where you came from), general location (country/city) via Google and Facebook, and cookies and other digital identifiers.",
           "Information from third parties: if you choose to sign in with a social network (such as Google or Facebook), we receive information according to the permissions set in your account.",
         ],

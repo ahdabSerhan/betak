@@ -119,8 +119,8 @@ async function handleNewOrder(request, response) {
     if (order.payWith === "card" && !paymentsEnabled()) return sendJson(response, 409, { error: "payments-off" });
     if (order.payWith === "card") order.payment = newPayment();
     const saved = await orders.add(order);
-    // The checkout became an order, so its draft is dropped; the order is saved either way.
-    if (validCheckoutId(input?.checkoutId)) await checkouts.remove(input.checkoutId).catch((error) => console.error("Draft not removed:", error.message));
+    // The checkout became an order; its draft is kept, marked with the order number. The order is saved either way.
+    if (validCheckoutId(input?.checkoutId)) await checkouts.markOrdered(input.checkoutId, saved.number).catch((error) => console.error("Draft not marked:", error.message));
     if (saved.payment) return sendJson(response, 201, { number: saved.number, payUrl: paymentUrl(saved, siteUrl(request)) });
     sendJson(response, 201, { number: saved.number });
   } catch (error) {
@@ -328,8 +328,8 @@ createServer((request, response) => {
   if (moved) return redirect(response, moved);
   // One address per page: /sofas/ and /sofas are the same page, so the slash is dropped.
   if (pathname.length > 1 && pathname.endsWith("/")) return redirect(response, pathname.slice(0, -1) + url.search);
-  // The orders page and the after-payment page are the site's own app, never indexed and never cached.
-  if (pathname === "/admin/orders" || pathname === "/paid") {
+  // The admin pages and the after-payment page are the site's own app, never indexed and never cached.
+  if (pathname === "/admin/orders" || pathname === "/admin/checkouts" || pathname === "/paid") {
     response.writeHead(200, { "content-type": CONTENT_TYPES[".html"], "cache-control": "no-store", "x-robots-tag": "noindex, nofollow" });
     return createReadStream(join(SITE_ROOT, "index.html")).pipe(response);
   }

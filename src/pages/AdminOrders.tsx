@@ -206,11 +206,15 @@ function MessagesPanel({ status, messages, onRead, onRefresh }: { status: string
 // A checkout with no change for this long counts as left; until then the customer may still be filling it in.
 const LEFT_AFTER_MS = 30 * 60_000;
 
-// One checkout that did not become a paid or sent order: a form draft, or a card order that was never paid.
-interface Unfinished {
+type Stage = "done" | "paid" | "paying" | "filling" | "left-form" | "left-payment" | "payment-failed";
+const DONE_STAGES: Stage[] = ["done", "paid"];
+
+// One row of the tracking page: a sent order, or a checkout that was started and not sent.
+interface Tracked {
   key: string;
-  stage: "filling" | "left-form" | "left-payment" | "payment-failed";
+  stage: Stage;
   time: string;
+  startedAt?: string;
   name: string;
   phone: string;
   email: string;
@@ -219,28 +223,39 @@ interface Unfinished {
   total: number;
   handled: boolean;
   number?: number;
+  payWith?: string;
   draft?: Checkout;
   order?: Order;
 }
 
 const isRecent = (time: string) => Date.now() - Date.parse(time) < LEFT_AFTER_MS;
 
-// Form drafts and unpaid card orders in one list, newest first.
-function unfinishedOf(checkouts: Checkout[], orders: Order[]): Unfinished[] {
-  const drafts = checkouts.map((draft): Unfinished => ({
-    key: `d${draft.id}`, stage: isRecent(draft.updatedAt) ? "filling" : "left-form", time: draft.updatedAt,
-    name: draft.name, phone: draft.phone, email: draft.email, city: draft.city, lines: draft.lines, total: draft.total, handled: draft.handled, draft,
-  }));
-  const unpaid = orders
-    .filter((order) => order.payment?.status === "failed" || (order.payment?.status === "pending" && !isRecent(order.createdAt)))
-    .map((order): Unfinished => ({
-      key: `o${order.id}`, stage: order.payment?.status === "failed" ? "payment-failed" : "left-payment", time: order.createdAt,
-      name: order.name, phone: order.phone, email: order.email, city: order.address?.city ?? "", lines: order.lines, total: order.total, handled: order.read, number: order.number, order,
-    }));
-  return [...drafts, ...unpaid].sort((a, b) => b.time.localeCompare(a.time));
+// Where an order stands: a phone order is done; a card order depends on what UPay reported.
+function orderStage(order: Order): Stage {
+  const status = order.payment?.status;
+  if (!status) return "done";
+  if (status === "reported" || status === "amount-mismatch") return "paid";
+  if (status === "failed") return "payment-failed";
+  return isRecent(order.createdAt) ? "paying" : "left-payment";
 }
 
-function UnfinishedRow({ item, onHandled }: { item: Unfinished; onHandled: (item: Unfinished, handled: boolean) => void }) {
+// Every order and every checkout that never became one, newest first.
+function trackedOf(checkouts: Checkout[], orders: Order[]): Tracked[] {
+  const startOf = new Map(checkouts.filter((draft) => draft.orderNumber).map((draft) => [draft.orderNumber, draft.startedAt]));
+  const sent = orders.map((order): Tracked => ({
+    key: `o${order.id}`, stage: orderStage(order), time: order.createdAt, startedAt: startOf.get(order.number),
+    name: order.name, phone: order.phone, email: order.email, city: order.address?.city ?? "", lines: order.lines, total: order.total,
+    handled: order.read, number: order.number, payWith: order.payWith, order,
+  }));
+  const drafts = checkouts.filter((draft) => !draft.orderNumber).map((draft): Tracked => ({
+    key: `d${draft.id}`, stage: isRecent(draft.updatedAt) ? "filling" : "left-form", time: draft.updatedAt, startedAt: draft.startedAt,
+    name: draft.name, phone: draft.phone, email: draft.email, city: draft.city, lines: draft.lines, total: draft.total,
+    handled: draft.handled, payWith: draft.payWith, draft,
+  }));
+  return [...sent, ...drafts].sort((a, b) => b.time.localeCompare(a.time));
+}
+
+function TrackedRow({ item, onHandled }: { item: Tracked; onHandled: (item: Tracked, handled: boolean) => void }) {
   const { t, lang } = useShop();
   const a = t.admin;
   const when = (time: string) => new Date(time).toLocaleString(lang === "he" ? "he-IL" : "en-GB", { dateStyle: "short", timeStyle: "short" });
@@ -250,11 +265,11 @@ function UnfinishedRow({ item, onHandled }: { item: Unfinished; onHandled: (item
       <td>
         <div className={`checkout-stage ${item.stage}`}><b>{a.stages[item.stage]}</b></div>
         {item.number && <small className="muted">{a.number} {item.number}</small>}
-        {item.draft && <small className="muted">{a.chosePay[item.draft.payWith]}</small>}
+        {item.payWith && <small className="muted">{a.chosePay[item.payWith]}</small>}
       </td>
       <td>
         {when(item.time)}
-        {item.draft && item.draft.startedAt !== item.draft.updatedAt && <small className="muted stage-start">{a.started} {when(item.draft.startedAt)}</small>}
+        {item.startedAt && item.startedAt !== item.time && <small className="muted stage-start">{a.started} {when(item.startedAt)}</small>}
       </td>
       <th scope="row">{item.name || a.noName}{item.city && <small className="muted stage-start">{item.city}</small>}</th>
       <td>
@@ -276,46 +291,60 @@ function UnfinishedRow({ item, onHandled }: { item: Unfinished; onHandled: (item
   );
 }
 
-// Customers who started an order and did not finish: who they are, what was in the cart, and where they stopped.
-function UnfinishedPanel({ status, items, onHandled, onRefresh }: { status: string; items: Unfinished[]; onHandled: (item: Unfinished, handled: boolean) => void; onRefresh: () => void }) {
+type Show = "all" | "open" | "done";
+
+// The tracking page: every order the customers made and every one they started and did not finish.
+function TrackingPanel({ status, items, onHandled, onRefresh }: { status: string; items: Tracked[]; onHandled: (item: Tracked, handled: boolean) => void; onRefresh: () => void }) {
   const a = useShop().t.admin;
-  const [openOnly, setOpenOnly] = useState(true);
+  const [show, setShow] = useState<Show>("all");
+  const [notHandledOnly, setNotHandledOnly] = useState(false);
   const [search, setSearch] = useState("");
+
+  const isDone = (item: Tracked) => DONE_STAGES.includes(item.stage);
+  const done = items.filter(isDone).length;
 
   const shown = useMemo(() => {
     const query = search.trim().toLowerCase();
     const queryDigits = digits(query);
-    const matches = (item: Unfinished) => !query
+    const matches = (item: Tracked) => !query
       || item.name.toLowerCase().includes(query)
       || item.email.toLowerCase().includes(query)
       || item.lines.some((line) => line.name.toLowerCase().includes(query))
-      || (queryDigits !== "" && digits(item.phone).includes(queryDigits));
-    return items.filter((item) => (!openOnly || !item.handled) && matches(item));
-  }, [items, openOnly, search]);
+      || (queryDigits !== "" && (digits(item.phone).includes(queryDigits) || String(item.number ?? "").includes(queryDigits)));
+    const inView = (item: Tracked) => show === "all" || (show === "done") === DONE_STAGES.includes(item.stage);
+    return items.filter((item) => inView(item) && (!notHandledOnly || !item.handled) && matches(item));
+  }, [items, show, notHandledOnly, search]);
 
   return (
     <>
-      <p className="admin-intro muted">{a.unfinishedIntro}</p>
+      <p className="admin-intro muted">{a.trackIntro}</p>
+      <div className="admin-tabs">
+        {(["all", "open", "done"] as Show[]).map((key) => (
+          <button type="button" key={key} aria-pressed={show === key} onClick={() => setShow(key)}>
+            {a.show[key]}<span className={key === "open" ? "tab-count" : "tab-count quiet"}>{key === "all" ? items.length : key === "done" ? done : items.length - done}</span>
+          </button>
+        ))}
+      </div>
       <div className="admin-tools">
         <label className="admin-search">
           <span className="sr-only">{a.searchUnfinished}</span>
           <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={a.searchUnfinished} />
         </label>
-        <label className="admin-check"><input type="checkbox" checked={openOnly} onChange={(event) => setOpenOnly(event.target.checked)} /> {a.openOnly}</label>
+        <label className="admin-check"><input type="checkbox" checked={notHandledOnly} onChange={(event) => setNotHandledOnly(event.target.checked)} /> {a.openOnly}</label>
         <button className="btn ghost small" onClick={onRefresh}>{a.refresh}</button>
       </div>
       <p role="status" className="muted">
-        {status === "loading" ? a.unfinishedLoading : status === "not-allowed" ? a.notAllowed : status === "error" ? a.error : a.unfinishedCount(shown.length, items.filter((item) => !item.handled).length)}
+        {status === "loading" ? a.unfinishedLoading : status === "not-allowed" ? a.notAllowed : status === "error" ? a.error : a.unfinishedCount(shown.length, shown.filter((item) => !item.handled).length)}
       </p>
       {status === "ok" && shown.length === 0 && <p className="empty">{a.unfinishedEmpty}</p>}
       {shown.length > 0 && (
-        <div className="table-scroll" tabIndex={0} role="region" aria-label={a.tabUnfinished}>
+        <div className="table-scroll" tabIndex={0} role="region" aria-label={a.trackTitle}>
           <table className="orders-table">
             <thead>
               <tr><th scope="col">{a.handled}</th><th scope="col">{a.stage}</th><th scope="col">{a.lastActivity}</th><th scope="col">{a.customer}</th><th scope="col">{a.contact}</th><th scope="col">{a.items}</th><th scope="col">{a.total}</th></tr>
             </thead>
             <tbody>
-              {shown.map((item) => <UnfinishedRow item={item} onHandled={onHandled} key={item.key} />)}
+              {shown.map((item) => <TrackedRow item={item} onHandled={onHandled} key={item.key} />)}
             </tbody>
           </table>
         </div>
@@ -324,8 +353,9 @@ function UnfinishedPanel({ status, items, onHandled, onRefresh }: { status: stri
   );
 }
 
-// The store's private orders page, at /admin/orders. Only the Google accounts in ADMIN_EMAILS see orders.
-export function AdminOrders() {
+// The store's private pages: /admin/orders (orders and messages) and /admin/checkouts (order tracking).
+// Only the Google accounts in ADMIN_EMAILS see anything; the sign-in is shared by both pages.
+export function AdminOrders({ page = "orders" }: { page?: "orders" | "checkouts" }) {
   const { t } = useShop();
   const a = t.admin;
   const [token, setToken] = useState(storedToken);
@@ -333,7 +363,7 @@ export function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [search, setSearch] = useState("");
-  const [view, setView] = useState<"orders" | "unfinished" | "messages">("orders");
+  const [view, setView] = useState<"orders" | "messages">("orders");
   const [checkouts, setCheckouts] = useState<Checkout[]>([]);
   const [checkoutsStatus, setCheckoutsStatus] = useState<AdminStatus | "loading">("loading");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -398,13 +428,12 @@ export function AdminOrders() {
 
   const unreadMessages = messages.filter((message) => !message.read).length;
 
-  // Unpaid card orders come from the orders list, so the tab waits for both lists.
-  const unfinished = useMemo(() => unfinishedOf(checkouts, orders), [checkouts, orders]);
-  const unfinishedStatus = checkoutsStatus === "ok" ? status : checkoutsStatus;
-  const openUnfinished = unfinished.filter((item) => !item.handled).length;
+  // The tracking page joins the orders and the checkouts, so it waits for both lists.
+  const tracked = useMemo(() => trackedOf(checkouts, orders), [checkouts, orders]);
+  const trackedStatus = checkoutsStatus === "ok" ? status : checkoutsStatus;
 
-  // "Handled" on an unpaid card order is the order's own read mark.
-  const onHandled = async (item: Unfinished, handled: boolean) => {
+  // "Handled" on an order is the order's own read mark.
+  const onHandled = async (item: Tracked, handled: boolean) => {
     if (item.order) return onRead(item.order, handled);
     if (!item.draft) return;
     const id = item.draft.id;
@@ -440,8 +469,13 @@ export function AdminOrders() {
   return (
     <section className="wrap admin-orders">
       <header className="admin-head">
-        <h1>{a.title}</h1>
-        {token && <button className="btn ghost small" onClick={signOut}>{a.signOut}</button>}
+        <h1>{page === "checkouts" ? a.trackTitle : a.title}</h1>
+        {token && (
+          <div className="admin-head-actions">
+            <a className="btn ghost small" href={page === "checkouts" ? "/admin/orders" : "/admin/checkouts"}>{page === "checkouts" ? a.title : a.trackTitle}</a>
+            <button className="btn ghost small" onClick={signOut}>{a.signOut}</button>
+          </div>
+        )}
       </header>
 
       {!token && (
@@ -452,23 +486,20 @@ export function AdminOrders() {
         </div>
       )}
 
-      {token && (
+      {token && page === "checkouts" && <TrackingPanel status={trackedStatus} items={tracked} onHandled={onHandled} onRefresh={() => { load(); loadCheckouts(); }} />}
+
+      {token && page === "orders" && (
         <div className="admin-tabs">
           <button type="button" aria-pressed={view === "orders"} onClick={() => setView("orders")}>{a.tabOrders}</button>
-          <button type="button" aria-pressed={view === "unfinished"} onClick={() => setView("unfinished")}>
-            {a.tabUnfinished}{openUnfinished > 0 && <span className="tab-count">{openUnfinished}</span>}
-          </button>
           <button type="button" aria-pressed={view === "messages"} onClick={() => setView("messages")}>
             {a.tabMessages}{unreadMessages > 0 && <span className="tab-count">{unreadMessages}</span>}
           </button>
         </div>
       )}
 
-      {token && view === "unfinished" && <UnfinishedPanel status={unfinishedStatus} items={unfinished} onHandled={onHandled} onRefresh={() => { load(); loadCheckouts(); }} />}
+      {token && page === "orders" && view === "messages" && <MessagesPanel status={messagesStatus} messages={messages} onRead={onMessageRead} onRefresh={loadMessages} />}
 
-      {token && view === "messages" && <MessagesPanel status={messagesStatus} messages={messages} onRead={onMessageRead} onRefresh={loadMessages} />}
-
-      {token && view === "orders" && (
+      {token && page === "orders" && view === "orders" && (
         <>
           <div className="admin-tools">
             <label className="admin-search">

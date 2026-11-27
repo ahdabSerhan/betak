@@ -1,12 +1,10 @@
-// Checkouts that were started but not finished: the cart form saves a short draft while the customer fills it in,
-// and the order removes it. Only what the store needs to call back is kept (no street address or note),
-// and drafts older than RETENTION_DAYS are deleted. Kept in Firestore, or in memory with ORDERS_STORE=memory.
+// Checkouts: the cart form saves a short draft while the customer fills it in, so the store sees orders that were
+// started and never sent. Sending the order marks the draft with its order number. Only what the store needs to
+// call back is kept (no street address or note). Kept in Firestore, or in memory with ORDERS_STORE=memory.
 
 import { firestore, fromFields, toFields } from "./orders.mjs";
 
-const LIST_LIMIT = 300;
-const RETENTION_DAYS = 30;
-const RETENTION_MS = RETENTION_DAYS * 24 * 3_600_000;
+const LIST_LIMIT = 1000;
 
 // The browser picks a random id per checkout, so a draft can be updated but never guessed or listed.
 export const validCheckoutId = (id) => typeof id === "string" && /^[a-f0-9]{32}$/.test(id);
@@ -49,8 +47,6 @@ export function cleanCheckout(input, priceOf) {
   };
 }
 
-const isOld = (checkout) => Date.now() - Date.parse(checkout.updatedAt) > RETENTION_MS;
-
 // Firestore store: each draft is a document in "checkouts" named by the browser's random id.
 function firestoreStore(cloud) {
   const { call } = firestore(cloud);
@@ -70,21 +66,19 @@ function firestoreStore(cloud) {
       }
     },
 
-    // The customer sent the order, so the draft is no longer needed.
-    async remove(id) {
-      await call(path(id), { method: "DELETE" });
+    // The customer sent the order; the draft stays as the record of when they started.
+    async markOrdered(id, orderNumber) {
+      await call(`${path(id)}?updateMask.fieldPaths=orderNumber&currentDocument.exists=true`, { method: "PATCH", body: { fields: toFields({ orderNumber }) } })
+        .catch((error) => { if (error.status !== 404) throw error; });
     },
 
-    // Newest first; drafts past the retention time are deleted on the way.
+    // Newest first.
     async list() {
       const rows = await call(":runQuery", {
         method: "POST",
         body: { structuredQuery: { from: [{ collectionId: "checkouts" }], orderBy: [{ field: { fieldPath: "updatedAt" }, direction: "DESCENDING" }], limit: LIST_LIMIT } },
       });
-      const checkouts = rows.filter((row) => row.document).map(({ document }) => ({ ...fromFields(document.fields), id: document.name.split("/").pop() }));
-      const old = checkouts.filter(isOld);
-      await Promise.all(old.map((checkout) => this.remove(checkout.id).catch((error) => console.error(error.message))));
-      return checkouts.filter((checkout) => !isOld(checkout));
+      return rows.filter((row) => row.document).map(({ document }) => ({ ...fromFields(document.fields), id: document.name.split("/").pop() }));
     },
 
     async setHandled(id, handled) {
@@ -102,11 +96,12 @@ function memoryStore() {
       const before = checkouts.get(id);
       checkouts.set(id, { startedAt: now, handled: false, ...before, ...checkout, id, updatedAt: now });
     },
-    async remove(id) {
-      checkouts.delete(id);
+    async markOrdered(id, orderNumber) {
+      const checkout = checkouts.get(id);
+      if (checkout) checkout.orderNumber = orderNumber;
     },
     async list() {
-      return [...checkouts.values()].filter((checkout) => !isOld(checkout)).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, LIST_LIMIT);
+      return [...checkouts.values()].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, LIST_LIMIT);
     },
     async setHandled(id, handled) {
       const checkout = checkouts.get(id);

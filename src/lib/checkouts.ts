@@ -1,5 +1,5 @@
-// Checkouts in progress: the cart form saves a short draft while the customer types, so the store can call back
-// customers who did not finish. Sending the order removes the draft on the server.
+// Checkouts: the cart form saves a short draft while the customer types, so the store can call back
+// customers who did not finish. Sending the order marks the draft with the order number.
 import { adminFetch, type AdminStatus, type OrderLine, type PayWith } from "./orders";
 
 // Only what the store needs to reach the customer and see the cart; the street address and note stay out.
@@ -25,6 +25,8 @@ export interface Checkout {
   total: number;
   lang: string;
   handled: boolean;
+  // Set once the customer sent the order; the record is kept as the order's start.
+  orderNumber?: number;
   startedAt: string;
   updatedAt: string;
 }
