@@ -1,4 +1,5 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { newCheckoutId, reachable, saveDraft, type CheckoutDraft } from "../lib/checkouts";
 import { slotForProduct } from "../lib/designer";
 import { money, whatsappLink } from "../lib/format";
 import { addressLine, paymentConfig, saveOrder, type Address, type NewOrder, type PayWith } from "../lib/orders";
@@ -30,6 +31,8 @@ function CartRow({ line }: { line: CartLine }) {
 }
 
 const EMPTY_ADDRESS: Address = { city: "", street: "", house: "", entrance: "", floor: "", apartment: "", entryCode: "", zip: "" };
+// How long after the last keystroke the checkout draft is saved.
+const DRAFT_DELAY_MS = 2000;
 const EMPTY_DETAILS = { firstName: "", lastName: "", email: "", phone: "", phone2: "", note: "", elevator: "" as NewOrder["elevator"] };
 
 // A labelled form field; required ones carry a visible star and the required attribute.
@@ -46,6 +49,13 @@ export function CartDrawer() {
   const [payWith, setPayWith] = useState<PayWith>("phone");
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState("");
+  const checkoutId = useRef(newCheckoutId());
+  // The draft as it was when an order went out, so the same details are not saved again as a new checkout.
+  const orderedKey = useRef("");
+  const draftTimer = useRef(0);
+  const draftSending = useRef<Promise<void>>(Promise.resolve());
+  // The draft waiting for its timer, sent at once if the cart closes first.
+  const pendingDraft = useRef<CheckoutDraft | null>(null);
   const field = (key: keyof typeof details) => ({ value: details[key], onChange: (event: { target: { value: string } }) => setDetails({ ...details, [key]: event.target.value }) });
   const addressField = (key: keyof Address) => ({ value: address[key], onChange: (event: { target: { value: string } }) => setAddress({ ...address, [key]: event.target.value }) });
 
@@ -88,17 +98,43 @@ export function CartDrawer() {
     return design ? { width: design.width, chaiseLength: design.chaiseLength } : undefined;
   };
 
-  const newOrder = (): NewOrder => ({
-    ...details,
-    address,
-    payWith,
-    lang,
-    lines: cartLines.map(({ product, quantity }) => ({ productId: product.id, name: product.name.he, sku: product.sku, design: designNote(product) ?? "", quantity, price: priceOf(product), size: sizeOf(product) })),
-  });
+  const orderLines = () => cartLines.map(({ product, quantity }) => ({ productId: product.id, name: product.name.he, sku: product.sku, design: designNote(product) ?? "", quantity, price: priceOf(product), size: sizeOf(product) }));
+
+  const newOrder = (): NewOrder => ({ ...details, address, payWith, lang, lines: orderLines(), checkoutId: checkoutId.current });
+
+  // While the customer fills the form, a short draft (name, phone, email, city, cart) is saved,
+  // so the store sees checkouts that were never finished. It waits for a pause in typing.
+  const draft: CheckoutDraft = { firstName: details.firstName, lastName: details.lastName, phone: details.phone, email: details.email, city: address.city, payWith, lang, lines: orderLines() };
+  const draftKey = JSON.stringify(draft);
+  useEffect(() => {
+    pendingDraft.current = null;
+    if (sending || cartLines.length === 0 || draftKey === orderedKey.current || !reachable(draft)) return;
+    pendingDraft.current = draft;
+    draftTimer.current = window.setTimeout(() => {
+      pendingDraft.current = null;
+      draftSending.current = saveDraft(checkoutId.current, draft);
+    }, DRAFT_DELAY_MS);
+    return () => window.clearTimeout(draftTimer.current);
+    // draftKey stands for the draft's contents.
+  }, [draftKey, sending]);
+
+  // Closing the cart sends a draft that was still waiting.
+  useEffect(() => () => {
+    if (pendingDraft.current) saveDraft(checkoutId.current, pendingDraft.current);
+  }, []);
+
+  // Before the order goes out, a pending draft is dropped and one on its way is let through,
+  // so it cannot reach the server after the order and bring the draft back.
+  const settleDraft = async () => {
+    window.clearTimeout(draftTimer.current);
+    pendingDraft.current = null;
+    await draftSending.current;
+  };
 
   // A card order is saved, then the customer moves to UPay's payment page. The card never touches this site.
   const payByCard = async () => {
     setMessage(c.toPaymentNow);
+    await settleDraft();
     const saved = await saveOrder(newOrder());
     if (!saved?.payUrl) {
       setSending(false);
@@ -112,7 +148,13 @@ export function CartDrawer() {
   const orderByPhone = async () => {
     // The tab is opened now, while the click still counts, so browsers do not block it.
     const whatsapp = window.open("", "_blank");
+    await settleDraft();
     const saved = await saveOrder(newOrder());
+    // Changes after this order belong to a new checkout.
+    if (saved) {
+      checkoutId.current = newCheckoutId();
+      orderedKey.current = draftKey;
+    }
     setSending(false);
     setMessage(saved ? t.orderSaved(saved.number) : "");
     const link = whatsappLink(orderMessage(saved?.number ?? null));

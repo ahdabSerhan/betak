@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { STORE } from "../data/store";
 import { money } from "../lib/format";
+import { listCheckouts, markHandled, type Checkout } from "../lib/checkouts";
 import { listMessages, markMessageRead, type Message } from "../lib/messages";
 import { addressLine, adminConfig, listOrders, markRead, type AdminStatus, type Order } from "../lib/orders";
 import type { Text } from "../i18n/text";
@@ -202,6 +203,127 @@ function MessagesPanel({ status, messages, onRead, onRefresh }: { status: string
   );
 }
 
+// A checkout with no change for this long counts as left; until then the customer may still be filling it in.
+const LEFT_AFTER_MS = 30 * 60_000;
+
+// One checkout that did not become a paid or sent order: a form draft, or a card order that was never paid.
+interface Unfinished {
+  key: string;
+  stage: "filling" | "left-form" | "left-payment" | "payment-failed";
+  time: string;
+  name: string;
+  phone: string;
+  email: string;
+  city: string;
+  lines: { name: string; sku: string; design: string; quantity: number }[];
+  total: number;
+  handled: boolean;
+  number?: number;
+  draft?: Checkout;
+  order?: Order;
+}
+
+const isRecent = (time: string) => Date.now() - Date.parse(time) < LEFT_AFTER_MS;
+
+// Form drafts and unpaid card orders in one list, newest first.
+function unfinishedOf(checkouts: Checkout[], orders: Order[]): Unfinished[] {
+  const drafts = checkouts.map((draft): Unfinished => ({
+    key: `d${draft.id}`, stage: isRecent(draft.updatedAt) ? "filling" : "left-form", time: draft.updatedAt,
+    name: draft.name, phone: draft.phone, email: draft.email, city: draft.city, lines: draft.lines, total: draft.total, handled: draft.handled, draft,
+  }));
+  const unpaid = orders
+    .filter((order) => order.payment?.status === "failed" || (order.payment?.status === "pending" && !isRecent(order.createdAt)))
+    .map((order): Unfinished => ({
+      key: `o${order.id}`, stage: order.payment?.status === "failed" ? "payment-failed" : "left-payment", time: order.createdAt,
+      name: order.name, phone: order.phone, email: order.email, city: order.address?.city ?? "", lines: order.lines, total: order.total, handled: order.read, number: order.number, order,
+    }));
+  return [...drafts, ...unpaid].sort((a, b) => b.time.localeCompare(a.time));
+}
+
+function UnfinishedRow({ item, onHandled }: { item: Unfinished; onHandled: (item: Unfinished, handled: boolean) => void }) {
+  const { t, lang } = useShop();
+  const a = t.admin;
+  const when = (time: string) => new Date(time).toLocaleString(lang === "he" ? "he-IL" : "en-GB", { dateStyle: "short", timeStyle: "short" });
+  return (
+    <tr className={item.handled ? "" : "unread"}>
+      <td><input type="checkbox" checked={item.handled} onChange={(event) => onHandled(item, event.target.checked)} aria-label={a.markHandled(item.name || item.phone || item.email)} /></td>
+      <td>
+        <div className={`checkout-stage ${item.stage}`}><b>{a.stages[item.stage]}</b></div>
+        {item.number && <small className="muted">{a.number} {item.number}</small>}
+        {item.draft && <small className="muted">{a.chosePay[item.draft.payWith]}</small>}
+      </td>
+      <td>
+        {when(item.time)}
+        {item.draft && item.draft.startedAt !== item.draft.updatedAt && <small className="muted stage-start">{a.started} {when(item.draft.startedAt)}</small>}
+      </td>
+      <th scope="row">{item.name || a.noName}{item.city && <small className="muted stage-start">{item.city}</small>}</th>
+      <td>
+        <div className="contact-links">
+          {item.phone && <a href={`https://wa.me/${whatsappNumber(item.phone)}`} target="_blank" rel="noopener">{a.whatsapp}</a>}
+          {item.phone && <a href={`tel:${digits(item.phone)}`} dir="ltr">{item.phone}</a>}
+          {item.email && <a href={`mailto:${item.email}`} dir="ltr">{item.email}</a>}
+        </div>
+      </td>
+      <td>
+        <ul className="order-lines">
+          {item.lines.map((line, index) => (
+            <li key={index}>{line.name}{line.sku && ` (${line.sku})`} ×{line.quantity}{line.design && <small className="muted"> {line.design}</small>}</li>
+          ))}
+        </ul>
+      </td>
+      <td><span className="price">{money(item.total)}</span></td>
+    </tr>
+  );
+}
+
+// Customers who started an order and did not finish: who they are, what was in the cart, and where they stopped.
+function UnfinishedPanel({ status, items, onHandled, onRefresh }: { status: string; items: Unfinished[]; onHandled: (item: Unfinished, handled: boolean) => void; onRefresh: () => void }) {
+  const a = useShop().t.admin;
+  const [openOnly, setOpenOnly] = useState(true);
+  const [search, setSearch] = useState("");
+
+  const shown = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const queryDigits = digits(query);
+    const matches = (item: Unfinished) => !query
+      || item.name.toLowerCase().includes(query)
+      || item.email.toLowerCase().includes(query)
+      || item.lines.some((line) => line.name.toLowerCase().includes(query))
+      || (queryDigits !== "" && digits(item.phone).includes(queryDigits));
+    return items.filter((item) => (!openOnly || !item.handled) && matches(item));
+  }, [items, openOnly, search]);
+
+  return (
+    <>
+      <p className="admin-intro muted">{a.unfinishedIntro}</p>
+      <div className="admin-tools">
+        <label className="admin-search">
+          <span className="sr-only">{a.searchUnfinished}</span>
+          <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={a.searchUnfinished} />
+        </label>
+        <label className="admin-check"><input type="checkbox" checked={openOnly} onChange={(event) => setOpenOnly(event.target.checked)} /> {a.openOnly}</label>
+        <button className="btn ghost small" onClick={onRefresh}>{a.refresh}</button>
+      </div>
+      <p role="status" className="muted">
+        {status === "loading" ? a.unfinishedLoading : status === "not-allowed" ? a.notAllowed : status === "error" ? a.error : a.unfinishedCount(shown.length, items.filter((item) => !item.handled).length)}
+      </p>
+      {status === "ok" && shown.length === 0 && <p className="empty">{a.unfinishedEmpty}</p>}
+      {shown.length > 0 && (
+        <div className="table-scroll" tabIndex={0} role="region" aria-label={a.tabUnfinished}>
+          <table className="orders-table">
+            <thead>
+              <tr><th scope="col">{a.handled}</th><th scope="col">{a.stage}</th><th scope="col">{a.lastActivity}</th><th scope="col">{a.customer}</th><th scope="col">{a.contact}</th><th scope="col">{a.items}</th><th scope="col">{a.total}</th></tr>
+            </thead>
+            <tbody>
+              {shown.map((item) => <UnfinishedRow item={item} onHandled={onHandled} key={item.key} />)}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
+}
+
 // The store's private orders page, at /admin/orders. Only the Google accounts in ADMIN_EMAILS see orders.
 export function AdminOrders() {
   const { t } = useShop();
@@ -211,7 +333,9 @@ export function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [search, setSearch] = useState("");
-  const [view, setView] = useState<"orders" | "messages">("orders");
+  const [view, setView] = useState<"orders" | "unfinished" | "messages">("orders");
+  const [checkouts, setCheckouts] = useState<Checkout[]>([]);
+  const [checkoutsStatus, setCheckoutsStatus] = useState<AdminStatus | "loading">("loading");
   const [messages, setMessages] = useState<Message[]>([]);
   const [messagesStatus, setMessagesStatus] = useState<AdminStatus | "loading">("loading");
   const buttonRef = useRef<HTMLDivElement>(null);
@@ -255,7 +379,16 @@ export function AdminOrders() {
     setMessages(result.messages);
   }, [token]);
 
+  const loadCheckouts = useCallback(async () => {
+    if (!token) return;
+    setCheckoutsStatus("loading");
+    const result = await listCheckouts(token);
+    setCheckoutsStatus(result.status);
+    setCheckouts(result.checkouts);
+  }, [token]);
+
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { loadCheckouts(); }, [loadCheckouts]);
   useEffect(() => { loadMessages(); }, [loadMessages]);
 
   const onMessageRead = async (message: Message, read: boolean) => {
@@ -264,6 +397,20 @@ export function AdminOrders() {
   };
 
   const unreadMessages = messages.filter((message) => !message.read).length;
+
+  // Unpaid card orders come from the orders list, so the tab waits for both lists.
+  const unfinished = useMemo(() => unfinishedOf(checkouts, orders), [checkouts, orders]);
+  const unfinishedStatus = checkoutsStatus === "ok" ? status : checkoutsStatus;
+  const openUnfinished = unfinished.filter((item) => !item.handled).length;
+
+  // "Handled" on an unpaid card order is the order's own read mark.
+  const onHandled = async (item: Unfinished, handled: boolean) => {
+    if (item.order) return onRead(item.order, handled);
+    if (!item.draft) return;
+    const id = item.draft.id;
+    setCheckouts((current) => current.map((draft) => (draft.id === id ? { ...draft, handled } : draft)));
+    if (!(await markHandled(token, id, handled))) loadCheckouts();
+  };
 
   const onRead = async (order: Order, read: boolean) => {
     setOrders((current) => current.map((item) => (item.id === order.id ? { ...item, read } : item)));
@@ -275,6 +422,7 @@ export function AdminOrders() {
     signIn("");
     setOrders([]);
     setMessages([]);
+    setCheckouts([]);
   };
 
   const shown = useMemo(() => {
@@ -307,11 +455,16 @@ export function AdminOrders() {
       {token && (
         <div className="admin-tabs">
           <button type="button" aria-pressed={view === "orders"} onClick={() => setView("orders")}>{a.tabOrders}</button>
+          <button type="button" aria-pressed={view === "unfinished"} onClick={() => setView("unfinished")}>
+            {a.tabUnfinished}{openUnfinished > 0 && <span className="tab-count">{openUnfinished}</span>}
+          </button>
           <button type="button" aria-pressed={view === "messages"} onClick={() => setView("messages")}>
             {a.tabMessages}{unreadMessages > 0 && <span className="tab-count">{unreadMessages}</span>}
           </button>
         </div>
       )}
+
+      {token && view === "unfinished" && <UnfinishedPanel status={unfinishedStatus} items={unfinished} onHandled={onHandled} onRefresh={() => { load(); loadCheckouts(); }} />}
 
       {token && view === "messages" && <MessagesPanel status={messagesStatus} messages={messages} onRead={onMessageRead} onRefresh={loadMessages} />}
 

@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { adminConfig, checkAdmin } from "./admin-auth.mjs";
 import { cleanOrder, createOrderStore, linePrice } from "./orders.mjs";
 import { cleanMessage, createMessageStore } from "./messages.mjs";
+import { cleanCheckout, createCheckoutStore, validCheckoutId } from "./checkouts.mjs";
 import { alertsEnabled, messageAlert, sendAlert } from "./mail.mjs";
 import { newPayment, paymentConfig, paymentsEnabled, paymentUrl, readReport } from "./upay.mjs";
 
@@ -74,6 +75,7 @@ let cachedProject = process.env.GOOGLE_CLOUD_PROJECT ?? "";
 const projectId = async () => (cachedProject ||= await metadata("project/project-id"));
 const orders = createOrderStore({ getToken: accessToken, getProject: projectId });
 const messages = createMessageStore({ getToken: accessToken, getProject: projectId });
+const checkouts = createCheckoutStore({ getToken: accessToken, getProject: projectId });
 
 // A check that says when one visitor sent more than perHour forms in the last hour; more is a script filling the form.
 function hourlyLimit(perHour) {
@@ -90,6 +92,8 @@ function hourlyLimit(perHour) {
 
 const tooManyOrders = hourlyLimit(10);
 const tooManyMessages = hourlyLimit(5);
+// A draft is saved a couple of seconds after the customer stops typing, so a real checkout sends a few dozen at most.
+const tooManyDrafts = hourlyLimit(120);
 
 // Catalog prices by product id, written by the build, so an order's total never trusts the browser.
 const PRICES = existsSync(join(SITE_ROOT, "prices.json")) ? JSON.parse(readFileSync(join(SITE_ROOT, "prices.json"), "utf8")) : {};
@@ -109,11 +113,14 @@ function siteUrl(request) {
 async function handleNewOrder(request, response) {
   try {
     if (tooManyOrders(request)) return sendJson(response, 429, { error: "Too many orders" });
-    const { order, error } = cleanOrder(await readJson(request), priceOf);
+    const input = await readJson(request);
+    const { order, error } = cleanOrder(input, priceOf);
     if (error) return sendJson(response, 400, { error });
     if (order.payWith === "card" && !paymentsEnabled()) return sendJson(response, 409, { error: "payments-off" });
     if (order.payWith === "card") order.payment = newPayment();
     const saved = await orders.add(order);
+    // The checkout became an order, so its draft is dropped; the order is saved either way.
+    if (validCheckoutId(input?.checkoutId)) await checkouts.remove(input.checkoutId).catch((error) => console.error("Draft not removed:", error.message));
     if (saved.payment) return sendJson(response, 201, { number: saved.number, payUrl: paymentUrl(saved, siteUrl(request)) });
     sendJson(response, 201, { number: saved.number });
   } catch (error) {
@@ -144,6 +151,21 @@ async function handleNewMessage(request, response) {
   }
 }
 
+// The cart form saves a draft of a checkout in progress, so the store can see checkouts that were never finished.
+async function handleCheckoutDraft(request, response, id) {
+  try {
+    if (tooManyDrafts(request)) return sendJson(response, 429, { error: "Too many drafts" });
+    const checkout = cleanCheckout(await readJson(request), priceOf);
+    // Without a phone or email there is nobody to call back, so nothing is kept.
+    if (checkout) await checkouts.save(id, checkout);
+    sendJson(response, 200, { ok: true });
+  } catch (error) {
+    // Drafts are only a help for the store; the customer never sees this fail.
+    console.error(error);
+    sendJson(response, 502, { error: "Drafts are unavailable right now." });
+  }
+}
+
 // UPay reports a payment to the address the order gave it; the token in that address must match the order's.
 async function handlePaymentReport(request, response, url) {
   try {
@@ -171,7 +193,7 @@ async function handlePaymentReport(request, response, url) {
 // The payment token is only for UPay's report, so the orders page never sees it.
 const withoutToken = (order) => (order.payment ? { ...order, payment: { ...order.payment, token: undefined } } : order);
 
-// The store's own admin page: list the orders and contact messages, mark one read or unread.
+// The store's own admin page: list the orders, unfinished checkouts and contact messages, and mark them.
 async function handleAdmin(request, response, pathname) {
   if (pathname === "/api/admin/config") return sendJson(response, 200, adminConfig());
   const access = await checkAdmin(request);
@@ -187,6 +209,12 @@ async function handleAdmin(request, response, pathname) {
     const messageMatch = pathname.match(/^\/api\/admin\/messages\/([A-Za-z0-9]+)$/);
     if (messageMatch && request.method === "PATCH") {
       await messages.setRead(messageMatch[1], Boolean((await readJson(request)).read));
+      return sendJson(response, 200, { ok: true });
+    }
+    if (pathname === "/api/admin/checkouts" && request.method === "GET") return sendJson(response, 200, { checkouts: await checkouts.list() });
+    const checkoutMatch = pathname.match(/^\/api\/admin\/checkouts\/([a-f0-9]{32})$/);
+    if (checkoutMatch && request.method === "PATCH") {
+      await checkouts.setHandled(checkoutMatch[1], Boolean((await readJson(request)).handled));
       return sendJson(response, 200, { ok: true });
     }
     sendJson(response, 404, { error: "Not found" });
@@ -285,6 +313,8 @@ createServer((request, response) => {
   if (pathname === "/api/designer") return request.method === "POST" ? handleDesigner(request, response) : sendJson(response, 405, { error: "Use POST" });
   if (pathname === "/api/orders") return request.method === "POST" ? handleNewOrder(request, response) : sendJson(response, 405, { error: "Use POST" });
   if (pathname === "/api/messages") return request.method === "POST" ? handleNewMessage(request, response) : sendJson(response, 405, { error: "Use POST" });
+  const draft = pathname.match(/^\/api\/checkouts\/([a-f0-9]{32})$/);
+  if (draft) return request.method === "PUT" ? handleCheckoutDraft(request, response, draft[1]) : sendJson(response, 405, { error: "Use PUT" });
   if (pathname.startsWith("/api/admin/")) return handleAdmin(request, response, pathname);
   if (pathname === "/api/payments/config") return sendJson(response, 200, paymentConfig());
   if (pathname === "/api/upay/ipn") return handlePaymentReport(request, response, url);

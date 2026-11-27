@@ -36,6 +36,8 @@ export interface NewOrder {
   note: string;
   lang: string;
   lines: OrderLine[];
+  // The draft this checkout saved while the customer typed; the server removes it once the order is in.
+  checkoutId?: string;
 }
 
 // What UPay reported about a card payment; orders from before card payments have none.
@@ -50,7 +52,7 @@ export interface Payment {
 }
 
 // Older orders have only a name, phone, email and note, so the newer fields are optional.
-export interface Order extends Omit<NewOrder, "firstName" | "lastName" | "phone2" | "address" | "elevator" | "payWith"> {
+export interface Order extends Omit<NewOrder, "firstName" | "lastName" | "phone2" | "address" | "elevator" | "payWith" | "checkoutId"> {
   id: string;
   number: number;
   name: string;

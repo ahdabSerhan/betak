@@ -84,7 +84,7 @@ export const TEXT = {
       privacy: "הפרטים נשמרים אצלנו רק כדי לחזור אליכם. פרטים נוספים ב", otherWays: "או דברו איתנו ישירות",
     },
     paid: { title: "תודה על ההזמנה!", text: (number: string) => `ההזמנה מספר ${number} התקבלה.`, more: "כשהתשלום מושלם, UPay שולחים לכם אישור. נחזור אליכם לתיאום המשלוח.", home: "חזרה לדף הבית" },
-    orderSaved: (number: number) => `ההזמנה נרשמה, מספר ${number}. ממשיכים איתכם בוואטסאפ.`, orderPrivacy: "הפרטים נשמרים אצלנו רק לטיפול בהזמנה. פרטים נוספים ב",
+    orderSaved: (number: number) => `ההזמנה נרשמה, מספר ${number}. ממשיכים איתכם בוואטסאפ.`, orderPrivacy: "הפרטים נשמרים אצלנו כבר בזמן המילוי, רק לטיפול בהזמנה. פרטים נוספים ב",
     admin: {
       title: "ניהול הזמנות", signIn: "התחברו עם חשבון Google של העסק כדי לראות את ההזמנות.", signOut: "יציאה", notAllowed: "החשבון הזה לא מורשה לראות הזמנות.", notReady: "דף ההזמנות עדיין לא הוגדר בשרת.",
       loading: "טוען הזמנות...", error: "לא הצלחנו לטעון את ההזמנות. נסו שוב.", empty: "אין הזמנות להצגה.", unreadOnly: "רק הזמנות שלא נקראו", search: "חיפוש לפי שם, טלפון או מספר הזמנה", export: "ייצוא לאקסל", refresh: "רענון",
@@ -94,6 +94,12 @@ export const TEXT = {
       payCheck: "לפני משלוח, ודאו את התשלום במערכת של UPay.", test: "מצב בדיקה",
       tabOrders: "הזמנות", tabMessages: "פניות מהאתר", messagesTitle: "פניות מטופס צור קשר", messagesLoading: "טוען פניות...", messagesEmpty: "אין פניות להצגה.", unreadMessagesOnly: "רק פניות שלא נקראו",
       messagesCount: (shown: number, unread: number) => `${shown} פניות, ${unread} לא נקראו`, message: "הודעה", markMessageRead: (name: string) => `סימון הפנייה של ${name} כנקראה`, searchMessages: "חיפוש לפי שם, טלפון או מילה בהודעה",
+      tabUnfinished: "הזמנות שלא הושלמו", unfinishedIntro: "לקוחות שהתחילו הזמנה ולא סיימו: מילאו טלפון או מייל בטופס ההזמנה ולא שלחו, או עברו לתשלום באשראי ולא שילמו. נשמרים רק שם, טלפון, מייל, עיר ותוכן העגלה, ונמחקים אחרי 30 יום.",
+      unfinishedLoading: "טוען הזמנות שלא הושלמו...", unfinishedEmpty: "אין הזמנות שלא הושלמו להצגה.", unfinishedCount: (shown: number, open: number) => `${shown} מוצגות, ${open} עוד לא טופלו`,
+      searchUnfinished: "חיפוש לפי שם, טלפון, מייל או מוצר", openOnly: "רק כאלה שעוד לא טופלו", handled: "טופל", markHandled: (name: string) => `סימון ההזמנה של ${name} כמטופלת`,
+      stage: "איפה עצר", lastActivity: "פעילות אחרונה", started: "התחיל:", noName: "בלי שם",
+      stages: { filling: "ממלא את הטופס עכשיו", "left-form": "עצר בטופס ההזמנה", "left-payment": "עבר לתשלום ולא שילם", "payment-failed": "התשלום באשראי נכשל" },
+      chosePay: { card: "בחר תשלום באשראי", phone: "בחר הזמנה טלפונית" },
     },
   },
   en: {
@@ -180,7 +186,7 @@ export const TEXT = {
       privacy: "We keep these details only to get back to you. More in our ", otherWays: "Or talk to us directly",
     },
     paid: { title: "Thank you for your order!", text: (number: string) => `Order number ${number} is in.`, more: "Once the payment is complete, UPay sends you a confirmation. We will get back to you to arrange delivery.", home: "Back to the home page" },
-    orderSaved: (number: number) => `Your order is in, number ${number}. We continue on WhatsApp.`, orderPrivacy: "We keep these details only to handle your order. More in our ",
+    orderSaved: (number: number) => `Your order is in, number ${number}. We continue on WhatsApp.`, orderPrivacy: "We keep these details, from the moment you type them, only to handle your order. More in our ",
     admin: {
       title: "Orders", signIn: "Sign in with the store's Google account to see the orders.", signOut: "Sign out", notAllowed: "This account may not see orders.", notReady: "The orders page is not set up on the server yet.",
       loading: "Loading orders...", error: "The orders could not be loaded. Try again.", empty: "No orders to show.", unreadOnly: "Unread orders only", search: "Search by name, phone or order number", export: "Export to Excel", refresh: "Refresh",
@@ -190,6 +196,12 @@ export const TEXT = {
       payCheck: "Before shipping, confirm the payment in UPay's system.", test: "Test mode",
       tabOrders: "Orders", tabMessages: "Site messages", messagesTitle: "Contact form messages", messagesLoading: "Loading messages...", messagesEmpty: "No messages to show.", unreadMessagesOnly: "Unread messages only",
       messagesCount: (shown: number, unread: number) => `${shown} messages, ${unread} unread`, message: "Message", markMessageRead: (name: string) => `Mark the message from ${name} as read`, searchMessages: "Search by name, phone or a word in the message",
+      tabUnfinished: "Unfinished orders", unfinishedIntro: "Customers who started an order and did not finish: they typed a phone or email in the order form and never sent it, or went to card payment and did not pay. Only the name, phone, email, city and cart are kept, and they are deleted after 30 days.",
+      unfinishedLoading: "Loading unfinished orders...", unfinishedEmpty: "No unfinished orders to show.", unfinishedCount: (shown: number, open: number) => `${shown} shown, ${open} not handled yet`,
+      searchUnfinished: "Search by name, phone, email or product", openOnly: "Not handled yet only", handled: "Handled", markHandled: (name: string) => `Mark the order of ${name} as handled`,
+      stage: "Where they stopped", lastActivity: "Last activity", started: "Started:", noName: "No name",
+      stages: { filling: "Filling in the form now", "left-form": "Stopped at the order form", "left-payment": "Went to payment, did not pay", "payment-failed": "Card payment failed" },
+      chosePay: { card: "Chose card payment", phone: "Chose phone order" },
     },
   },
 };

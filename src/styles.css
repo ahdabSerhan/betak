@@ -954,3 +954,9 @@ html.a11y-grayscale { filter: grayscale(1); }
 .pay-state.reported b { color: var(--whatsapp); }
 .pay-state.failed b, .pay-state.amount-mismatch b { color: #a3221b; }
 .paid-page { padding-block: 48px 64px; max-width: 640px; }
+/* Unfinished orders tab */
+.admin-intro { max-width: 80ch; margin-block: 16px 0; }
+.checkout-stage { min-width: 150px; }
+.checkout-stage.filling b { color: var(--whatsapp); }
+.checkout-stage.payment-failed b { color: #a3221b; }
+.orders-table small.stage-start, .orders-table td > small { display: block; font-weight: 400; }
