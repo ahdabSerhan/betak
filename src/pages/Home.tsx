@@ -8,7 +8,6 @@ import { Reveal } from "../components/Reveal";
 import AnimatedContent from "../components/bits/AnimatedContent";
 import Magnet from "../components/bits/Magnet";
 import SplitText from "../components/bits/SplitText";
-import { GoogleReviews } from "../components/GoogleReviews";
 import { PRODUCTS } from "../data/catalog";
 import { useShop } from "../state/ShopContext";
 import { asset } from "../lib/asset";
@@ -71,13 +70,6 @@ export function Home() {
         <AnimatedContent className="carousel" direction={phone ? "vertical" : "horizontal"} reverse={!phone} distance={phone ? 16 : 60} duration={phone ? 0.45 : 0.8} stagger={phone ? 0.04 : 0.08}>
           {FEATURED.map((product) => <ProductCard product={product} key={product.id} />)}
         </AnimatedContent>
-      </section>
-
-      <section className="block flush-top">
-        <div className="wrap section-head">
-          <h2>{t.reviewsTitle}</h2>
-        </div>
-        <div className="wrap"><GoogleReviews /></div>
       </section>
 
       <section className="block wrap flush-top">
