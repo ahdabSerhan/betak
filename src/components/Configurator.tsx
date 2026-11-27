@@ -136,6 +136,8 @@ export function Configurator({ product, design, rules, onChange, onReset }: Conf
       <div className="config-cards">
         {FIRMNESS.map((firmness) => (
           <button aria-pressed={design.firmness === firmness} onClick={() => change({ firmness })} key={firmness}>
+            {/* The store recommends medium foam for most customers. */}
+            {firmness === "medium" && <span className="config-rec">{t.firmnessRecommended}</span>}
             <b>{t.firmness[firmness]}</b>
             <small>{t.firmnessFeel[firmness]}</small>
           </button>
