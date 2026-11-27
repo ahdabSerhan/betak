@@ -6,8 +6,9 @@ import { CATEGORIES, isOnSale, PRODUCTS, productsIn, type Product } from "../dat
 import { detailsOf, POLICIES } from "../data/details";
 import { modelOf } from "../data/models";
 import { GOOGLE_REVIEWS_URL } from "../data/reviewLinks";
-import { fabricText, rulesFor, type Design, type DesignRules } from "../lib/custom";
-import { money, whatsappLink } from "../lib/format";
+import { fabricText, isSofaBed, rulesFor, type Design, type DesignRules } from "../lib/custom";
+import { money, phoneLink, whatsappLink } from "../lib/format";
+import { STORE } from "../data/store";
 import { useShop } from "../state/ShopContext";
 import { href } from "../lib/routes";
 
@@ -209,6 +210,13 @@ export function ProductPage({ product }: { product: Product }) {
 
           {rules && design && (
             <Configurator product={product} design={design} rules={rules} onChange={changeDesign} onReset={() => { setDesign(product.id, null); setView("photos"); }} key={product.id} />
+          )}
+
+          {/* Sofa beds have no designer: changes are agreed with the store. */}
+          {isSofaBed(product) && (
+            <p className="custom-contact">
+              {t.sofaBedChanges} <a href={whatsappLink(question)} target="_blank" rel="noopener">{t.sofaBedWhatsapp}</a> {t.sofaBedOr} <a href={phoneLink} dir="ltr">{STORE.phone}</a>
+            </p>
           )}
 
           {buyRow}

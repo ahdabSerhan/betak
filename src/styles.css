@@ -710,6 +710,9 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 .design-fabric span { margin-inline-start: auto; font-size: 14px; }
 
 .config { border: 1px solid var(--rule); background: #fff; font-family: var(--body); color: #1f1f1f; }
+/* The note on sofa beds that replaces the designer. */
+.custom-contact { border: 1px solid var(--rule); background: var(--pale); padding: 14px 16px; margin: 0; }
+.custom-contact a { text-decoration: underline; }
 .config-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 14px 20px; background: var(--pale); border-bottom: 1px solid var(--rule); font-weight: 600; }
 .config-section { border-bottom: 1px solid var(--rule); }
 .config-toggle { display: flex; align-items: center; gap: 18px; width: 100%; padding: 20px; border: 0; background: none; font: inherit; font-size: 17px; text-align: start; color: inherit; cursor: pointer; }
