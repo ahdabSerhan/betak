@@ -1,3 +1,4 @@
+import type { OrderSize } from "../state/ShopContext";
 // Orders: the cart sends one to the server, and the store's orders page reads them back.
 
 export interface OrderLine {
@@ -7,8 +8,8 @@ export interface OrderLine {
   design: string;
   quantity: number;
   price: number;
-  // The chosen sofa sizes in cm, so the server can add the size extra itself.
-  size?: { width: number; chaiseLength: number };
+  // The chosen sofa sizes in cm (or a mattress size), so the server can add the size extra itself.
+  size?: OrderSize;
 }
 
 export interface Address {

@@ -4,7 +4,6 @@ import { slotForProduct } from "../lib/designer";
 import { money, whatsappLink } from "../lib/format";
 import { addressLine, paymentConfig, saveOrder, type Address, type NewOrder, type PayWith } from "../lib/orders";
 import { href } from "../lib/routes";
-import type { Product } from "../data/catalog";
 import { useShop, type CartLine } from "../state/ShopContext";
 
 function CartRow({ line }: { line: CartLine }) {
@@ -41,7 +40,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
 }
 
 export function CartDrawer() {
-  const { t, lang, nameOf, cartLines, cartTotal, closeCart, clearCart, showInRoom, designNote, designOf, priceOf } = useShop();
+  const { t, lang, nameOf, cartLines, cartTotal, closeCart, clearCart, showInRoom, designNote, sizeOf, priceOf } = useShop();
   const c = t.checkout;
   const [details, setDetails] = useState(EMPTY_DETAILS);
   const [address, setAddress] = useState(EMPTY_ADDRESS);
@@ -93,11 +92,6 @@ export function CartDrawer() {
   ].join("\n");
 
   // The sofa sizes the server prices the line by (none for a product sold as it is).
-  const sizeOf = (product: Product) => {
-    const design = designOf(product);
-    return design ? { width: design.width, chaiseLength: design.chaiseLength } : undefined;
-  };
-
   const orderLines = () => cartLines.map(({ product, quantity }) => ({ productId: product.id, name: product.name.he, sku: product.sku, design: designNote(product) ?? "", quantity, price: priceOf(product), size: sizeOf(product) }));
 
   const newOrder = (): NewOrder => ({ ...details, address, payWith, lang, lines: orderLines(), checkoutId: checkoutId.current });

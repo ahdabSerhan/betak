@@ -84,6 +84,9 @@ section.block { padding-block: 44px; }
 .chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .chip { border: 1px solid var(--line); background: var(--surface); padding: 6px 14px; border-radius: 20px; font-size: 14px; }
 .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+/* Mattress size choice on the product page. */
+.mattress-sizes { border: 0; padding: 0; margin: 0; display: grid; gap: 10px; }
+.mattress-sizes legend { font-weight: 600; padding: 0; margin-block-end: 10px; }
 select { font: inherit; padding: 7px 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 2px; }
 .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px 18px; padding-block: 24px; }
 .card { position: relative; display: flex; flex-direction: column; gap: 8px; }

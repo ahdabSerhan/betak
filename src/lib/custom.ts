@@ -78,6 +78,19 @@ function sofaWidth(listed: number | null): Range {
   return { min: listed - below, max: listed + above, step: SOFA_WIDTH.step };
 }
 
+// Mattress sizes (width x length, cm) and what each adds to the listed price, as betak.co.il lists them.
+export const MATTRESS_SIZES = [
+  { size: "140x190", extra: 0 },
+  { size: "160x190", extra: 349 },
+  { size: "160x200", extra: 499 },
+  { size: "180x200", extra: 650 },
+];
+export const isMattress = (product: Product) => product.type === "mattress";
+// A saved size that is no longer offered falls back to the listed one.
+export const mattressSize = (saved?: string) => MATTRESS_SIZES.find((option) => option.size === saved) ?? MATTRESS_SIZES[0];
+// "160x200" as people read it: "160 × 200".
+export const sizeLabel = (size: string) => size.replace("x", " × ");
+
 // What can be changed on this product, or null when it is sold as it is (tables, rugs, mattresses).
 export function rulesFor(product: Product): DesignRules | null {
   const { type } = product;
@@ -119,7 +132,8 @@ export function sizeExtra(rules: DesignRules, design: Design): number {
 }
 
 // Each size the visitor can pick and what it adds, for the server to price orders with, e.g. { width: { "310": 100 } }.
-export function sizeExtraTable(product: Product): Record<string, Record<number, number>> | null {
+export function sizeExtraTable(product: Product): Record<string, Record<string, number>> | null {
+  if (isMattress(product)) return { mattress: Object.fromEntries(MATTRESS_SIZES.map((option) => [option.size, option.extra])) };
   const rules = rulesFor(product);
   if (!rules) return null;
   const ranges: Record<string, Range | null> = { width: rules.width, chaiseLength: rules.chaise };
