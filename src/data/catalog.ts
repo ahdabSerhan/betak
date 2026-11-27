@@ -25,13 +25,14 @@ export interface Product {
 
 export const CATEGORIES: Category[] = [
   { id: "sofas", he: "ספות", en: "Sofas", h1: { he: "ספות לסלון", en: "Living room sofas" } },
-  { id: "sofa-beds", he: "ספות נפתחות למיטה", en: "Sofa beds", h1: { he: "ספות נפתחות למיטה", en: "Sofa beds" } },
   { id: "sideboards", he: "מזנונים ושולחנות סלון", en: "Sideboards & coffee tables", h1: { he: "מזנונים ושולחנות סלון", en: "Sideboards and coffee tables" } },
   { id: "armchairs", he: "כורסאות", en: "Armchairs", h1: { he: "כורסאות", en: "Armchairs" } },
   { id: "dining", he: "פינות אוכל וכיסאות", en: "Dining sets & chairs", h1: { he: "פינות אוכל וכיסאות", en: "Dining sets and chairs" } },
   { id: "beds", he: "מיטות והדומים", en: "Beds & ottomans", h1: { he: "מיטות והדומים", en: "Beds and ottomans" } },
   { id: "mattresses", he: "מזרונים", en: "Mattresses", h1: { he: "מזרונים", en: "Mattresses" } },
   { id: "rugs", he: "שטיחים לסלון", en: "Living room rugs", h1: { he: "שטיחים לסלון", en: "Living room rugs" } },
+  // Sofa beds come last in the menus.
+  { id: "sofa-beds", he: "ספות נפתחות למיטה", en: "Sofa beds", h1: { he: "ספות נפתחות למיטה", en: "Sofa beds" } },
 ];
 
 // Product type: Hebrew prefix and English suffix of the product name.
