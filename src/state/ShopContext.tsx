@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { productById, type Product } from "../data/catalog";
 import { navigate } from "../hooks/useRoute";
 import { usePersistentState } from "../hooks/usePersistentState";
-import { describeDesign, rulesFor, savedDesign, sizeExtra, type Design } from "../lib/custom";
+import { describeDesign, isMattress, mattressSize, rulesFor, savedDesign, sizeExtra, sizeLabel, type Design } from "../lib/custom";
 import type { Piece } from "../lib/designer";
 import type { RoomDimensions } from "../lib/measure";
 import { askEsentrix, esentrixEnabled, loadEsentrixWidget } from "../lib/esentrix";
@@ -46,6 +46,11 @@ interface Shop {
   designNote: (product: Product) => string | null;
   // The full design (with standard choices filled in), or null for a product sold as it is.
   designOf: (product: Product) => Design | null;
+  // A mattress's chosen size ("160x200"); the listed size until the visitor picks another.
+  mattressOf: (product: Product) => string;
+  setMattress: (productId: number, size: string) => void;
+  // The chosen sizes the server prices an order line with.
+  sizeOf: (product: Product) => OrderSize | undefined;
   // What the chosen size adds to the listed price, and the price with it.
   extraOf: (product: Product) => number;
   priceOf: (product: Product) => number;
@@ -58,6 +63,8 @@ interface Shop {
   showInRoom: (pieces: Piece[]) => void;
 }
 
+export type OrderSize = { width: number; chaiseLength: number } | { mattress: string };
+
 const ShopContext = createContext<Shop | null>(null);
 
 export function ShopProvider({ children }: { children: ReactNode }) {
@@ -65,6 +72,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = usePersistentState<Record<number, number>>("betak.cart", {});
   const [saved, setSaved] = usePersistentState<number[]>("betak.saved", []);
   const [designs, setDesigns] = usePersistentState<Record<number, Design>>("betak.designs", {});
+  const [mattresses, setMattresses] = usePersistentState<Record<number, string>>("betak.mattresses", {});
   const [cartOpen, setCartOpen] = useState(false);
   const [agentOpen, setAgentOpen] = useState(false);
   const [agentPrompt, setAgentPrompt] = useState<string | null>(null);
@@ -100,7 +108,9 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       const rules = rulesFor(product);
       return rules && savedDesign(product, rules, designs[product.id]);
     };
+    const mattressOf = (product: Product) => mattressSize(mattresses[product.id]).size;
     const extraOf = (product: Product) => {
+      if (isMattress(product)) return mattressSize(mattresses[product.id]).extra;
       const rules = rulesFor(product);
       const design = designOf(product);
       return rules && design ? sizeExtra(rules, design) : 0;
@@ -140,11 +150,20 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       designs,
       setDesign: (productId, design) => setDesigns(({ [productId]: _old, ...others }) => (design ? { ...others, [productId]: design } : others)),
       designNote: (product) => {
+        // A mattress always names its size, so the store knows which one to send.
+        if (isMattress(product)) return `${TEXT[lang].mattressSize}: ${sizeLabel(mattressOf(product))} ${TEXT[lang].cm}`;
         const rules = rulesFor(product);
         const design = designOf(product);
         return rules && design && designs[product.id] ? describeDesign(design, rules, TEXT[lang], lang) : null;
       },
       designOf,
+      mattressOf,
+      setMattress: (productId, size) => setMattresses((current) => ({ ...current, [productId]: size })),
+      sizeOf: (product) => {
+        if (isMattress(product)) return { mattress: mattressOf(product) };
+        const design = designOf(product);
+        return design ? { width: design.width, chaiseLength: design.chaiseLength } : undefined;
+      },
       extraOf,
       priceOf,
       roomPhoto,
@@ -159,7 +178,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         navigate("designer");
       },
     };
-  }, [lang, cart, saved, cartOpen, agentOpen, agentPrompt, agentRoom, roomPhoto, designs, setDesigns, agentBrief, addToCart, toggleSaved, setLang, clearCart]);
+  }, [lang, cart, saved, cartOpen, agentOpen, agentPrompt, agentRoom, roomPhoto, designs, setDesigns, mattresses, setMattresses, agentBrief, addToCart, toggleSaved, setLang, clearCart]);
 
   return <ShopContext.Provider value={shop}>{children}</ShopContext.Provider>;
 }

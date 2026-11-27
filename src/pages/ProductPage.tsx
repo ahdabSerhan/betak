@@ -6,7 +6,7 @@ import { CATEGORIES, isOnSale, PRODUCTS, productsIn, type Product } from "../dat
 import { detailsOf, POLICIES } from "../data/details";
 import { modelOf } from "../data/models";
 import { GOOGLE_REVIEWS_URL } from "../data/reviewLinks";
-import { fabricText, isSofaBed, rulesFor, type Design, type DesignRules } from "../lib/custom";
+import { MATTRESS_SIZES, fabricText, isMattress, isSofaBed, rulesFor, sizeLabel, type Design, type DesignRules } from "../lib/custom";
 import { money, phoneLink, whatsappLink } from "../lib/format";
 import { STORE } from "../data/store";
 import { useShop } from "../state/ShopContext";
@@ -109,7 +109,7 @@ function Description({ paragraphs }: { paragraphs: string[] }) {
 }
 
 export function ProductPage({ product }: { product: Product }) {
-  const { t, lang, nameOf, addToCart, openCart, isSaved, toggleSaved, setDesign, designNote, designOf, extraOf, priceOf } = useShop();
+  const { t, lang, nameOf, addToCart, openCart, isSaved, toggleSaved, setDesign, designNote, designOf, mattressOf, setMattress, extraOf, priceOf } = useShop();
   const [quantity, setQuantity] = useState(1);
   const [view, setView] = useState<View>("photos");
   const model = modelOf(product.id);
@@ -206,6 +206,21 @@ export function ProductPage({ product }: { product: Product }) {
             <ul className="specs" aria-label={t.sizesTitle}>
               {details.specs.map((spec) => <li key={spec}>{spec}</li>)}
             </ul>
+          )}
+
+          {/* Mattresses come in a few sizes; a bigger one adds its price. */}
+          {isMattress(product) && (
+            <fieldset className="mattress-sizes">
+              <legend>{t.mattressSizes}</legend>
+              <div className="chips">
+                {MATTRESS_SIZES.map(({ size, extra: sizeExtra }) => (
+                  <button type="button" className="chip" aria-pressed={mattressOf(product) === size} onClick={() => setMattress(product.id, size)} key={size}>
+                    <span dir="ltr">{sizeLabel(size)}</span>{sizeExtra > 0 && <small> · <bdi dir="ltr">+{money(sizeExtra)}</bdi></small>}
+                  </button>
+                ))}
+              </div>
+              <small className="muted">{t.mattressOther}</small>
+            </fieldset>
           )}
 
           {rules && design && (
