@@ -29,7 +29,7 @@ export function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <article className="card">
+    <article className="card" data-product={product.id}>
       <Badge product={product} />
       <button className="heart" onClick={() => toggleSaved(product.id)} aria-pressed={saved} aria-label={saved ? t.unsave : t.save}>
         {saved ? "♥" : "♡"}

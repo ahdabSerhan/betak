@@ -471,21 +471,28 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 }
 
 /* ---------- Agent widget: a launcher pill that opens a chat panel, on every page ---------- */
-/* The closed assistant follows the visitor: an orb with a label that tucks away while scrolling down, and a tip for each page. */
-.agent-dock { position: fixed; inset-block-end: 22px; inset-inline-start: 22px; z-index: 26; display: grid; justify-items: start; gap: 10px; }
-.agent-launcher { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px 10px 12px; border: 0; border-radius: 999px; background: var(--ink); color: var(--cream); font-weight: 700; box-shadow: 0 16px 34px -12px rgba(29, 22, 18, .7); animation: rise .5s ease both; transition: transform .2s, background .2s, padding .3s, gap .3s; }
-.agent-launcher .orb { --blur: 2px; }
-.agent-launcher-text { max-width: 240px; overflow: hidden; white-space: nowrap; transition: max-width .35s ease, opacity .25s; }
-.agent-dock.compact .agent-launcher { padding: 10px; gap: 0; }
-.agent-dock.compact .agent-launcher-text { max-width: 0; opacity: 0; }
-.agent-hint { display: flex; align-items: flex-start; gap: 2px; max-width: min(300px, calc(100vw - 40px)); padding: 12px 6px 12px 14px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 18px; border-end-start-radius: 6px; box-shadow: 0 18px 40px -18px rgba(29, 22, 18, .45); animation: sheet-in .35s cubic-bezier(.2, .7, .2, 1) both; }
-.agent-hint-text { background: none; border: 0; padding: 0; font: inherit; font-size: 15px; line-height: 1.45; text-align: start; color: inherit; cursor: pointer; }
+/* The closed assistant is a small character: it walks to the product the visitor looks at, and talks in a speech bubble. */
+@keyframes buddy-bob { 50% { translate: 0 -3px; } }
+@keyframes buddy-blink { 0%, 92%, 100% { scale: 1 1; } 96% { scale: 1 .1; } }
+@keyframes buddy-talk { 50% { box-shadow: 0 0 0 7px rgba(184, 134, 43, 0); } }
+.agent-dock { position: fixed; inset-block-end: 22px; inset-inline-start: 22px; z-index: 26; }
+.agent-launcher { display: inline-flex; align-items: center; padding: 4px; border: 0; border-radius: 999px; background: var(--ink); color: var(--cream); font-weight: 700; box-shadow: 0 16px 34px -12px rgba(29, 22, 18, .7); transition: background .2s; }
+.agent-face { position: relative; flex: none; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; animation: buddy-bob 3.2s ease-in-out infinite; }
+.agent-face .orb { --blur: 4px; }
+.agent-eyes { position: absolute; display: flex; gap: 7px; translate: var(--look-x, 0) var(--look-y, 0); transition: translate .15s; }
+.agent-eyes i { width: 7px; height: 11px; border-radius: 50%; background: #fff; box-shadow: 0 0 6px rgba(0, 0, 0, .35); animation: buddy-blink 5s infinite; }
+.agent-dock.talking .agent-face { box-shadow: 0 0 0 0 rgba(184, 134, 43, .8); animation: buddy-bob 3.2s ease-in-out infinite, buddy-talk .7s infinite; }
+.agent-launcher-text { max-width: 240px; padding-inline: 8px 16px; overflow: hidden; white-space: nowrap; transition: max-width .35s ease, opacity .25s, padding .35s; }
+.agent-dock.compact .agent-launcher-text { max-width: 0; padding-inline: 0; opacity: 0; }
+.agent-hint { position: absolute; inset-block-end: calc(100% + 10px); inset-inline-start: 0; display: flex; align-items: flex-start; gap: 2px; width: max-content; max-width: min(290px, calc(100vw - 24px)); padding: 12px 6px 12px 14px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 18px; border-end-start-radius: 6px; box-shadow: 0 18px 40px -18px rgba(29, 22, 18, .45); animation: sheet-in .35s cubic-bezier(.2, .7, .2, 1) both; }
+.agent-hint-text { min-height: 1.45em; background: none; border: 0; padding: 0; font: inherit; font-size: 15px; line-height: 1.45; text-align: start; color: inherit; cursor: pointer; }
 .agent-hint-close { flex: none; background: none; border: 0; padding: 2px 8px; font-size: 14px; color: var(--muted); cursor: pointer; border-radius: 8px; }
 .agent-hint-close:hover { background: var(--line); }
+.agent-about { margin: 0; font-size: 13px; color: #d9c9ae; }
 /* The button under an answer that opens the page the assistant pointed to. */
 .agent-go { align-self: flex-start; padding: 8px 14px; border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px; background: rgba(255, 255, 255, .08); color: var(--cream); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .2s; }
 .agent-go:hover { background: rgba(255, 255, 255, .18); }
-.agent-launcher:hover { transform: translateY(-3px); background: #45311f; }
+.agent-launcher:hover { background: #45311f; }
 /* The open chat sits above the side accessibility button, which would otherwise cover its messages on phones. */
 .agent-panel { position: fixed; inset-block-end: 22px; inset-inline-start: 22px; z-index: 28; width: min(400px, calc(100vw - 32px)); height: min(620px, calc(100dvh - 44px)); box-shadow: 0 30px 60px -20px rgba(29, 22, 18, .75); animation: sheet-in .3s cubic-bezier(.2, .7, .2, 1) both; }
 .agent-panel .agent-log { flex: 1; height: auto; }
