@@ -531,352 +531,422 @@
     {
      "code": "Dream 1",
      "file": "dream-dream-1.webp",
-     "color": "#d1c8bb"
+     "color": "#d1c8bb",
+     "zoom": true
     },
     {
      "code": "Dream 2",
      "file": "dream-dream-2.webp",
-     "color": "#d2c2b1"
+     "color": "#d2c2b1",
+     "zoom": true
     },
     {
      "code": "Dream 3",
      "file": "dream-dream-3.webp",
-     "color": "#c8b9a4"
+     "color": "#c8b9a4",
+     "zoom": true
     },
     {
      "code": "Dream 4",
      "file": "dream-dream-4.webp",
-     "color": "#b19e88"
+     "color": "#b19e88",
+     "zoom": true
     },
     {
      "code": "Dream 5",
      "file": "dream-dream-5.webp",
-     "color": "#d4c4a9"
+     "color": "#d4c4a9",
+     "zoom": true
     },
     {
      "code": "Dream 6",
      "file": "dream-dream-6.webp",
-     "color": "#c3aa7b"
+     "color": "#c3aa7b",
+     "zoom": true
     },
     {
      "code": "Dream 7",
      "file": "dream-dream-7.webp",
-     "color": "#c2a36c"
+     "color": "#c2a36c",
+     "zoom": true
     },
     {
      "code": "Dream 8",
      "file": "dream-dream-8.webp",
-     "color": "#8a6539"
+     "color": "#8a6539",
+     "zoom": true
     },
     {
      "code": "Dream 9",
      "file": "dream-dream-9.webp",
-     "color": "#503820"
+     "color": "#503820",
+     "zoom": true
     },
     {
      "code": "Dream 10",
      "file": "dream-dream-10.webp",
-     "color": "#413025"
+     "color": "#413025",
+     "zoom": true
     },
     {
      "code": "Dream 11",
      "file": "dream-dream-11.webp",
-     "color": "#37291e"
+     "color": "#37291e",
+     "zoom": true
     },
     {
      "code": "Dream 12",
      "file": "dream-dream-12.webp",
-     "color": "#312927"
+     "color": "#312927",
+     "zoom": true
     },
     {
      "code": "Dream 13",
      "file": "dream-dream-13.webp",
-     "color": "#2c211b"
+     "color": "#2c211b",
+     "zoom": true
     },
     {
      "code": "Dream 14",
      "file": "dream-dream-14.webp",
-     "color": "#211a1a"
+     "color": "#211a1a",
+     "zoom": true
     },
     {
      "code": "Dream 15",
      "file": "dream-dream-15.webp",
-     "color": "#978065"
+     "color": "#978065",
+     "zoom": true
     },
     {
      "code": "Dream 16",
      "file": "dream-dream-16.webp",
-     "color": "#90826b"
+     "color": "#90826b",
+     "zoom": true
     },
     {
      "code": "Dream 17",
      "file": "dream-dream-17.webp",
-     "color": "#8e7e70"
+     "color": "#8e7e70",
+     "zoom": true
     },
     {
      "code": "Dream 18",
      "file": "dream-dream-18.webp",
-     "color": "#5a544d"
+     "color": "#5a544d",
+     "zoom": true
     },
     {
      "code": "Dream 19",
      "file": "dream-dream-19.webp",
-     "color": "#34302b"
+     "color": "#34302b",
+     "zoom": true
     },
     {
      "code": "Dream 20",
      "file": "dream-dream-20.webp",
-     "color": "#78772f"
+     "color": "#78772f",
+     "zoom": true
     },
     {
      "code": "Dream 21",
      "file": "dream-dream-21.webp",
-     "color": "#758a4b"
+     "color": "#758a4b",
+     "zoom": true
     },
     {
      "code": "Dream 22",
      "file": "dream-dream-22.webp",
-     "color": "#807734"
+     "color": "#807734",
+     "zoom": true
     },
     {
      "code": "Dream 23",
      "file": "dream-dream-23.webp",
-     "color": "#605f37"
+     "color": "#605f37",
+     "zoom": true
     },
     {
      "code": "Dream 24",
      "file": "dream-dream-24.webp",
-     "color": "#686742"
+     "color": "#686742",
+     "zoom": true
     },
     {
      "code": "Dream 25",
      "file": "dream-dream-25.webp",
-     "color": "#182e28"
+     "color": "#182e28",
+     "zoom": true
     },
     {
      "code": "Dream 26",
      "file": "dream-dream-26.webp",
-     "color": "#1f2923"
+     "color": "#1f2923",
+     "zoom": true
     },
     {
      "code": "Dream 27",
      "file": "dream-dream-27.webp",
-     "color": "#cba736"
+     "color": "#cba736",
+     "zoom": true
     },
     {
      "code": "Dream 28",
      "file": "dream-dream-28.webp",
-     "color": "#816d27"
+     "color": "#816d27",
+     "zoom": true
     },
     {
      "code": "Dream 29",
      "file": "dream-dream-29.webp",
-     "color": "#d4a33a"
+     "color": "#d4a33a",
+     "zoom": true
     },
     {
      "code": "Dream 30",
      "file": "dream-dream-30.webp",
-     "color": "#b17f3e"
+     "color": "#b17f3e",
+     "zoom": true
     },
     {
      "code": "Dream 31",
      "file": "dream-dream-31.webp",
-     "color": "#c9b8ae"
+     "color": "#c9b8ae",
+     "zoom": true
     },
     {
      "code": "Dream 32",
      "file": "dream-dream-32.webp",
-     "color": "#927d76"
+     "color": "#927d76",
+     "zoom": true
     },
     {
      "code": "Dream 33",
      "file": "dream-dream-33.webp",
-     "color": "#926963"
+     "color": "#926963",
+     "zoom": true
     },
     {
      "code": "Dream 34",
      "file": "dream-dream-34.webp",
-     "color": "#8e502b"
+     "color": "#8e502b",
+     "zoom": true
     },
     {
      "code": "Dream 35",
      "file": "dream-dream-35.webp",
-     "color": "#614036"
+     "color": "#614036",
+     "zoom": true
     },
     {
      "code": "Dream 36",
      "file": "dream-dream-36.webp",
-     "color": "#a98f93"
+     "color": "#a98f93",
+     "zoom": true
     },
     {
      "code": "Dream 37",
      "file": "dream-dream-37.webp",
-     "color": "#796079"
+     "color": "#796079",
+     "zoom": true
     },
     {
      "code": "Dream 38",
      "file": "dream-dream-38.webp",
-     "color": "#523b68"
+     "color": "#523b68",
+     "zoom": true
     },
     {
      "code": "Dream 39",
      "file": "dream-dream-39.webp",
-     "color": "#391832"
+     "color": "#391832",
+     "zoom": true
     },
     {
      "code": "Dream 40",
      "file": "dream-dream-40.webp",
-     "color": "#5c1d52"
+     "color": "#5c1d52",
+     "zoom": true
     },
     {
      "code": "Dream 41",
      "file": "dream-dream-41.webp",
-     "color": "#9b366d"
+     "color": "#9b366d",
+     "zoom": true
     },
     {
      "code": "Dream 42",
      "file": "dream-dream-42.webp",
-     "color": "#6a1b36"
+     "color": "#6a1b36",
+     "zoom": true
     },
     {
      "code": "Dream 43",
      "file": "dream-dream-43.webp",
-     "color": "#9a264f"
+     "color": "#9a264f",
+     "zoom": true
     },
     {
      "code": "Dream 44",
      "file": "dream-dream-44.webp",
-     "color": "#981e32"
+     "color": "#981e32",
+     "zoom": true
     },
     {
      "code": "Dream 45",
      "file": "dream-dream-45.webp",
-     "color": "#3e0915"
+     "color": "#3e0915",
+     "zoom": true
     },
     {
      "code": "Dream 46",
      "file": "dream-dream-46.webp",
-     "color": "#430d1d"
+     "color": "#430d1d",
+     "zoom": true
     },
     {
      "code": "Dream 47",
      "file": "dream-dream-47.webp",
-     "color": "#380d15"
+     "color": "#380d15",
+     "zoom": true
     },
     {
      "code": "Dream 48",
      "file": "dream-dream-48.webp",
-     "color": "#978985"
+     "color": "#978985",
+     "zoom": true
     },
     {
      "code": "Dream 49",
      "file": "dream-dream-49.webp",
-     "color": "#918477"
+     "color": "#918477",
+     "zoom": true
     },
     {
      "code": "Dream 50",
      "file": "dream-dream-50.webp",
-     "color": "#6c6865"
+     "color": "#6c6865",
+     "zoom": true
     },
     {
      "code": "Dream 51",
      "file": "dream-dream-51.webp",
-     "color": "#89867e"
+     "color": "#89867e",
+     "zoom": true
     },
     {
      "code": "Dream 52",
      "file": "dream-dream-52.webp",
-     "color": "#73716d"
+     "color": "#73716d",
+     "zoom": true
     },
     {
      "code": "Dream 53",
      "file": "dream-dream-53.webp",
-     "color": "#535154"
+     "color": "#535154",
+     "zoom": true
     },
     {
      "code": "Dream 54",
      "file": "dream-dream-54.webp",
-     "color": "#88a3a3"
+     "color": "#88a3a3",
+     "zoom": true
     },
     {
      "code": "Dream 55",
      "file": "dream-dream-55.webp",
-     "color": "#c0c2bf"
+     "color": "#c0c2bf",
+     "zoom": true
     },
     {
      "code": "Dream 56",
      "file": "dream-dream-56.webp",
-     "color": "#989a97"
+     "color": "#989a97",
+     "zoom": true
     },
     {
      "code": "Dream 57",
      "file": "dream-dream-57.webp",
-     "color": "#75818b"
+     "color": "#75818b",
+     "zoom": true
     },
     {
      "code": "Dream 58",
      "file": "dream-dream-58.webp",
-     "color": "#65787a"
+     "color": "#65787a",
+     "zoom": true
     },
     {
      "code": "Dream 59",
      "file": "dream-dream-59.webp",
-     "color": "#808c85"
+     "color": "#808c85",
+     "zoom": true
     },
     {
      "code": "Dream 60",
      "file": "dream-dream-60.webp",
-     "color": "#1b3644"
+     "color": "#1b3644",
+     "zoom": true
     },
     {
      "code": "Dream 61",
      "file": "dream-dream-61.webp",
-     "color": "#2a3e4e"
+     "color": "#2a3e4e",
+     "zoom": true
     },
     {
      "code": "Dream 62",
      "file": "dream-dream-62.webp",
-     "color": "#53717d"
+     "color": "#53717d",
+     "zoom": true
     },
     {
      "code": "Dream 63",
      "file": "dream-dream-63.webp",
-     "color": "#567282"
+     "color": "#567282",
+     "zoom": true
     },
     {
      "code": "Dream 64",
      "file": "dream-dream-64.webp",
-     "color": "#242f57"
+     "color": "#242f57",
+     "zoom": true
     },
     {
      "code": "Dream 65",
      "file": "dream-dream-65.webp",
-     "color": "#18253a"
+     "color": "#18253a",
+     "zoom": true
     },
     {
      "code": "Dream 66",
      "file": "dream-dream-66.webp",
-     "color": "#111d36"
+     "color": "#111d36",
+     "zoom": true
     },
     {
      "code": "Dream 67",
      "file": "dream-dream-67.webp",
-     "color": "#111319"
+     "color": "#111319",
+     "zoom": true
     },
     {
      "code": "Dream 68",
      "file": "dream-dream-68.webp",
-     "color": "#b99793"
+     "color": "#b99793",
+     "zoom": true
     },
     {
      "code": "Dream 69",
      "file": "dream-dream-69.webp",
-     "color": "#b19b94"
+     "color": "#b19b94",
+     "zoom": true
     },
     {
      "code": "Dream 70",
      "file": "dream-dream-70.webp",
-     "color": "#1e2645"
+     "color": "#1e2645",
+     "zoom": true
     }
    ]
   }
