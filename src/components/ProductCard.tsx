@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { isOnSale, type Product } from "../data/catalog";
-import { reviewsOf } from "../data/details";
 import { useTilt } from "../hooks/useTilt";
 import { money } from "../lib/format";
 import { useShop } from "../state/ShopContext";
@@ -21,7 +20,6 @@ export function ProductCard({ product }: { product: Product }) {
   const saved = isSaved(product.id);
   const tilt = useTilt<HTMLAnchorElement>(7);
   const [quickViewOpen, setQuickViewOpen] = useState(false);
-  const reviewCount = reviewsOf(product).length;
 
   const addAndShowCart = () => {
     addToCart(product.id);
@@ -43,7 +41,6 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="row price">
         <span className="now">{money(product.price)}</span>
         {isOnSale(product) && <span className="was">{money(product.listPrice)}</span>}
-        {reviewCount > 0 && <a className="card-reviews" href={productHref(product)}>{t.reviewsCount(reviewCount)}</a>}
       </div>
       {quickViewOpen && <QuickView product={product} onClose={() => setQuickViewOpen(false)} />}
     </article>

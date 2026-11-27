@@ -8,29 +8,20 @@ import { Reveal } from "../components/Reveal";
 import AnimatedContent from "../components/bits/AnimatedContent";
 import Magnet from "../components/bits/Magnet";
 import SplitText from "../components/bits/SplitText";
-import { ReviewBelt } from "../components/ReviewBelt";
-import { productById, PRODUCTS } from "../data/catalog";
-import { ALL_REVIEWS } from "../data/details";
-import { GOOGLE_REVIEWS_URL } from "../data/reviewLinks";
+import { GoogleReviews } from "../components/GoogleReviews";
+import { PRODUCTS } from "../data/catalog";
 import { useShop } from "../state/ShopContext";
 import { asset } from "../lib/asset";
 import { calm, smallScreen } from "../lib/motion";
-import { href, productHref } from "../lib/routes";
+import { href } from "../lib/routes";
 
 const FEATURED = PRODUCTS.filter((product) => product.featured);
-// The home page shows the longer reviews, which say the most.
-const HOME_REVIEW_COUNT = 12;
-// One review per customer, so the same thank-you left on two products shows once.
-const HOME_REVIEWS = [...ALL_REVIEWS]
-  .sort((a, b) => b.text.length - a.text.length)
-  .filter((review, index, all) => all.findIndex((other) => other.name === review.name) === index)
-  .slice(0, HOME_REVIEW_COUNT);
 
 // three.js is heavy, so the showroom loads on its own after the page shows.
 const Showroom = lazy(() => import("../showroom/Showroom"));
 
 export function Home() {
-  const { t, nameOf } = useShop();
+  const { t } = useShop();
   // The list is doubled so the marquee can loop without a gap.
   const marquee = [...t.values, ...t.values, ...t.values, ...t.values];
   const hero = useRef<HTMLElement>(null);
@@ -84,10 +75,9 @@ export function Home() {
 
       <section className="block flush-top">
         <div className="wrap section-head">
-          <h2>{t.reviewsTitle} <small className="muted">({ALL_REVIEWS.length})</small></h2>
-        <a className="btn google" href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener"><b aria-hidden="true">G</b> {t.reviewGoogle}</a>
+          <h2>{t.reviewsTitle}</h2>
         </div>
-        <ReviewBelt reviews={HOME_REVIEWS} linkOf={(review) => productHref(productById(review.productId)!)} noteOf={(review) => nameOf(productById(review.productId)!)} />
+        <div className="wrap"><GoogleReviews /></div>
       </section>
 
       <section className="block wrap flush-top">

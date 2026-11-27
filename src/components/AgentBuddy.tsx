@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { isOnSale, productById, type Product } from "../data/catalog";
-import { reviewsOf } from "../data/details";
 import { pageKind } from "../lib/agentPages";
 import { money } from "../lib/format";
 import { calm } from "../lib/motion";
@@ -52,12 +51,10 @@ export function AgentBuddy({ route, onOpen }: { route: string; onOpen: (about?: 
     if (dock.current) gsap.to(dock.current, { x: 0, y: 0, duration: 0.6, ease: "power3.inOut", overwrite: true });
   }, []);
 
-  // One line about a product: its sale, its reviews, or its price.
+  // One line about a product: its sale or its price.
   const lineFor = useCallback((product: Product) => {
     const name = nameOf(product);
-    const reviews = reviewsOf(product).length;
     if (isOnSale(product)) return t.agentSay.sale(name, money(product.price), money(product.listPrice));
-    if (reviews > 0) return t.agentSay.loved(name, reviews);
     return t.agentSay.plain(name, money(product.price));
   }, [nameOf, t]);
 

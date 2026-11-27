@@ -48,7 +48,7 @@ export const ACCESSIBILITY: Record<Lang, Statement> = {
           "התאמה לקוראי מסך: שפת העמוד וכיוון הכתיבה מוגדרים, ולרכיבים אינטראקטיביים יש שמות ברורים.",
           "האתר מתאים את עצמו לגודל המסך ותומך בהגדלת טקסט בדפדפן.",
           "האתר מותאם לדפדפנים Chrome, Edge, Firefox, Safari ו-Opera, ולקוראי המסך NVDA, JAWS ו-VoiceOver.",
-          "תנועה באתר (קרוסלת ההמלצות, אולם התצוגה) נעצרת אצל מי שהגדיר במכשיר \"הפחתת תנועה\", וקרוסלת ההמלצות נעצרת גם כשמצביעים עליה או מגיעים אליה במקלדת.",
+          "תנועה באתר (אולם התצוגה) נעצרת אצל מי שהגדיר במכשיר \"הפחתת תנועה\".",
         ],
       },
       {
@@ -111,7 +111,7 @@ export const ACCESSIBILITY: Record<Lang, Statement> = {
           "Screen reader support: each page states its language and writing direction, and interactive parts have clear names.",
           "The layout adapts to the screen size and supports text enlarged in the browser.",
           "The site works with the Chrome, Edge, Firefox, Safari and Opera browsers, and with the NVDA, JAWS and VoiceOver screen readers.",
-          "Motion (the reviews carousel, the showroom) stops for visitors who set \"reduce motion\" on their device, and the reviews carousel also stops when pointed at or reached with the keyboard.",
+          "Motion (the showroom) stops for visitors who set \"reduce motion\" on their device.",
         ],
       },
       {
