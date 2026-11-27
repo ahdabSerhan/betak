@@ -134,6 +134,25 @@ gcloud projects add-iam-policy-binding $PROJECT --member serviceAccount:<run ser
   `gcloud run services update betak-website --region me-west1 --project $PROJECT --update-env-vars GOOGLE_CLIENT_ID=<client id>,ADMIN_EMAILS=<gmail>`
   (several emails: separate with `\,` or use `--env-vars-file`).
 
+### Contact form and email alerts
+
+The contact page form saves each message in Firestore (`messages`, `server/messages.mjs`); they show in the
+"פניות מהאתר" tab of `/admin/orders`. To also get an email for each new message (`server/mail.mjs`, Gmail SMTP):
+
+1. On the Gmail account, turn on 2-Step Verification, then create an app password at
+   https://myaccount.google.com/apppasswords (16 letters).
+2. Keep it in Secret Manager and give it to the service (the run service account needs
+   `roles/secretmanager.secretAccessor` on the secret):
+
+```bash
+printf '%s' '<app password>' | gcloud secrets create alert-email-password --data-file=- --project $PROJECT
+gcloud run services update betak-website --region me-west1 --project $PROJECT \
+  --update-env-vars ALERT_EMAIL_USER=<gmail> --update-secrets ALERT_EMAIL_PASSWORD=alert-email-password:latest
+```
+
+`ALERT_EMAIL_TO` sends the alerts to another address (default: the same Gmail). Without these settings the form
+works the same, with no email.
+
 Local run without Google Cloud: `ORDERS_STORE=memory npm start` keeps orders in memory. To open the orders
 page locally, also set `ADMIN_TEST_TOKEN` and put the same value in the tab's `sessionStorage`
 (`betak.admin.token`); the production image ignores it.
