@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { adminConfig, checkAdmin } from "./admin-auth.mjs";
 import { cleanOrder, createOrderStore, linePrice } from "./orders.mjs";
 import { cleanMessage, createMessageStore } from "./messages.mjs";
+import { alertsEnabled, messageAlert, sendAlert } from "./mail.mjs";
 import { newPayment, paymentConfig, paymentsEnabled, paymentUrl, readReport } from "./upay.mjs";
 
 const PORT = Number(process.env.PORT ?? 8080);
@@ -132,6 +133,9 @@ async function handleNewMessage(request, response) {
     const { message, error } = cleanMessage(input);
     if (error) return sendJson(response, 400, { error });
     await messages.add(message);
+    // The email alert goes out before answering, since Cloud Run slows the CPU once a response is sent.
+    // The message is already saved, so a failed alert is only logged.
+    if (alertsEnabled()) await sendAlert(messageAlert(message, siteUrl(request))).catch((error) => console.error("Email alert failed:", error.message));
     sendJson(response, 201, { ok: true });
   } catch (error) {
     // The contact page offers WhatsApp instead when this fails.
