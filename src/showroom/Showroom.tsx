@@ -1,3 +1,4 @@
+import { keepWheel } from "../lib/motion";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { type Product } from "../data/catalog";
@@ -238,7 +239,7 @@ export default function Showroom() {
       aim(event);
       const piece = pieceUnderPointer();
       if (!piece && !view.current.focus) return;
-      event.preventDefault();
+      keepWheel(event);
       touched.current = true;
       if (piece) piece.rotation.y += event.deltaY * TURN.wheel;
       else look.distance = THREE.MathUtils.clamp(look.distance + event.deltaY * WALK.wheel, WALK.near, WALK.far);

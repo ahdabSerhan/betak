@@ -10,6 +10,7 @@ import { CATEGORIES } from "./data/catalog";
 import { useRoute } from "./hooks/useRoute";
 import { productFromRoute } from "./lib/routes";
 import { esentrixEnabled } from "./lib/esentrix";
+import { startSmoothScroll } from "./lib/motion";
 import { About } from "./pages/About";
 import { AdminOrders } from "./pages/AdminOrders";
 import { Accessibility, Privacy, Shipping, Terms } from "./pages/Accessibility";
@@ -50,6 +51,9 @@ export function App() {
   const { t, lang, nameOf, cartOpen } = useShop();
   const product = productFromRoute(route);
   const category = CATEGORIES.find((item) => item.id === route);
+
+  // Smooth scrolling for the whole site; it stops when the visitor asks for less motion.
+  useEffect(() => startSmoothScroll(), []);
 
   // The store's orders page and the after-payment page are never indexed.
   useEffect(() => {

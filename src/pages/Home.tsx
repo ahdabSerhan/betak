@@ -1,14 +1,20 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
 import { CategoryBento } from "../components/CategoryBento";
 import { DesignerPrompt } from "../components/DesignerPrompt";
 import { ProductCard } from "../components/ProductCard";
 import { Reveal } from "../components/Reveal";
+import AnimatedContent from "../components/bits/AnimatedContent";
+import Magnet from "../components/bits/Magnet";
+import SplitText from "../components/bits/SplitText";
 import { ReviewBelt } from "../components/ReviewBelt";
 import { productById, PRODUCTS } from "../data/catalog";
 import { ALL_REVIEWS } from "../data/details";
 import { GOOGLE_REVIEWS_URL } from "../data/reviewLinks";
 import { useShop } from "../state/ShopContext";
 import { asset } from "../lib/asset";
+import { calm } from "../lib/motion";
 import { href, productHref } from "../lib/routes";
 
 const FEATURED = PRODUCTS.filter((product) => product.featured);
@@ -27,15 +33,27 @@ export function Home() {
   const { t, nameOf } = useShop();
   // The list is doubled so the marquee can loop without a gap.
   const marquee = [...t.values, ...t.values, ...t.values, ...t.values];
+  const hero = useRef<HTMLElement>(null);
+
+  // As the visitor scrolls past the showroom, its headline drifts up and fades out.
+  useGSAP(() => {
+    if (calm()) return;
+    gsap.fromTo(".showroom-copy", { yPercent: 0, opacity: 1 }, {
+      yPercent: -35,
+      opacity: 0,
+      ease: "none",
+      scrollTrigger: { trigger: hero.current, start: "top top", end: "bottom 30%", scrub: true },
+    });
+  }, { scope: hero });
 
   return (
     <>
-      <section className="showroom">
+      <section className="showroom" ref={hero}>
         <img className="showroom-still" src={asset("img/hero1.webp")} alt="" />
         <Suspense fallback={null}><Showroom /></Suspense>
         <div className="showroom-copy">
           <span className="eyebrow">✦ {t.showroomLabel}</span>
-          <h1>{t.heroTitle}</h1>
+          <SplitText tag="h1" text={t.heroTitle} splitType="words" effect="blur" trigger="load" delay={70} duration={1} textAlign="start" />
           <p>{t.showroomHint}</p>
         </div>
         <div className="showroom-prompt"><DesignerPrompt /></div>
@@ -48,7 +66,7 @@ export function Home() {
       </div>
 
       <section className="block wrap">
-        <div className="section-head"><h2>{t.collections}</h2></div>
+        <AnimatedContent className="section-head" distance={30} duration={0.7}><h2>{t.collections}</h2></AnimatedContent>
         <Reveal><CategoryBento /></Reveal>
       </section>
 
@@ -57,9 +75,9 @@ export function Home() {
           <h2>{t.featured}</h2>
           <a href={href("sofas")}>{t.allModels}</a>
         </div>
-        <div className="carousel">
+        <AnimatedContent className="carousel" direction="horizontal" reverse distance={60} duration={0.8} stagger={0.08}>
           {FEATURED.map((product) => <ProductCard product={product} key={product.id} />)}
-        </div>
+        </AnimatedContent>
       </section>
 
       <section className="block flush-top">
@@ -75,7 +93,7 @@ export function Home() {
           <div className="stack">
             <h2>{t.promoTitle}</h2>
             <p className="muted">{t.promoText}</p>
-            <div><a className="btn" href={href("designer")}>{t.tryDesigner}</a></div>
+            <Magnet padding={40} magnetStrength={4}><a className="btn" href={href("designer")}>{t.tryDesigner}</a></Magnet>
           </div>
           <ol className="how-steps">
             {t.promoSteps.map((step, index) => <li key={step}><b>{index + 1}</b>{step}</li>)}

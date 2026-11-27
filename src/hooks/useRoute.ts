@@ -1,3 +1,4 @@
+import { scrollToTop } from "../lib/motion";
 import { useEffect, useState } from "react";
 import { flushSync } from "react-dom";
 import { isRoute, pathOf, routeOf, USES_PATHS } from "../lib/routes";
@@ -35,7 +36,7 @@ export function useRoute() {
       currentShown = next;
       const update = () => {
         flushSync(() => setRoute(next));
-        window.scrollTo(0, 0);
+        scrollToTop();
       };
       // Browsers with View Transitions cross-fade between pages.
       if ("startViewTransition" in document) document.startViewTransition(update);

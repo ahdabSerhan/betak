@@ -25,6 +25,7 @@ Vite + React 19 + TypeScript, plain CSS, three.js. Hebrew (RTL) and English.
 ## Rules
 - Never invent products, photos or reviews: everything comes from the original betak.co.il.
 - Every change works in Hebrew (RTL) and English; use logical CSS (`inset-inline-start`, not `left`).
+- Motion: Lenis smooth scroll and GSAP live in `src/lib/motion.ts`; React Bits components are in `src/components/bits`. Any new animation checks `calm()` so it stops for reduced motion and the accessibility menu.
 - Accessibility: IS 5568 / WCAG AA. Keep axe-core at zero violations. Accessibility menu options are classes on `<html>` (`a11y-*`).
 - Code style: simple and readable, like a senior Google engineer would write it; one-line comments on new code.
 

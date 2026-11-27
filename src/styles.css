@@ -206,8 +206,6 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 ::view-transition-old(root) { animation: fade .18s ease reverse both; }
 ::view-transition-new(root) { animation: rise .32s ease both; }
 
-.reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s cubic-bezier(.2, .7, .2, 1); }
-.reveal.in { opacity: 1; transform: none; }
 .scrim { animation: fade .2s ease; }
 .drawer { animation: slide-in .32s cubic-bezier(.2, .7, .2, 1); --from: 100%; }
 [dir="rtl"] .drawer { --from: -100%; }
@@ -264,7 +262,6 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 }
 @media (prefers-reduced-motion: reduce) {
   *, ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; transition: none !important; }
-  .reveal { opacity: 1; transform: none; }
 }
 
 /* The room plane sits in front of its pieces, so only the pieces take clicks. */
@@ -388,7 +385,7 @@ header.site { background: rgba(255, 255, 255, .82); backdrop-filter: blur(14px) 
 .showroom-canvas canvas { display: block; animation: fade 1.2s ease both; }
 .showroom::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(rgba(29, 22, 18, .78), transparent 34%, transparent 62%, rgba(29, 22, 18, .82)); }
 .showroom-copy, .showroom-prompt, .showroom-nav, .showroom-tip { position: absolute; z-index: 2; }
-.showroom-copy { inset-block-start: 34px; inset-inline-start: max(20px, calc((100% - var(--wrap)) / 2 + 20px)); max-width: min(560px, calc(100% - 40px)); display: grid; gap: 10px; justify-items: start; pointer-events: none; animation: rise .8s ease both; }
+.showroom-copy { inset-block-start: 34px; inset-inline-start: max(20px, calc((100% - var(--wrap)) / 2 + 20px)); max-width: min(560px, calc(100% - 40px)); display: grid; gap: 10px; justify-items: start; pointer-events: none; }
 .showroom-copy h1 { color: var(--cream); font-size: clamp(30px, 4.2vw, 54px); line-height: 1.08; text-shadow: 0 2px 24px rgba(0, 0, 0, .5); }
 .showroom-copy p { color: #e4d8c5; }
 .showroom-copy .eyebrow { background: rgba(29, 22, 18, .55); }

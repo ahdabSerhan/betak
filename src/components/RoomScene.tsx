@@ -1,3 +1,4 @@
+import { keepWheel } from "../lib/motion";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { cutoutOf } from "../data/cutouts";
 import type { Piece, SlotKey } from "../lib/designer";
@@ -182,7 +183,7 @@ export function RoomScene({ pieces, photo, onSwap, onRemove }: RoomSceneProps) {
     const onWheel = (event: WheelEvent) => {
       const piece = (event.target as Element).closest<HTMLElement>("[data-piece]");
       if (!piece) return;
-      event.preventDefault();
+      keepWheel(event);
       const id = Number(piece.dataset.piece);
       const amount = event.deltaY || event.deltaX;
       if (event.shiftKey) update(id, (current) => ({ turn: current.turn + amount * WHEEL.turn }));
