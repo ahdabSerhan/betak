@@ -8,6 +8,7 @@ import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { adminConfig, checkAdmin } from "./admin-auth.mjs";
 import { cleanOrder, createOrderStore, linePrice } from "./orders.mjs";
+import { cleanMessage, createMessageStore } from "./messages.mjs";
 import { newPayment, paymentConfig, paymentsEnabled, paymentUrl, readReport } from "./upay.mjs";
 
 const PORT = Number(process.env.PORT ?? 8080);
@@ -71,19 +72,23 @@ async function accessToken() {
 let cachedProject = process.env.GOOGLE_CLOUD_PROJECT ?? "";
 const projectId = async () => (cachedProject ||= await metadata("project/project-id"));
 const orders = createOrderStore({ getToken: accessToken, getProject: projectId });
+const messages = createMessageStore({ getToken: accessToken, getProject: projectId });
 
-// A few orders per visitor per hour is plenty; more is a script filling the form.
-const ORDERS_PER_HOUR = 10;
-const recentOrders = new Map();
-
-function tooManyOrders(request) {
-  const visitor = String(request.headers["x-forwarded-for"] ?? request.socket.remoteAddress).split(",")[0].trim();
-  const hourAgo = Date.now() - 3_600_000;
-  const times = (recentOrders.get(visitor) ?? []).filter((time) => time > hourAgo);
-  if (recentOrders.size > 5000) recentOrders.clear();
-  recentOrders.set(visitor, [...times, Date.now()]);
-  return times.length >= ORDERS_PER_HOUR;
+// A check that says when one visitor sent more than perHour forms in the last hour; more is a script filling the form.
+function hourlyLimit(perHour) {
+  const recent = new Map();
+  return (request) => {
+    const visitor = String(request.headers["x-forwarded-for"] ?? request.socket.remoteAddress).split(",")[0].trim();
+    const hourAgo = Date.now() - 3_600_000;
+    const times = (recent.get(visitor) ?? []).filter((time) => time > hourAgo);
+    if (recent.size > 5000) recent.clear();
+    recent.set(visitor, [...times, Date.now()]);
+    return times.length >= perHour;
+  };
 }
+
+const tooManyOrders = hourlyLimit(10);
+const tooManyMessages = hourlyLimit(5);
 
 // Catalog prices by product id, written by the build, so an order's total never trusts the browser.
 const PRICES = existsSync(join(SITE_ROOT, "prices.json")) ? JSON.parse(readFileSync(join(SITE_ROOT, "prices.json"), "utf8")) : {};
@@ -117,6 +122,24 @@ async function handleNewOrder(request, response) {
   }
 }
 
+// A visitor sends a question from the contact form; it waits on the store's admin page.
+async function handleNewMessage(request, response) {
+  try {
+    const input = await readJson(request);
+    // The hidden "website" field is left empty by people and filled by bots: answer as if saved.
+    if (input?.website) return sendJson(response, 201, { ok: true });
+    if (tooManyMessages(request)) return sendJson(response, 429, { error: "Too many messages" });
+    const { message, error } = cleanMessage(input);
+    if (error) return sendJson(response, 400, { error });
+    await messages.add(message);
+    sendJson(response, 201, { ok: true });
+  } catch (error) {
+    // The contact page offers WhatsApp instead when this fails.
+    console.error(error);
+    sendJson(response, 502, { error: "Messages are unavailable right now." });
+  }
+}
+
 // UPay reports a payment to the address the order gave it; the token in that address must match the order's.
 async function handlePaymentReport(request, response, url) {
   try {
@@ -144,7 +167,7 @@ async function handlePaymentReport(request, response, url) {
 // The payment token is only for UPay's report, so the orders page never sees it.
 const withoutToken = (order) => (order.payment ? { ...order, payment: { ...order.payment, token: undefined } } : order);
 
-// The store's own orders page: list the orders, mark one read or unread.
+// The store's own admin page: list the orders and contact messages, mark one read or unread.
 async function handleAdmin(request, response, pathname) {
   if (pathname === "/api/admin/config") return sendJson(response, 200, adminConfig());
   const access = await checkAdmin(request);
@@ -154,6 +177,12 @@ async function handleAdmin(request, response, pathname) {
     const match = pathname.match(/^\/api\/admin\/orders\/(\d+)$/);
     if (match && request.method === "PATCH") {
       await orders.setRead(match[1], Boolean((await readJson(request)).read));
+      return sendJson(response, 200, { ok: true });
+    }
+    if (pathname === "/api/admin/messages" && request.method === "GET") return sendJson(response, 200, { messages: await messages.list() });
+    const messageMatch = pathname.match(/^\/api\/admin\/messages\/([A-Za-z0-9]+)$/);
+    if (messageMatch && request.method === "PATCH") {
+      await messages.setRead(messageMatch[1], Boolean((await readJson(request)).read));
       return sendJson(response, 200, { ok: true });
     }
     sendJson(response, 404, { error: "Not found" });
@@ -251,6 +280,7 @@ createServer((request, response) => {
   const { pathname } = url;
   if (pathname === "/api/designer") return request.method === "POST" ? handleDesigner(request, response) : sendJson(response, 405, { error: "Use POST" });
   if (pathname === "/api/orders") return request.method === "POST" ? handleNewOrder(request, response) : sendJson(response, 405, { error: "Use POST" });
+  if (pathname === "/api/messages") return request.method === "POST" ? handleNewMessage(request, response) : sendJson(response, 405, { error: "Use POST" });
   if (pathname.startsWith("/api/admin/")) return handleAdmin(request, response, pathname);
   if (pathname === "/api/payments/config") return sendJson(response, 200, paymentConfig());
   if (pathname === "/api/upay/ipn") return handlePaymentReport(request, response, url);

@@ -77,6 +77,12 @@ export const TEXT = {
       toPayment: "המשך לתשלום מאובטח", sendPhone: "שליחת ההזמנה בוואטסאפ", toPaymentNow: "עוברים לדף התשלום...",
       payError: "לא הצלחנו לפתוח את דף התשלום. נסו שוב, או בחרו הזמנה טלפונית.",
     },
+    contactForm: {
+      title: "השאירו לנו הודעה", intro: "יש שאלה על דגם, מידות או משלוח? כתבו לנו ונחזור אליכם בהקדם.", name: "שם", phone: "טלפון", email: "דואר אלקטרוני (לא חובה)", message: "במה נוכל לעזור?",
+      send: "שליחה", sending: "שולחים...", sent: "תודה! ההודעה התקבלה ונחזור אליכם בהקדם.", another: "שליחת הודעה נוספת",
+      failed: "לא הצלחנו לשלוח את ההודעה. אפשר לשלוח אותה בוואטסאפ:", waSend: "שליחה בוואטסאפ", waIntro: "שלום, פנייה מאתר ביתאק:",
+      privacy: "הפרטים נשמרים אצלנו רק כדי לחזור אליכם. פרטים נוספים ב", otherWays: "או דברו איתנו ישירות",
+    },
     paid: { title: "תודה על ההזמנה!", text: (number: string) => `ההזמנה מספר ${number} התקבלה.`, more: "כשהתשלום מושלם, UPay שולחים לכם אישור. נחזור אליכם לתיאום המשלוח.", home: "חזרה לדף הבית" },
     orderSaved: (number: number) => `ההזמנה נרשמה, מספר ${number}. ממשיכים איתכם בוואטסאפ.`, orderPrivacy: "הפרטים נשמרים אצלנו רק לטיפול בהזמנה. פרטים נוספים ב",
     admin: {
@@ -86,6 +92,8 @@ export const TEXT = {
       payment: "תשלום", phone2: "טלפון נוסף", address: "כתובת", elevator: "מעלית", yes: "יש", no: "אין", reference: "אסמכתא", installments: (count: string) => `${count} תשלומים`,
       payStatus: { phone: "הזמנה טלפונית", pending: "אשראי: עוד לא שולם", reported: "אשראי: UPay דיווחו ששולם", failed: "אשראי: התשלום נכשל", "amount-mismatch": "אשראי: שולם סכום אחר" } as Record<string, string>,
       payCheck: "לפני משלוח, ודאו את התשלום במערכת של UPay.", test: "מצב בדיקה",
+      tabOrders: "הזמנות", tabMessages: "פניות מהאתר", messagesTitle: "פניות מטופס צור קשר", messagesLoading: "טוען פניות...", messagesEmpty: "אין פניות להצגה.", unreadMessagesOnly: "רק פניות שלא נקראו",
+      messagesCount: (shown: number, unread: number) => `${shown} פניות, ${unread} לא נקראו`, message: "הודעה", markMessageRead: (name: string) => `סימון הפנייה של ${name} כנקראה`, searchMessages: "חיפוש לפי שם, טלפון או מילה בהודעה",
     },
   },
   en: {
@@ -165,6 +173,12 @@ export const TEXT = {
       toPayment: "Continue to secure payment", sendPhone: "Send the order on WhatsApp", toPaymentNow: "Opening the payment page...",
       payError: "The payment page could not be opened. Try again, or choose to order by phone.",
     },
+    contactForm: {
+      title: "Leave us a message", intro: "A question about a model, sizes or delivery? Write to us and we will get back to you soon.", name: "Name", phone: "Phone", email: "Email (optional)", message: "How can we help?",
+      send: "Send", sending: "Sending...", sent: "Thank you! Your message is in and we will get back to you soon.", another: "Send another message",
+      failed: "The message could not be sent. You can send it on WhatsApp:", waSend: "Send on WhatsApp", waIntro: "Hello, a message from the Betak site:",
+      privacy: "We keep these details only to get back to you. More in our ", otherWays: "Or talk to us directly",
+    },
     paid: { title: "Thank you for your order!", text: (number: string) => `Order number ${number} is in.`, more: "Once the payment is complete, UPay sends you a confirmation. We will get back to you to arrange delivery.", home: "Back to the home page" },
     orderSaved: (number: number) => `Your order is in, number ${number}. We continue on WhatsApp.`, orderPrivacy: "We keep these details only to handle your order. More in our ",
     admin: {
@@ -174,6 +188,8 @@ export const TEXT = {
       payment: "Payment", phone2: "Other phone", address: "Address", elevator: "Lift", yes: "Yes", no: "No", reference: "Reference", installments: (count: string) => `${count} instalments`,
       payStatus: { phone: "Phone order", pending: "Card: not paid yet", reported: "Card: UPay reported paid", failed: "Card: payment failed", "amount-mismatch": "Card: a different amount was paid" } as Record<string, string>,
       payCheck: "Before shipping, confirm the payment in UPay's system.", test: "Test mode",
+      tabOrders: "Orders", tabMessages: "Site messages", messagesTitle: "Contact form messages", messagesLoading: "Loading messages...", messagesEmpty: "No messages to show.", unreadMessagesOnly: "Unread messages only",
+      messagesCount: (shown: number, unread: number) => `${shown} messages, ${unread} unread`, message: "Message", markMessageRead: (name: string) => `Mark the message from ${name} as read`, searchMessages: "Search by name, phone or a word in the message",
     },
   },
 };

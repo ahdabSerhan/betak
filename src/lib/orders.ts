@@ -102,7 +102,7 @@ export function addressLine(address: Address | undefined, t: { entrance: string;
 
 export type AdminStatus = "ok" | "signed-out" | "not-allowed" | "error";
 
-async function adminFetch(path: string, token: string, init: RequestInit = {}) {
+export async function adminFetch(path: string, token: string, init: RequestInit = {}) {
   const response = await fetch(path, { ...init, headers: { "content-type": "application/json", authorization: `Bearer ${token}` } });
   const status: AdminStatus = response.ok ? "ok" : response.status === 401 ? "signed-out" : response.status === 403 ? "not-allowed" : "error";
   return { status, data: response.ok ? await response.json() : null };
