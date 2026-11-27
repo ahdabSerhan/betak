@@ -425,82 +425,98 @@
     {
      "code": "Dallas-601",
      "file": "dallas-dallas-601.webp",
-     "color": "#d5d0c4"
+     "color": "#d5d0c4",
+     "zoom": true
     },
     {
      "code": "Dallas-602",
      "file": "dallas-dallas-602.webp",
-     "color": "#d7cfb9"
+     "color": "#d7cfb9",
+     "zoom": true
     },
     {
      "code": "Dallas-603",
      "file": "dallas-dallas-603.webp",
-     "color": "#b5a48c"
+     "color": "#b5a48c",
+     "zoom": true
     },
     {
      "code": "Dallas-604",
      "file": "dallas-dallas-604.webp",
-     "color": "#aa9f90"
+     "color": "#aa9f90",
+     "zoom": true
     },
     {
      "code": "Dallas-605",
      "file": "dallas-dallas-605.webp",
-     "color": "#76654e"
+     "color": "#76654e",
+     "zoom": true
     },
     {
      "code": "Dallas-606",
      "file": "dallas-dallas-606.webp",
-     "color": "#3b1709"
+     "color": "#3b1709",
+     "zoom": true
     },
     {
      "code": "Dallas-607",
      "file": "dallas-dallas-607.webp",
-     "color": "#ac7723"
+     "color": "#ac7723",
+     "zoom": true
     },
     {
      "code": "Dallas-608",
      "file": "dallas-dallas-608.webp",
-     "color": "#554b30"
+     "color": "#554b30",
+     "zoom": true
     },
     {
      "code": "Dallas-609",
      "file": "dallas-dallas-609.webp",
-     "color": "#424537"
+     "color": "#424537",
+     "zoom": true
     },
     {
      "code": "Dallas-610",
      "file": "dallas-dallas-610.webp",
-     "color": "#76786c"
+     "color": "#76786c",
+     "zoom": true
     },
     {
      "code": "Dallas-611",
      "file": "dallas-dallas-611.webp",
-     "color": "#b3aea2"
+     "color": "#b3aea2",
+     "zoom": true
     },
     {
      "code": "Dallas-612",
      "file": "dallas-dallas-612.webp",
-     "color": "#979797"
+     "color": "#979797",
+     "zoom": true
     },
     {
      "code": "Dallas-613",
      "file": "dallas-dallas-613.webp",
-     "color": "#6d6b69"
+     "color": "#6d6b69",
+     "zoom": true
     },
     {
      "code": "Dallas-614",
      "file": "dallas-dallas-614.webp",
-     "color": "#0b1834"
+     "color": "#0b1834",
+     "zoom": true
     },
     {
      "code": "Dallas-615",
      "file": "dallas-dallas-615.webp",
-     "color": "#1e232c"
+     "color": "#1e232c",
+     "zoom": true
     },
     {
      "code": "Dallas-616",
      "file": "dallas-dallas-616.webp",
-     "color": "#131216"
+     "color": "#131216",
+     "zoom": true
     }
    ]
   },
