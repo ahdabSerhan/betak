@@ -114,6 +114,8 @@ then goes in Secret Manager (`--update-secrets UPAY_KEY=upay-key:latest`), never
 
 ### The store's orders page
 
+`/admin` is the dashboard (orders, revenue, average order and messages since a chosen day), with links to the pages below.
+
 `/admin/orders` lists the orders (newest first, up to 300) with WhatsApp, phone and email links, a "read"
 checkbox, search, an unread filter and export to Excel. It is linked from nowhere, never indexed, and the
 server hands orders only to a Google account listed in `ADMIN_EMAILS` (`server/admin-auth.mjs`).

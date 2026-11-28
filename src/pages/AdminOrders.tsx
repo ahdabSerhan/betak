@@ -355,7 +355,41 @@ function TrackingPanel({ status, items, onHandled, onRefresh }: { status: string
 
 // The store's private pages: /admin/orders (orders and messages) and /admin/checkouts (order tracking).
 // Only the Google accounts in ADMIN_EMAILS see anything; the sign-in is shared by both pages.
-export function AdminOrders({ page = "orders" }: { page?: "orders" | "checkouts" }) {
+// The first day of the dashboard's default range: 30 days back, as yyyy-mm-dd for the date field.
+const DASHBOARD_DAYS = 30;
+const daysAgo = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+
+// The business at a glance: orders, revenue and messages since a chosen day.
+function Dashboard({ orders, messages, tracked }: { orders: Order[]; messages: Message[]; tracked: Tracked[] }) {
+  const { t } = useShop();
+  const a = t.admin;
+  const [from, setFrom] = useState(() => daysAgo(DASHBOARD_DAYS));
+  const since = (time: string) => time.slice(0, 10) >= from;
+  const recent = orders.filter((order) => since(order.createdAt));
+  const total = recent.reduce((sum, order) => sum + order.total, 0);
+  const unfinished = tracked.filter((item) => !DONE_STAGES.includes(item.stage) && since(item.time)).length;
+  const tiles: [string, string][] = [
+    [a.dashOrders, String(recent.length)],
+    [a.dashTotal, money(total)],
+    [a.dashAverage, money(recent.length ? Math.round(total / recent.length) : 0)],
+    [a.dashMessages, String(messages.filter((message) => since(message.createdAt)).length)],
+    [a.dashUnread, String(orders.filter((order) => !order.read).length)],
+    [a.dashUnfinished, String(unfinished)],
+  ];
+
+  return (
+    <>
+      <label className="admin-from">{a.dashFrom} <input type="date" value={from} max={daysAgo(0)} onChange={(event) => setFrom(event.target.value || daysAgo(DASHBOARD_DAYS))} /></label>
+      <dl className="admin-tiles">
+        {tiles.map(([label, value]) => <div key={label}><dd>{value}</dd><dt>{label}</dt></div>)}
+      </dl>
+    </>
+  );
+}
+
+type AdminPage = "dashboard" | "orders" | "checkouts";
+
+export function AdminOrders({ page = "orders" }: { page?: AdminPage }) {
   const { t } = useShop();
   const a = t.admin;
   const [token, setToken] = useState(storedToken);
@@ -469,10 +503,12 @@ export function AdminOrders({ page = "orders" }: { page?: "orders" | "checkouts"
   return (
     <section className="wrap admin-orders">
       <header className="admin-head">
-        <h1>{page === "checkouts" ? a.trackTitle : a.title}</h1>
+        <h1>{page === "checkouts" ? a.trackTitle : page === "dashboard" ? a.dashTitle : a.title}</h1>
         {token && (
           <div className="admin-head-actions">
-            <a className="btn ghost small" href={page === "checkouts" ? "/admin/orders" : "/admin/checkouts"}>{page === "checkouts" ? a.title : a.trackTitle}</a>
+            <a className="btn ghost small" href="/admin" aria-current={page === "dashboard" ? "page" : undefined}>{a.dashTitle}</a>
+            <a className="btn ghost small" href="/admin/orders" aria-current={page === "orders" ? "page" : undefined}>{a.title}</a>
+            <a className="btn ghost small" href="/admin/checkouts" aria-current={page === "checkouts" ? "page" : undefined}>{a.trackTitle}</a>
             <button className="btn ghost small" onClick={signOut}>{a.signOut}</button>
           </div>
         )}
@@ -485,6 +521,8 @@ export function AdminOrders({ page = "orders" }: { page?: "orders" | "checkouts"
           <p className="muted"><a href={`mailto:${STORE.email}`}>{STORE.email}</a></p>
         </div>
       )}
+
+      {token && page === "dashboard" && (status === "ok" ? <Dashboard orders={orders} messages={messages} tracked={tracked} /> : <p className="muted">{status === "loading" ? a.messagesLoading : status === "not-allowed" ? a.notAllowed : a.error}</p>)}
 
       {token && page === "checkouts" && <TrackingPanel status={trackedStatus} items={tracked} onHandled={onHandled} onRefresh={() => { load(); loadCheckouts(); }} />}
 

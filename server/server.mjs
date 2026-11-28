@@ -329,7 +329,7 @@ createServer((request, response) => {
   // One address per page: /sofas/ and /sofas are the same page, so the slash is dropped.
   if (pathname.length > 1 && pathname.endsWith("/")) return redirect(response, pathname.slice(0, -1) + url.search);
   // The admin pages and the after-payment page are the site's own app, never indexed and never cached.
-  if (pathname === "/admin/orders" || pathname === "/admin/checkouts" || pathname === "/paid") {
+  if (pathname === "/admin" || pathname === "/admin/orders" || pathname === "/admin/checkouts" || pathname === "/paid") {
     response.writeHead(200, { "content-type": CONTENT_TYPES[".html"], "cache-control": "no-store", "x-robots-tag": "noindex, nofollow" });
     return createReadStream(join(SITE_ROOT, "index.html")).pipe(response);
   }

@@ -993,3 +993,12 @@ html.a11y-grayscale { filter: grayscale(1); }
 .search-results a:hover img, .search-results a:focus-visible img { transform: scale(1.03); }
 .search-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 @media (max-width: 760px) { .search { padding: 18px 16px 20px; } .search-bar .btn { padding-inline: 14px; } .search-open > span:not(.search-ai-tag) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } .search-results { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Admin dashboard: the business at a glance. */
+.admin-from { display: inline-flex; align-items: center; gap: 10px; margin-block: 16px; font-weight: 600; }
+.admin-from input { font: inherit; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; }
+.admin-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin: 0; }
+.admin-tiles div { display: grid; gap: 4px; padding: 22px; text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.admin-tiles dd { margin: 0; font-size: 30px; font-weight: 700; }
+.admin-tiles dt { color: var(--muted); }
+.admin-head-actions [aria-current="page"] { background: var(--ink); color: var(--cream); }

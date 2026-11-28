@@ -85,7 +85,7 @@ export const TEXT = {
     },
     paid: { title: "תודה על ההזמנה!", text: (number: string) => `ההזמנה מספר ${number} התקבלה.`, more: "כשהתשלום מושלם, UPay שולחים לכם אישור. נחזור אליכם לתיאום המשלוח.", home: "חזרה לדף הבית" },
     orderSaved: (number: number) => `ההזמנה נרשמה, מספר ${number}. ממשיכים איתכם בוואטסאפ.`, orderPrivacy: "הפרטים נשמרים אצלנו כבר בזמן המילוי, רק לטיפול בהזמנה. פרטים נוספים ב",
-    admin: {
+    admin: { dashTitle: "לוח בקרה", dashFrom: "מתאריך", dashOrders: "כמות ההזמנות", dashTotal: "סך ההזמנות", dashAverage: "ממוצע להזמנה", dashMessages: "פניות מהאתר", dashUnread: "הזמנות שלא נקראו", dashUnfinished: "הזמנות שלא הושלמו",
       title: "ניהול הזמנות", signIn: "התחברו עם חשבון Google של העסק כדי לראות את ההזמנות.", signOut: "יציאה", notAllowed: "החשבון הזה לא מורשה לראות הזמנות.", notReady: "דף ההזמנות עדיין לא הוגדר בשרת.",
       loading: "טוען הזמנות...", error: "לא הצלחנו לטעון את ההזמנות. נסו שוב.", empty: "אין הזמנות להצגה.", unreadOnly: "רק הזמנות שלא נקראו", search: "חיפוש לפי שם, טלפון או מספר הזמנה", export: "ייצוא לאקסל", refresh: "רענון",
       count: (shown: number, unread: number) => `${shown} הזמנות, ${unread} לא נקראו`, number: "מספר הזמנה", date: "תאריך", customer: "לקוח", contact: "יצירת קשר", items: "פריטים", total: "סך הכול", read: "נקרא", whatsapp: "וואטסאפ", phone: "טלפון", email: "מייל", note: "הערה", markRead: (number: number) => `סימון הזמנה ${number} כנקראה`,
@@ -188,7 +188,7 @@ export const TEXT = {
     },
     paid: { title: "Thank you for your order!", text: (number: string) => `Order number ${number} is in.`, more: "Once the payment is complete, UPay sends you a confirmation. We will get back to you to arrange delivery.", home: "Back to the home page" },
     orderSaved: (number: number) => `Your order is in, number ${number}. We continue on WhatsApp.`, orderPrivacy: "We keep these details, from the moment you type them, only to handle your order. More in our ",
-    admin: {
+    admin: { dashTitle: "Dashboard", dashFrom: "From", dashOrders: "Orders", dashTotal: "Orders total", dashAverage: "Average order", dashMessages: "Contact messages", dashUnread: "Unread orders", dashUnfinished: "Unfinished orders",
       title: "Orders", signIn: "Sign in with the store's Google account to see the orders.", signOut: "Sign out", notAllowed: "This account may not see orders.", notReady: "The orders page is not set up on the server yet.",
       loading: "Loading orders...", error: "The orders could not be loaded. Try again.", empty: "No orders to show.", unreadOnly: "Unread orders only", search: "Search by name, phone or order number", export: "Export to Excel", refresh: "Refresh",
       count: (shown: number, unread: number) => `${shown} orders, ${unread} unread`, number: "Order", date: "Date", customer: "Customer", contact: "Contact", items: "Items", total: "Total", read: "Read", whatsapp: "WhatsApp", phone: "Phone", email: "Email", note: "Note", markRead: (number: number) => `Mark order ${number} as read`,

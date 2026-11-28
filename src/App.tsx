@@ -73,7 +73,7 @@ export function App() {
   if (route === "admin") {
     return (
       <>
-        <main id="main" tabIndex={-1}><AdminOrders page={window.location.pathname.startsWith("/admin/checkouts") ? "checkouts" : "orders"} /></main>
+        <main id="main" tabIndex={-1}><AdminOrders page={window.location.pathname.startsWith("/admin/checkouts") ? "checkouts" : window.location.pathname.startsWith("/admin/orders") ? "orders" : "dashboard"} /></main>
         <AccessibilityMenu />
       </>
     );
