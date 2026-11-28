@@ -32,9 +32,9 @@ export function Header({ route }: { route: string }) {
               <img src={asset("img/logo.webp")} alt="Betak Furniture Design" />
             </a>
             <div className="tools">
-              <button className="icon-btn search-open" onClick={() => setSearching(true)} aria-label={t.search.label}>
+              <button className="icon-btn search-open" onClick={() => setSearching(true)}>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 0 1 5.2 10.4l4.4 4.4-1.4 1.4-4.4-4.4A6.5 6.5 0 1 1 10.5 4Zm0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z" /></svg>
-                <span>{t.search.open}</span> <span className="search-ai-tag" aria-hidden="true">AI</span>
+                <span>{t.search.open}</span> <span className="search-ai-tag">AI</span>
               </button>
               <a className="icon-btn" href={href("about")}>{t.about}</a>
               <a className="icon-btn" href={href("contact")}>{t.contact}</a>
