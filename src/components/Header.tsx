@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { CATEGORIES } from "../data/catalog";
+import { SearchDialog } from "./SearchDialog";
 import { useShop } from "../state/ShopContext";
 import { asset } from "../lib/asset";
 import { href } from "../lib/routes";
@@ -6,6 +8,19 @@ import { href } from "../lib/routes";
 export function Header({ route }: { route: string }) {
   const { t, lang, toggleLang, saved, cartCount, openCart } = useShop();
   const current = (id: string) => (route === id ? "page" : undefined);
+  const [searching, setSearching] = useState(false);
+
+  // Ctrl+K or Cmd+K opens the search from anywhere.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setSearching(true);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
     <>
@@ -17,6 +32,10 @@ export function Header({ route }: { route: string }) {
               <img src={asset("img/logo.webp")} alt="Betak Furniture Design" />
             </a>
             <div className="tools">
+              <button className="icon-btn search-open" onClick={() => setSearching(true)} aria-label={t.search.label}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 0 1 5.2 10.4l4.4 4.4-1.4 1.4-4.4-4.4A6.5 6.5 0 1 1 10.5 4Zm0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z" /></svg>
+                <span>{t.search.open}</span> <span className="search-ai-tag" aria-hidden="true">AI</span>
+              </button>
               <a className="icon-btn" href={href("about")}>{t.about}</a>
               <a className="icon-btn" href={href("contact")}>{t.contact}</a>
               <a className="icon-btn" href={href("saved")}>♡ {t.saved} <span className="count">{saved.length}</span></a>
@@ -32,6 +51,7 @@ export function Header({ route }: { route: string }) {
           </nav>
         </div>
       </header>
+      {searching && <SearchDialog route={route} onClose={() => setSearching(false)} />}
     </>
   );
 }

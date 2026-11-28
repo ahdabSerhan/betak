@@ -24,7 +24,7 @@ interface Turn extends ChatMessage {
 }
 
 // The name of a page the agent links to, e.g. "מיטות והדומים" or "מדיניות משלוחים".
-function pageLabel(route: string, t: ReturnType<typeof useShop>["t"], lang: "he" | "en"): string {
+export function pageLabel(route: string, t: ReturnType<typeof useShop>["t"], lang: "he" | "en"): string {
   const category = CATEGORIES.find((item) => item.id === route);
   if (category) return category[lang];
   if (route === "home") return t.showroomLabel;

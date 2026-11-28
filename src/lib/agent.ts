@@ -34,6 +34,8 @@ interface AgentContext {
   viewing?: Product;
   // The page the visitor is on right now.
   route: string;
+  // Search: answer from the whole catalog and suggest more products.
+  search?: boolean;
 }
 
 type Ask = (system: string, messages: ChatMessage[]) => Promise<string>;
@@ -41,9 +43,13 @@ type Ask = (system: string, messages: ChatMessage[]) => Promise<string>;
 const AGENT_ENDPOINT = "/api/designer";
 const MAX_PIECES = 6;
 const MAX_QUANTITY = 8;
+const MAX_SEARCH_RESULTS = 12;
 
 // Like the designer, the agent offers pieces that can be shown standing in the room (any rug works).
-const CATALOG = PRODUCTS.filter((product) => product.category === "rugs" || cutoutOf(product)).map((product) => `${product.id}|${product.category}|${product.name.en}|${product.name.he}|${product.price}`).join("\n");
+const catalogLine = (product: Product) => `${product.id}|${product.category}|${product.name.en}|${product.name.he}|${product.price}`;
+const CATALOG = PRODUCTS.filter((product) => product.category === "rugs" || cutoutOf(product)).map(catalogLine).join("\n");
+// Search looks through every product, also those that cannot be shown standing in a room.
+const FULL_CATALOG = PRODUCTS.map(catalogLine).join("\n");
 
 // What the store says about one product, for the AI.
 function productFacts(product: Product): string[] {
@@ -55,12 +61,13 @@ function productFacts(product: Product): string[] {
   ];
 }
 
-function instructions({ pieces, budget, dimensions, lang, viewing, route }: AgentContext): string {
+function instructions({ pieces, budget, dimensions, lang, viewing, route, search }: AgentContext): string {
   const current = pieces.map((piece) => `${piece.product.id} x${piece.quantity}`).join(", ") || "none";
   return [
     "You are the sales and interior design assistant of Betak, a furniture store in Israel. You help visitors find furniture, answer questions and design rooms, using only Betak's catalog.",
     "Catalog, one product per line as id|category|English name|Hebrew name|price in ILS:",
-    CATALOG,
+    search ? FULL_CATALOG : CATALOG,
+    search ? `The visitor typed this into the site's search box. Find the products that best match it (up to ${MAX_SEARCH_RESULTS}), best match first, and say in one sentence why they fit.` : "",
     `Products suggested so far (product id x quantity): ${current}. Budget for a room: ${budget} ILS.`,
     `The room is ${dimensions.wall} m along its main wall and ${dimensions.depth} m deep, unless the visitor gives other measurements.`,
     viewing ? `The visitor is looking at product ${viewing.id} (${viewing.name.en}) right now.` : "",
@@ -115,7 +122,7 @@ function toDimensions(wall?: number | null, depth?: number | null): RoomDimensio
   return { wall: clamp(wall, WALL_RANGE), depth: clamp(depth, DEPTH_RANGE) };
 }
 
-function parseReply(text: string): AgentReply {
+function parseReply(text: string, limit = MAX_PIECES): AgentReply {
   const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
   const answer = JSON.parse(json) as { message?: string; pieces?: { id: number; quantity?: number }[] | null; budget?: number | null; wall?: number | null; depth?: number | null; page?: unknown };
   if (!answer.message) throw new Error("The agent's answer had no message");
@@ -128,7 +135,7 @@ function parseReply(text: string): AgentReply {
 
   return {
     message: answer.message,
-    pieces: pieces.length > 0 ? pieces.slice(0, MAX_PIECES) : null,
+    pieces: pieces.length > 0 ? pieces.slice(0, limit) : null,
     budget: typeof answer.budget === "number" && answer.budget > 0 ? answer.budget : null,
     dimensions: toDimensions(answer.wall, answer.depth),
     // Only real pages of the site; anything else the model names is dropped.
@@ -159,7 +166,7 @@ export async function askAgent(messages: ChatMessage[], context: AgentContext): 
   const system = instructions(context);
   try {
     const ask = (await previewAsk()) ?? serverAsk;
-    return parseReply(await ask(system, messages));
+    return parseReply(await ask(system, messages), context.search ? MAX_SEARCH_RESULTS : MAX_PIECES);
   } catch {
     return rulesReply(messages[messages.length - 1].content, context);
   }
