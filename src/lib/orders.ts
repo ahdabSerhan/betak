@@ -111,9 +111,15 @@ export async function adminFetch(path: string, token: string, init: RequestInit 
   return { status, data: response.ok ? await response.json() : null };
 }
 
-export async function adminConfig(): Promise<{ clientId: string; ready: boolean }> {
+export async function adminConfig(): Promise<{ clientId: string; ready: boolean; password?: boolean }> {
   const response = await fetch("/api/admin/config");
   return response.ok ? response.json() : { clientId: "", ready: false };
+}
+
+// Signs in with the store's username and password; returns the session token, or why it failed.
+export async function adminLogin(username: string, password: string): Promise<{ token?: string; error?: "wrong" | "locked" | "off" }> {
+  const response = await fetch("/api/admin/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username, password }) }).catch(() => null);
+  return response ? response.json() : { error: "wrong" };
 }
 
 export async function listOrders(token: string): Promise<{ status: AdminStatus; orders: Order[] }> {

@@ -6,7 +6,7 @@ import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { adminConfig, checkAdmin } from "./admin-auth.mjs";
+import { adminConfig, checkAdmin, passwordSignIn } from "./admin-auth.mjs";
 import { cleanOrder, createOrderStore, linePrice } from "./orders.mjs";
 import { cleanMessage, createMessageStore } from "./messages.mjs";
 import { cleanCheckout, createCheckoutStore, validCheckoutId } from "./checkouts.mjs";
@@ -196,6 +196,13 @@ const withoutToken = (order) => (order.payment ? { ...order, payment: { ...order
 // The store's own admin page: list the orders, unfinished checkouts and contact messages, and mark them.
 async function handleAdmin(request, response, pathname) {
   if (pathname === "/api/admin/config") return sendJson(response, 200, adminConfig());
+  if (pathname === "/api/admin/login" && request.method === "POST") {
+    // Cloud Run puts the visitor's address first in x-forwarded-for.
+    const address = String(request.headers["x-forwarded-for"] ?? request.socket.remoteAddress ?? "").split(",")[0].trim();
+    const { username, password } = await readJson(request).catch(() => ({}));
+    const result = passwordSignIn(address, username, password);
+    return sendJson(response, result.token ? 200 : result.error === "locked" ? 429 : 401, result);
+  }
   const access = await checkAdmin(request);
   if (access !== "ok") return sendJson(response, access === "signed-out" ? 401 : 403, { error: access });
   try {

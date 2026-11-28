@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { STORE } from "../data/store";
 import { money } from "../lib/format";
 import { listCheckouts, markHandled, type Checkout } from "../lib/checkouts";
 import { listMessages, markMessageRead, type Message } from "../lib/messages";
-import { addressLine, adminConfig, listOrders, markRead, type AdminStatus, type Order } from "../lib/orders";
+import { addressLine, adminConfig, adminLogin, listOrders, markRead, type AdminStatus, type Order } from "../lib/orders";
 import type { Text } from "../i18n/text";
 import { useShop } from "../state/ShopContext";
 
@@ -389,6 +389,34 @@ function Dashboard({ orders, messages, tracked }: { orders: Order[]; messages: M
 
 type AdminPage = "dashboard" | "orders" | "checkouts";
 
+// Sign-in with the store's username and password, for when Google sign-in is not used.
+function PasswordForm({ onSignIn }: { onSignIn: (token: string) => void }) {
+  const { t } = useShop();
+  const a = t.admin;
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    setBusy(true);
+    const result = await adminLogin(username, password);
+    setBusy(false);
+    if (result.token) return onSignIn(result.token);
+    setError(result.error === "locked" ? a.loginLocked : a.loginWrong);
+  };
+
+  return (
+    <form className="admin-login" onSubmit={onSubmit}>
+      <label>{a.loginUser} <input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" required /></label>
+      <label>{a.loginPassword} <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required /></label>
+      {error && <p className="admin-login-error" role="alert">{error}</p>}
+      <button className="btn" disabled={busy}>{a.loginButton}</button>
+    </form>
+  );
+}
+
 export function AdminOrders({ page = "orders" }: { page?: AdminPage }) {
   const { t } = useShop();
   const a = t.admin;
@@ -403,6 +431,7 @@ export function AdminOrders({ page = "orders" }: { page?: AdminPage }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messagesStatus, setMessagesStatus] = useState<AdminStatus | "loading">("loading");
   const buttonRef = useRef<HTMLDivElement>(null);
+  const [passwordLogin, setPasswordLogin] = useState(false);
 
   const signIn = useCallback((next: string) => {
     keepToken(next);
@@ -414,9 +443,10 @@ export function AdminOrders({ page = "orders" }: { page?: AdminPage }) {
     if (token) return;
     let cancelled = false;
     (async () => {
-      const config = await adminConfig().catch(() => ({ clientId: "", ready: false }));
+      const config = await adminConfig().catch(() => ({ clientId: "", ready: false, password: false }));
       if (cancelled) return;
-      if (!config.ready) return setStatus("not-ready");
+      setPasswordLogin(Boolean(config.password));
+      if (!config.ready) return setStatus(config.password ? "signed-out" : "not-ready");
       setStatus("signed-out");
       await loadGoogle();
       if (cancelled || !buttonRef.current || !window.google) return;
@@ -516,7 +546,8 @@ export function AdminOrders({ page = "orders" }: { page?: AdminPage }) {
 
       {!token && (
         <div className="admin-signin">
-          <p>{status === "not-ready" ? a.notReady : status === "error" ? a.error : a.signIn}</p>
+          <p>{status === "not-ready" ? a.notReady : status === "error" ? a.error : passwordLogin ? a.loginIntro : a.signIn}</p>
+          {passwordLogin && <PasswordForm onSignIn={signIn} />}
           <div ref={buttonRef} />
           <p className="muted"><a href={`mailto:${STORE.email}`}>{STORE.email}</a></p>
         </div>

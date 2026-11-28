@@ -1002,3 +1002,8 @@ html.a11y-grayscale { filter: grayscale(1); }
 .admin-tiles dd { margin: 0; font-size: 30px; font-weight: 700; }
 .admin-tiles dt { color: var(--muted); }
 .admin-head-actions [aria-current="page"] { background: var(--ink); color: var(--cream); }
+/* Admin sign-in with a username and password. */
+.admin-login { display: grid; gap: 12px; width: 100%; }
+.admin-login label { display: grid; gap: 4px; font-weight: 600; }
+.admin-login input { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+.admin-login-error { margin: 0; color: #a3221b; font-weight: 600; }

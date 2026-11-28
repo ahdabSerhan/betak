@@ -136,6 +136,10 @@ gcloud projects add-iam-policy-binding $PROJECT --member serviceAccount:<run ser
   `gcloud run services update betak-website --region me-west1 --project $PROJECT --update-env-vars GOOGLE_CLIENT_ID=<client id>,ADMIN_EMAILS=<gmail>`
   (several emails: separate with `\,` or use `--env-vars-file`).
 
+- Or sign in with a username and password (kept on the service, never in the code):
+  `gcloud run services update betak-website --region me-west1 --project $PROJECT --update-env-vars ADMIN_USER=<username>,ADMIN_PASSWORD=<password>`
+  The page then shows a sign-in form. A session lasts 12 hours; five wrong tries lock an address for 15 minutes.
+
 ### Order tracking
 
 `/admin/checkouts` (same Google sign-in, linked only from `/admin/orders`) lists every order and every checkout that
